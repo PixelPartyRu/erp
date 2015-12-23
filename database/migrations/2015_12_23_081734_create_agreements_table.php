@@ -19,7 +19,7 @@ class CreateAgreementsTable extends Migration
             $table->boolean('account')->default(false);
             $table->date('penalty');
             $table->boolean('second_pay')->default(false);
-            $table->integer('code_1c');
+            $table->string('code_1c',25);
             $table->string('description',100);
             $table->boolean('active')->default(true);
 

@@ -16,11 +16,11 @@ class CreateRelationsTable extends Migration
             $table->bigIncrements('id');
             $table->boolean('active')->default(true);
             $table->float('rpp');
-            $table->string('confedential_factoring',10);
-            $table->string('registry',50)->default(false);
+            $table->boolean('confedential_factoring')->default(false);
+            $table->float('registry',50)->default(false);
 
             $table->integer('deferment');
-            $table->date('deferment_start');
+            $table->boolean('deferment_start')->default(false);
             $table->string('deferment_type',10);
 
             $table->integer('waiting_period');

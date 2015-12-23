@@ -14,10 +14,10 @@ class CreateContractsTable extends Migration
     {
         Schema::create('contracts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->integer('code');
+            $table->string('code',25);
             $table->string('name',25);
-            $table->integer('code_1c');
-            $table->integer('gd_debitor_1c');
+            $table->string('code_1c',25);
+            $table->string('gd_debitor_1c',25);
             $table->string('description',100);
             
             $table->timestamps();
