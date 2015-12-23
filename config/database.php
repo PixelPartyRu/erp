@@ -67,9 +67,9 @@ return [
         'pgsql' => [
             'driver'   => 'pgsql',
             'host'     => env('DB_HOST', 'localhost'),
-            'database'  => 'factor_database',
-            'username'  => 'postgres',
-            'password'  => '123456a',
+            'database' => env('DB_DATABASE', 'factor_database'),
+            'username' => env('DB_USERNAME', 'oleg'),
+            'password' => env('DB_PASSWORD', 'Afterlife244457'),
             'charset'  => 'utf8',
             'prefix'   => '',
             'schema'   => 'public',
