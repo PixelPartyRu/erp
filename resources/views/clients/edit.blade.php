@@ -40,7 +40,6 @@
 			  {!! Form::text('description') !!}
 			  {{ Form::radio('active', 'true') }}
 			  {{ Form::radio('active', 'false') }}
-			  {!! Form::date('penalty') !!}
 			  {!! Form::date('date_end') !!}
 			  {!! Form::hidden('client_id',$client->id) !!}
 			  {!! Form::submit('Сохранить') !!}
@@ -50,11 +49,51 @@
 	</div>
 	<div class="panel panel-success">
 		<div class="panel-heading">Все договора</div>
-			@forelse($agreements as $agreement)
-				<p><a href="/agreement/{{ $agreement->id }}/edit">{{$agreement->code }}</a></p>
-			@empty
-				<p>Договора отсутствуют</p>
-			@endforelse 
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table class="table table-striped" id="client-table">
+				  <thead>
+				  	<tr>
+				  		<th>Код</th>
+				  		<th>Тип</th>
+				  		<th>Счет</th>
+				  		<th>Штраф</th>
+				  		<th>Начисление второго платежа</th>
+				  		<th>Код в 1С</th>
+				  		<th>Описание</th>
+				  		<th>Активность</th>
+				  		<th>Дата создания</th>
+				  		<th>Дата окончания</th>
+				  		<th></th>
+				  		<th></th>
+				  	</tr>
+				  </thead>
+				  <tbody>
+				  	@forelse($agreements as $agreements)
+						<tr>
+							<td>{{ $agreements->code }}</td>
+							<td>{{ $agreements->type }}</td>
+							<td>{{ $agreements->account }}</td>
+							<td>{{ $agreements->penalty }}</td>
+							<td>{{ $agreements->second_pay }}</td>
+							<td>{{ $agreements->code_1c }}</td>
+							<td>{{ $agreements->description }}</td>
+							<td>{{ $agreements->active }}</td>
+							<td>{{ $agreements->created_at }}</td>
+							<td>{{ $agreements->date_end }}</td>
+							<td><a href="/agreement/{{ $agreements->id }}/edit"><i class="fa fa-pencil"></i></a></td>
+							<td>
+								{{ Form::model($agreements, array('route' => array('agreement.destroy', $agreements->id), 'method' => 'DELETE')) }}
+									{{ Form::button('<i class="fa fa-close"></i>', array('class'=>'', 'type'=>'submit')) }}
+								{{ Form::close() }}
+							</td>
+						</tr>
+					@empty
+						<p>Договора отсутствуют</p>
+					@endforelse
+				  </tbody>
+				</table>
+			</div>
 		</div>
 	</div>
 @stop
