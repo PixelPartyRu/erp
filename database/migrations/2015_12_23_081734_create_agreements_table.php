@@ -24,7 +24,7 @@ class CreateAgreementsTable extends Migration
             $table->boolean('active')->default(true);
 
             $table->integer('client_id')->unsigned();
-            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');;
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
 
             $table->timestamps();
             $table->date('date_end');

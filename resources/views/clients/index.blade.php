@@ -2,29 +2,86 @@
 
 @section('title', 'Заголовок страницы')
 
-@section('sidebar')
-    @
-
-    <p>Этот элемент будет добавлен к главному сайдбару.</p>
+@section('stylesheet')
+  	<link rel="stylesheet" type="text/css" href="/assets/css/clients.css">
 @stop
 
 @section('content')
-    <p>
-		{!! Form::open(array('action' => 'ClientController@store')) !!}
+	<div class="panel panel-success">
+		<div class="panel-heading">Заполните данные клиента</div>
+		<div class="panel-body">
+				{!! Form::open(array('action' => 'ClientController@store')) !!}
+					<div class="row">
+						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<label for="InputEmail1">Полное наименование:</label>
+						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'InputEmail1')) !!}
+						</div>		
+						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<label for="InputEmail2">Наименование:</label>
+						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'InputEmail2')) !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
+							<label for="InputEmail3">ИНН:</label>
+						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'InputEmail3')) !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
+							<label for="InputEmail4">КПП:</label>
+						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4')) !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
+							<label for="InputEmail5">КПП:</label>
+						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5')) !!}
+						</div>
+						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container'>
+						  	{!! Form::submit('Добавить',array('class' => 'btn btn-success')) !!}
+						</div>
+						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							{!! Session::get('message') !!}
+						</div>
+					</div>
+				{!! Form::close() !!}
+  		</div>
+	</div>
+	<div class="panel panel-info">
+		<div class="panel-heading">Наши клиенты</div>
+		<div class="panel-body">
+			<div class="table-responsive">
+				<table class="table table-striped" id="client-table">
+				  <thead>
+				  	<tr>
+				  		<th>Полное наименование</th>
+				  		<th>Наименование</th>
+				  		<th>ИНН</th>
+				  		<th>КПП</th>
+				  		<th>ОГРН</th>
+				  		<th></th>
+				  		<th></th>
+				  	</tr>
+				  </thead>
+				  <tbody>
+				  	@forelse($clients as $client)
+						<tr>
+							<td>{{ $client->full_name }}</td>
+							<td>{{ $client->name }}</td>
+							<td>{{ $client->inn }}</td>
+							<td>{{ $client->kpp }}</td>
+							<td>{{ $client->ogrn }}</td>
+							<td><a href="/client/{{ $client->id }}/edit"><i class="fa fa-pencil"></i></a></td>
+							<td>
+								{{ Form::model($client, array('route' => array('client.destroy', $client->id), 'method' => 'DELETE')) }}
+									{{ Form::button('<i class="fa fa-close"></i>', array('class'=>'', 'type'=>'submit')) }}
+								{{ Form::close() }}
+							</td>
+						</tr>
+					@empty
+						<p>Клиентов нет</p>
+					@endforelse
+				  </tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 
-		  {!! Form::text('full_name', @$full_name) !!}
-		  {!! Form::text('name', @$name) !!}
-		  {!! Form::text('inn', @$inn) !!}
-		  {!! Form::text('kpp', @$kpp) !!}
-		  {!! Form::text('ogrn', @$ogrn) !!}
-
-		  {!! Form::submit('Send') !!}
-
-		{!! Form::close() !!}
-    	@forelse($clients as $client)
-      <li><a href="/client/{{ $client->id }}/edit">{{ $client->full_name }}</a></li>
-		@empty
-		      <p>No users</p>
-		@endforelse
-    </p>
 @stop
+
+<!--, array('class' => 'btn btn-warning'-->

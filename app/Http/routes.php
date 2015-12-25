@@ -15,6 +15,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('client', 'ClientController');
+Route::resource('debtor', 'DebtorController');
+Route::resource('relation', 'RelationController');
+Route::resource('agreement', 'AgreementController');
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes

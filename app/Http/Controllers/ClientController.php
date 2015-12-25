@@ -14,12 +14,13 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
 use App\Client;
+use App\Agreement;
 
 class ClientController extends Controller
 {
     public function index()
-    {	
-    	$clients=Client::all();
+    {   
+        $clients=Client::all();
         return view('clients.index', ['clients' => $clients]); 
     }
 
@@ -28,7 +29,7 @@ class ClientController extends Controller
         // validate
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
-        	'full_name'  => 'required',
+            'full_name'  => 'required',
             'name'       => 'required',
             'inn'       => 'required',
             'kpp'       => 'required',
@@ -51,29 +52,24 @@ class ClientController extends Controller
             $client->save();
 
             // redirect
-            Session::flash('message', 'Клиент добавлен');
+           /* Request::flashOnly('message', 'Клиент добавлен');*/
             return Redirect::to('client');
         }
     }
 
-    public function show($id)
+    public function edit($id)
     {
         $client = Client::find($id);
+        $agreements = Agreement::where('client_id','=',$id)->get();
 
-        return view('clients.show', ['client' => $client]); 
-    }
-	public function edit($id)
-    {
-        $client = Client::find($id);
-
-        return view('clients.edit', ['client' => $client]); 
+        return view('clients.edit', ['client' => $client,'agreements' => $agreements]); 
     }
     public function update($id)
     {
         // validate
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
-        	'full_name'  => 'required',
+            'full_name'  => 'required',
             'name'       => 'required',
             'inn'       => 'required',
             'kpp'       => 'required',
@@ -96,9 +92,18 @@ class ClientController extends Controller
             $client->save();
 
             // redirect
-            Session::flash('message', 'Клиент добавлен');
+            Session::flash('message', 'Изменения сохранены');
             return Redirect::to('client');
         }
+    }
+    public function destroy($id)
+    {
+        $client = Client::find($id);
+        $client->delete();
+
+        // redirect
+        Session::flash('message', 'Successfully deleted the nerd!');
+        return Redirect::to('client');
     }
 
 }
