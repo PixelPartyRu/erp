@@ -29,17 +29,13 @@
 			{!! Form::open(array('action' => 'AgreementController@store')) !!}
 
 			  {!! Form::text('code') !!}
-			  {{ Form::radio('account', 'true') }}
-			  {{ Form::radio('account', 'false') }}
-			  {{ Form::radio('type', 'true') }}
-			  {{ Form::radio('type', 'false') }}
-			  {!! Form::text('penalty') !!}
-  			  {{ Form::radio('second_pay', 'true') }}
-			  {{ Form::radio('second_pay', 'false') }}
+			  {{ Form::checkbox('type') }}
+			  {{ Form::checkbox('account') }}
+			  {!! Form::date('penalty') !!}
+  			  {{ Form::checkbox('second_pay') }}
 			  {!! Form::text('code_1c') !!}
 			  {!! Form::text('description') !!}
-			  {{ Form::radio('active', 'true') }}
-			  {{ Form::radio('active', 'false') }}
+			  {{ Form::checkbox('active') }}
 			  {!! Form::date('date_end') !!}
 			  {!! Form::hidden('client_id',$client->id) !!}
 			  {!! Form::submit('Сохранить') !!}
@@ -72,13 +68,36 @@
 				  	@forelse($agreements as $agreements)
 						<tr>
 							<td>{{ $agreements->code }}</td>
-							<td>{{ $agreements->type }}</td>
-							<td>{{ $agreements->account }}</td>
+							<td>
+								@if ($agreements->type)
+									true
+								@else
+									false
+								@endif
+							</td>
+							<td>
+								@if ($agreements->account)
+									true
+								@else
+									false
+								@endif
+							</td>
 							<td>{{ $agreements->penalty }}</td>
-							<td>{{ $agreements->second_pay }}</td>
+							<td>
+								@if ($agreements->second_pay)
+									true
+								@else
+									false
+								@endif
 							<td>{{ $agreements->code_1c }}</td>
 							<td>{{ $agreements->description }}</td>
-							<td>{{ $agreements->active }}</td>
+							<td>
+								@if ($agreements->active)
+									true
+								@else
+									false
+								@endif
+							</td>
 							<td>{{ $agreements->created_at }}</td>
 							<td>{{ $agreements->date_end }}</td>
 							<td><a href="/agreement/{{ $agreements->id }}/edit"><i class="fa fa-pencil"></i></a></td>

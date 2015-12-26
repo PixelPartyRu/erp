@@ -23,12 +23,8 @@ class AgreementController extends Controller
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'code'  => 'required',
-            'type'       => 'required',
-            'account'       => 'required',
             'penalty'       => 'required',
-            'second_pay'       => 'required',
             'code_1c'       => 'required',
-            'active'       => 'required',
             'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
@@ -41,17 +37,32 @@ class AgreementController extends Controller
             // store
             $agreement = new Agreement;
             $agreement->code = Input::get('code');
-            $agreement->type = Input::get('type');
-            $agreement->account = Input::get('account');
+            if (Input::get('type')){
+                $agreement->type = TRUE;
+            }else{
+                $agreement->type = FALSE;
+            }
+            if (Input::get('account')){
+                $agreement->account = TRUE;
+            }else{
+                $agreement->account = FALSE;
+            }
             $agreement->penalty = Input::get('penalty');
-            $agreement->second_pay = Input::get('second_pay');
+            if (Input::get('second_pay')){
+                $agreement->second_pay = TRUE;
+            }else{
+                $agreement->second_pay = FALSE;
+            }
             $agreement->code_1c = Input::get('code_1c');
             $agreement->description = Input::get('description');
-            $agreement->active = Input::get('active');
+            if (Input::get('active')){
+                $agreement->active = TRUE;
+            }else{
+                $agreement->active = FALSE;
+            }
             $agreement->client_id = Input::get('client_id');
             $agreement->date_end= Input::get('date_end');
             $agreement->save();
-
             // redirect
            /* Request::flashOnly('message', 'Клиент добавлен');*/
             return Redirect::to('client/'.Input::get('client_id').'/edit');
@@ -71,12 +82,8 @@ class AgreementController extends Controller
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'code'  => 'required',
-            'type'       => 'required',
-            'account'       => 'required',
             'penalty'       => 'required',
-            'second_pay'       => 'required',
             'code_1c'       => 'required',
-            'active'       => 'required',
             'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
@@ -89,13 +96,29 @@ class AgreementController extends Controller
             // store
          	$agreement = Agreement::find($id);
             $agreement->code = Input::get('code');
-            $agreement->type = Input::get('type');
-            $agreement->account = Input::get('account');
+            if (Input::get('type')){
+                $agreement->type = TRUE;
+            }else{
+                $agreement->type = FALSE;
+            }
+            if (Input::get('account')){
+                $agreement->account = TRUE;
+            }else{
+                $agreement->account = FALSE;
+            }
             $agreement->penalty = Input::get('penalty');
-            $agreement->second_pay = Input::get('second_pay');
+            if (Input::get('second_pay')){
+                $agreement->second_pay = TRUE;
+            }else{
+                $agreement->second_pay = FALSE;
+            }
             $agreement->code_1c = Input::get('code_1c');
             $agreement->description = Input::get('description');
-            $agreement->active = Input::get('active');
+            if (Input::get('active')){
+                $agreement->active = TRUE;
+            }else{
+                $agreement->active = FALSE;
+            }
             $agreement->client_id = Input::get('client_id');
             $agreement->date_end= Input::get('date_end');
             $agreement->save();

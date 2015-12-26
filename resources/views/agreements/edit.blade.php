@@ -11,21 +11,31 @@
 		<div class="panel-heading">Редактирование договора</div>
 		<div class="panel-body">
 		{!! Form::model($agreement, array('route' => array('agreement.update', $agreement->id), 'method' => 'PUT')) !!}
-
 		  	  {!! Form::text('code', @$agreement->code) !!}
-			  {{ Form::radio('account', 'true') }}
-			  {{ Form::radio('account', 'false') }}
-			  {{ Form::radio('type', 'true') }}
-			  {{ Form::radio('type', 'false') }}
-			  {!! Form::text('penalty',@$agreement->penalty) !!}
-  			  {{ Form::radio('second_pay', 'true') }}
-			  {{ Form::radio('second_pay', 'false') }}
+		  	  @if( $agreement->account ) 
+			  	{{ Form::checkbox('account', null, true) }}
+			  @else
+				{{ Form::checkbox('account', null) }}
+			  @endif
+			  @if($agreement->type) 
+				  {{ Form::checkbox('type', null, true) }}
+			  @else
+			  	  {{ Form::checkbox('type', null) }}
+			  @endif
+			  {!! Form::date('penalty',@$agreement->penalty) !!}
+			  @if($agreement->second_pay) 
+	  			  {{ Form::checkbox('second_pay', null ,true) }}
+			  @else
+			  	  {{ Form::checkbox('second_pay', null) }}
+			  @endif
 			  {!! Form::text('code_1c',@$agreement->code_1c) !!}
 			  {!! Form::text('description',@$agreement->description) !!}
-			  {{ Form::radio('active', 'true') }}
-			  {{ Form::radio('active', 'false') }}
+			  @if($agreement->active) 
+				  {{ Form::checkbox('active', null, true) }}
+			  @else
+			  	  {{ Form::checkbox('active', null) }}
+			  @endif
 			  {!! Form::hidden('client_id',@$agreement->client_td) !!}
-			  {!! Form::date('created_at',@$agreement->created_at) !!}
 			  {!! Form::date('date_end',@$agreement->date_end) !!}
 
 			  {!! Form::submit('Сохранить') !!}
