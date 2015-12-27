@@ -26,29 +26,13 @@
 			    <div class="collapse navbar-collapse" id="nav-dropdown-menu">
 			      <ul class="nav navbar-nav">
 			        <li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Файл<b class="caret"></b></a>
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Система<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Action</a></li>
-			            <li><a href="#">Another action</a></li>
-			            <li><a href="#">Something else here</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">Separated link</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">One more separated link</a></li>
-			          </ul>
-			        </li>
-			      </ul>
-			      <ul class="nav navbar-nav">
-			        <li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Справочники<b class="caret"></b></a>
-			          <ul class="dropdown-menu">
-			            <li><a href="#">Action</a></li>
-			            <li><a href="#">Another action</a></li>
-			            <li><a href="#">Something else here</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">Separated link</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">One more separated link</a></li>
+			            <li><a href="#">Тарифные планы</a></li>
+			            <li><a href="#">Шаблоны типовых документов</a></li>
+			            <li><a href="#">Календарь</a></li>
+			            <li><a href="#">Настройка соединения с 1С</a></li>
+			            <li><a href="#">Выход</a></li>
 			          </ul>
 			        </li>
 			      </ul>
@@ -56,13 +40,9 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Контрагенты<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Action</a></li>
-			            <li><a href="#">Another action</a></li>
-			            <li><a href="#">Something else here</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">Separated link</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">One more separated link</a></li>
+			            <li><a href="../client">Клиенты</a></li>
+			            <li><a href="../debtor">Дебиторы</a></li>
+			            <li><a href="../relation">Связи Клиент-Дебитор</a></li>
 			          </ul>
 			        </li>
 			      </ul>
@@ -70,13 +50,9 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Отчеты<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Action</a></li>
-			            <li><a href="#">Another action</a></li>
-			            <li><a href="#">Something else here</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">Separated link</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">One more separated link</a></li>
+			            <li><a href="#">Начисленные комиссии</a></li>
+			            <li><a href="#">Отчет о наличии оригиналов документов</a></li>
+			            <li><a href="#">Лимиты</a></li>
 			          </ul>
 			        </li>
 			      </ul>
@@ -84,23 +60,11 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Операции<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Action</a></li>
-			            <li><a href="#">Another action</a></li>
-			            <li><a href="#">Something else here</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">Separated link</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">One more separated link</a></li>
-			          </ul>
-			        </li>
-			      </ul>
-			      <ul class="nav navbar-nav">
-			        <li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Лимиты<b class="caret"></b></a>
-			          <ul class="dropdown-menu">
-			            <li><a href="#">Уведомление о лимитах</a></li>
-			            <li><a href="#">Об операциях по погашению предостав. финансирование</a></li>
-			            <li><a href="#">О факторинговых операциях</a></li>
+			            <li><a href="../delivery">Поставки</a></li>
+			            <li><a href="#">Финансирование</a></li>
+			            <li><a href="#">Погашение</a></li>
+			            <li><a href="#">Выставление счетов</a></li>
+			            <li><a href="#">Документы 1С</a></li>
 			          </ul>
 			        </li>
 			      </ul>
@@ -108,13 +72,8 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Риск менеджмент<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Action</a></li>
-			            <li><a href="#">Another action</a></li>
-			            <li><a href="#">Something else here</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">Separated link</a></li>
-			            <li class="divider"></li>
-			            <li><a href="#">One more separated link</a></li>
+			            <li><a href="#">АУДЗ</a></li>
+			            <li><a href="#">Статистика по просрочке</a></li>
 			          </ul>
 			        </li>
 			      </ul>

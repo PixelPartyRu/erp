@@ -76,6 +76,11 @@ class AgreementController extends Controller
         return view('agreements.edit', ['agreement' => $agreement]); 
     }
 
+    public function show($id){
+        $agreement = Agreement::find($id);
+        return response()->json(['agreement' => $agreement]);
+    }
+
     public function update($id)
     {
         // validate

@@ -12,16 +12,22 @@
 		<div class="panel-body">
 				{!! Form::open(array('action' => 'RelationController@store')) !!}
 					<div class="row">
-						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+						<div id="relation_selectors" class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<label for="InputEmail1">Дебитор:</label>
+						  	{!! Form::select('debtor',['0' => 'Выбрать дебитора'] + array_pluck($debtors, 'full_name', 'id')) !!}
 							<label for="InputEmail1">Клиент:</label>
-						  	{!! Form::select('client', array_pluck($clients, 'full_name', 'id')) !!}
-						  	<label for="InputEmail1">Дебитор:</label>
-						  	{!! Form::select('debtor', array_pluck($debtors, 'full_name', 'id')) !!}
+						  	{!! Form::select('client',['0' => 'Выбрать клиента'] + array_pluck($clients, 'full_name', 'id')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-						<label for="rpp">Коэфициент финансирования:</label>
+							<label for="rpp">Коэфициент финансирования:</label>
 						  	{!! Form::text('rpp',null,array('class' => 'form-control','id' => 'rpp')) !!} <span>%</span>
-						</div>		
+						</div>
+						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<label for="created_at">Коэфициент финансирования:</label>
+						  	{!! Form::date('created_at') !!}
+						</div>
+						
+						select		
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 							{!! Form::submit('Создать связь') !!}
 							{!! Session::get('message') !!}
@@ -52,7 +58,7 @@
 			</div>
 		</div>
 	</div>
-
+<script type="text/javascript" src="/assets/js/relations.js"></script>
 @stop
 
 <!--, array('class' => 'btn btn-warning'-->

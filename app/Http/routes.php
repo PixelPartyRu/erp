@@ -19,6 +19,9 @@ Route::resource('debtor', 'DebtorController');
 Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
 
+Route::post('delivery/getCsvFile', 'DeliveryController@getCsvFile');
+Route::resource('delivery', 'DeliveryController');
+
 /*
 |--------------------------------------------------------------------------
 | Application Routes

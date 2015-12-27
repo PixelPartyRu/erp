@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
 use App\Client;
-use App\Agreement;
 
 class ClientController extends Controller
 {
@@ -58,12 +57,19 @@ class ClientController extends Controller
     }
 
     public function edit($id)
-    {
+    {   
         $client = Client::find($id);
-        $agreements = Agreement::where('client_id','=',$id)->get();
+        $agreements =  $client->agreements;
 
         return view('clients.edit', ['client' => $client,'agreements' => $agreements]); 
     }
+
+    public function show($id){
+        $client = Client::find($id);
+        $agreements =  $client->agreements;
+        return response()->json(['agreements' => $agreements]);
+    }
+
     public function update($id)
     {
         // validate
