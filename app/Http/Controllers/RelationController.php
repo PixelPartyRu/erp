@@ -30,30 +30,33 @@ class RelationController extends Controller
         // validate
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
-            'full_name'  => 'required',
-            'name'       => 'required',
-            'inn'       => 'required',
-            'kpp'       => 'required',
-            'ogrn'       => 'required',
+            
         );
         $validator = Validator::make(Input::all(), $rules);
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('debtor')
+            return Redirect::to('relation')
                 ->withErrors($validator);
         } else {
             // store
-            $debtor = new Debtor;
-            $debtor->full_name = Input::get('full_name');
-            $debtor->name = Input::get('name');
-            $debtor->inn = Input::get('inn');
-            $debtor->kpp = Input::get('kpp');
-            $debtor->ogrn = Input::get('ogrn');
-            $debtor->save();
+            $relation = new Relation;
+            $relation->client_id = Input::get('client_id');
+            $relation->debtor_id = Input::get('debtor_id');
+            $relation->active = Input::get('active');
+            $relation->created_at = Input::get('created_at');
+            $relation->rpp = Input::get('rpp');
+            $relation->agreement_id = Input::get('agreement_id');
+            $relation->deferment = Input::get('deferment');
+            $relation->deferment_type = Input::get('deferment_type');
+            $relation->waiting_period = Input::get('waiting_period');
+            $relation->waiting_period_type = Input::get('waiting_period_type');
+            $relation->regress_period = Input::get('regress_period');
+            $relation->regress_period_type = Input::get('regress_period_type');
+            $relation->save();
 
             // redirect
-            Session::flash('message', 'Дебитор добавлен');
+            Session::flash('message', 'Связь добавлена добавлен');
             return Redirect::to('debtor');
         }
     }

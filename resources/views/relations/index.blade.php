@@ -12,22 +12,48 @@
 		<div class="panel-body">
 				{!! Form::open(array('action' => 'RelationController@store')) !!}
 					<div class="row">
-						<div id="relation_selectors" class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-							<label for="InputEmail1">Дебитор:</label>
-						  	{!! Form::select('debtor',['0' => 'Выбрать дебитора'] + array_pluck($debtors, 'full_name', 'id')) !!}
-							<label for="InputEmail1">Клиент:</label>
-						  	{!! Form::select('client',['0' => 'Выбрать клиента'] + array_pluck($clients, 'full_name', 'id')) !!}
+						<div id="relation_selectors" class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
+							<label for="client_id">Клиент:</label>
+						  	{!! Form::select('client_id',['0' => 'Выбрать клиента'] + array_pluck($clients, 'full_name', 'id')) !!}
+							<label for="debtor_id"> Дебитор:</label>
+						  	{!! Form::select('debtor_id',['0' => 'Выбрать дебитора'] + array_pluck($debtors, 'full_name', 'id')) !!}
+						  	<label for="active"> Активно</label>
+							{!! Form::checkbox('active', 'true', true);!!}
+
 						</div>
-						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-							<label for="rpp">Коэфициент финансирования:</label>
-						  	{!! Form::text('rpp',null,array('class' => 'form-control','id' => 'rpp')) !!} <span>%</span>
-						</div>
-						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-							<label for="created_at">Коэфициент финансирования:</label>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="created_at">Условия вступают в силу:</label>
 						  	{!! Form::date('created_at') !!}
 						</div>
-						
-						select		
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="rpp">Коэфициент финансирования(%):</label>
+						  	{!! Form::text('rpp',null,array('class' => 'form-control','id' => 'rpp')) !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="confedential_factoring">Конфеденциальный факторинг:</label>
+							{!! Form::checkbox('confedential_factoring', 'true');!!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="deferment_start">Отсчет начала отсрочки:</label>
+							{!! Form::select('size', array('true' => 'Дата накладной', 'false' => 'Дата финансирования'), 'true') !!}
+						</div>
+						<div class="clearfix"></div>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="deferment">Отсрочка:</label>
+						  	{!! Form::text('deferment',null,array('class' => 'form-control','id' => 'deferment')) !!}
+						  	{!! Form::select('deferment_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней') !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="deferment">Период ожидания:</label>
+						  	{!! Form::text('waiting_period',null,array('class' => 'form-control','id' => 'waiting_period')) !!}
+						  	{!! Form::select('waiting_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней') !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+							<label for="regress_period">Период регресса:</label>
+						  	{!! Form::text('regress_period',null,array('class' => 'form-control','id' => 'waiting_period')) !!}
+						  	{!! Form::select('regress_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней') !!}
+						</div>
+
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 							{!! Form::submit('Создать связь') !!}
 							{!! Session::get('message') !!}

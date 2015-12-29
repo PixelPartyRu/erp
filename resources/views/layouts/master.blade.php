@@ -6,6 +6,7 @@
       	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
+      	<meta charset="UTF-8">
       	@yield('stylesheet')
       	<script type="text/javascript" src="/assets/js/jquery-2.1.4.min.js"></script>
       	<script type="text/javascript" src="/assets/js/main.js"></script>

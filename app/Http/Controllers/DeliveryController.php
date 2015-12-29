@@ -18,14 +18,16 @@ class DeliveryController extends Controller
     }
 
     public function getCsvFile(){
+	   Excel::load(Input::file('report'), function($reader){
+	   		$reader->formatDates(true, 'Y-m-d');
+	   		$reader->each(function($sheet) {
 
-	    Excel::load(Input::file('report'), function($reader) {
+			    $sheet->each(function($row) {
+			    	var_dump($row);
+			    });
 
-		    echo $reader;
-
-		});
-	    //$filename = $this->doSomethingLikeUpload($file);
-
-	    //return Redirect::to('delivery');
+			});
+		}, 'UTF-8');
+	   //return view('delivery.getCsvFile');
     }
 }
