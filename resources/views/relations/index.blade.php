@@ -50,8 +50,18 @@
 						</div>
 						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
 							<label for="regress_period">Период регресса:</label>
-						  	{!! Form::text('regress_period',null,array('class' => 'form-control','id' => 'waiting_period')) !!}
+						  	{!! Form::text('regress_period',null,array('class' => 'form-control','id' => 'regress_period')) !!}
 						  	{!! Form::select('regress_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней') !!}
+						</div>
+						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<label for="original_documents_select">Оригиналы первичных документов:</label>
+							<div class="clearfix"></div>
+							<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							  	{!! Form::select('original_documents_select', array('0' => 'Финансирование по оригиналам', '1' => 'Нет', '2' => 'Первичные документы через'), '0') !!}
+							</div>
+							<div class="form-group col-xs-12 col-sm-4 col-md-4 col-lg-4" id="o_documents_value">
+								{!! Form::text('original_documents_value',null,array('class' => 'form-control','id' => 'original_documents_value')) !!}	
+							</div>										
 						</div>
 
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">

@@ -59,9 +59,8 @@ class ClientController extends Controller
     public function edit($id)
     {   
         $client = Client::find($id);
-        $agreements =  $client->agreements;
 
-        return view('clients.edit', ['client' => $client,'agreements' => $agreements]); 
+        return view('clients.edit', ['client' => $client]); 
     }
 
     public function show($id){

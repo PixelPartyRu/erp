@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Session;
 use App\Relation;
 use App\Client;
 use App\Debtor;
+use App\OriginalDocument;
+use App\Contract;
+
 class RelationController extends Controller
 {
     public function index()
@@ -40,6 +43,27 @@ class RelationController extends Controller
                 ->withErrors($validator);
         } else {
             // store
+            if(!empty(Input::get('original_documents_value'))){
+                echo "string";
+                $original_document_value = Input::get('original_documents_value');
+            }else {
+                echo "string1";
+                $original_document_value = 0;
+            }
+           
+            $original_document = new OriginalDocument;
+            $original_document->type = Input::get('original_documents_select');
+            $original_document->name = Input::get('original_documents_select');
+            $original_document->value = $original_document_value;
+            $original_document->save();
+            $contract = new Contract;
+            $contract->code = 'test';
+            $contract->name = 'test';
+            $contract->code_1c = 'test';
+            $contract->gd_debitor_1c = 'test';
+            $contract->description = 'test';
+            $contract->date_end = Input::get('created_at');
+            $contract->save();
             $relation = new Relation;
             $relation->client_id = Input::get('client_id');
             $relation->debtor_id = Input::get('debtor_id');
@@ -53,11 +77,13 @@ class RelationController extends Controller
             $relation->waiting_period_type = Input::get('waiting_period_type');
             $relation->regress_period = Input::get('regress_period');
             $relation->regress_period_type = Input::get('regress_period_type');
+            $relation->original_document_id = OriginalDocument::all()->pluck('id')->last();
+            $relation->contract_id = Contract::all()->pluck('id')->last();
             $relation->save();
 
             // redirect
             Session::flash('message', 'Связь добавлена добавлен');
-            return Redirect::to('debtor');
+            return Redirect::to('relation');
         }
     }
 

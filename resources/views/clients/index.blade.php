@@ -1,36 +1,44 @@
 @extends('layouts.master')
 
-@section('title', 'Заголовок страницы')
+@section('title', 'Клиенты')
 
 @section('stylesheet')
   	<link rel="stylesheet" type="text/css" href="/assets/css/clients.css">
+@stop	
+
+@section('javascript')
+  	<script type="text/javascript" src="/assets/js/clients.js"></script>
 @stop
 
 @section('content')
-	<div class="panel panel-success">
-		<div class="panel-heading">Заполните данные клиента</div>
+	<h1><strong>Клиенты</strong></h1>
+	<div class="panel panel-success" id="clientCreate">
+		<div class="panel-heading">
+			<span>Заполните данные клиента</span>
+			<i class="fa fa-chevron-down"></i> 
+		</div>
 		<div class="panel-body">
 				{!! Form::open(array('action' => 'ClientController@store')) !!}
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-							<label for="InputEmail1">Полное наименование:</label>
-						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'InputEmail1')) !!}
+							<label for="Input1">Полное наименование:</label>
+						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'Input1')) !!}
 						</div>		
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-							<label for="InputEmail2">Наименование:</label>
-						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'InputEmail2')) !!}
+							<label for="Input2">Наименование:</label>
+						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'Input2')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
-							<label for="InputEmail3">ИНН:</label>
-						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'InputEmail3')) !!}
+							<label for="Input3">ИНН:</label>
+						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'Input3')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
-							<label for="InputEmail4">КПП:</label>
-						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4')) !!}
+							<label for="Input4">КПП:</label>
+						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'Input4')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
-							<label for="InputEmail5">ОГРН:</label>
-						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5')) !!}
+							<label for="Input5">ОГРН:</label>
+						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'Input5')) !!}
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container'>
 						  	{!! Form::submit('Добавить',array('class' => 'btn btn-success')) !!}

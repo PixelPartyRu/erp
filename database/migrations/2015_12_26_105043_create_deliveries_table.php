@@ -47,7 +47,7 @@ class CreateDeliveriesTable extends Migration
             $table->date('date_of_act');
             $table->float('remainder_of_the_debt_first_payment_rub');
             $table->boolean('the_presence_of_the_original_document')->default(false);
-            $table->integer('type of factoring');
+            $table->integer('type_of_factoring');
 
             $table->timestamps();
         });

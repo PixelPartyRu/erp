@@ -11,6 +11,7 @@
       	<script type="text/javascript" src="/assets/js/jquery-2.1.4.min.js"></script>
       	<script type="text/javascript" src="/assets/js/main.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+      	@yield('javascript')
     </head>
     <body>
         <div class="container-fluid">
@@ -41,9 +42,9 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Контрагенты<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="../client">Клиенты</a></li>
-			            <li><a href="../debtor">Дебиторы</a></li>
-			            <li><a href="../relation">Связи Клиент-Дебитор</a></li>
+			            <li><a href="/client">Клиенты</a></li>
+			            <li><a href="/debtor">Дебиторы</a></li>
+			            <li><a href="/relation">Связи Клиент-Дебитор</a></li>
 			          </ul>
 			        </li>
 			      </ul>
@@ -61,7 +62,7 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Операции<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="../delivery">Поставки</a></li>
+			            <li><a href="/delivery">Поставки</a></li>
 			            <li><a href="#">Финансирование</a></li>
 			            <li><a href="#">Погашение</a></li>
 			            <li><a href="#">Выставление счетов</a></li>

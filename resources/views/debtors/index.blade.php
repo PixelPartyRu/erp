@@ -3,12 +3,20 @@
 @section('title', 'Заголовок страницы')
 
 @section('stylesheet')
-  	<link rel="stylesheet" type="text/css" href="/assets/css/clients.css">
+  	<link rel="stylesheet" type="text/css" href="/assets/css/debtor.css">
+@stop
+
+@section('javascript')
+  	<script type="text/javascript" src="/assets/js/debtor.js"></script>
 @stop
 
 @section('content')
-	<div class="panel panel-success">
-		<div class="panel-heading">Заполните данные клиента</div>
+	<h1><strong>Дебиторы</strong></h1>
+	<div class="panel panel-success" id="debtorCreate">
+		<div class="panel-heading">
+			<span>Заполните данные дебитора</span>
+			<i class="fa fa-chevron-down"></i> 
+		</div>		
 		<div class="panel-body">
 				{!! Form::open(array('action' => 'DebtorController@store')) !!}
 					<div class="row">
@@ -43,7 +51,7 @@
   		</div>
 	</div>
 	<div class="panel panel-info">
-		<div class="panel-heading">Наши клиенты</div>
+		<div class="panel-heading">Наши дебиторы</div>
 			<div class="table-responsive">
 				<table class="table table-striped" id="debtor-table">
 				  <thead>
