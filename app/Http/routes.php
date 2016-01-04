@@ -19,7 +19,7 @@ Route::resource('debtor', 'DebtorController');
 Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
 
-//Route::post('delivery/downloadFile', 'DeliveryController@downloadFile');
+Route::post('delivery/verification', 'DeliveryController@verification');
 Route::resource('delivery', 'DeliveryController');
 
 /*

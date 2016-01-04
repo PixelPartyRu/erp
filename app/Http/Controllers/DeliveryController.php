@@ -119,6 +119,15 @@ class DeliveryController extends Controller
     		 return Redirect::to('delivery');
     	}
     }
+
+    public function verification(){
+    	$verificationArray = Input::get('verificationArray');
+		foreach ($verificationArray as $cell){
+			$delivery = Delivery::find($cell);
+			$delivery->status = 'Верефицирован';
+			$delivery->save();
+		}
+    }
 }
 
 
