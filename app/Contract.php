@@ -8,6 +8,6 @@ class Contract extends Model
 {
     public function relation()
     {
-        return $this->belongsTo('App\Relation');
+        return $this->hasOne('App\Relation');
     }
 }

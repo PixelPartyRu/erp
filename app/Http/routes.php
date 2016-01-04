@@ -19,7 +19,7 @@ Route::resource('debtor', 'DebtorController');
 Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
 
-Route::post('delivery/getCsvFile', 'DeliveryController@getCsvFile');
+//Route::post('delivery/downloadFile', 'DeliveryController@downloadFile');
 Route::resource('delivery', 'DeliveryController');
 
 /*

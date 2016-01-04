@@ -18,11 +18,16 @@ class Relation extends Model
 
     public function contract()
     {
-        return $this->hasOne('App\Contract');
+        return $this->belongsTo('App\Contract');
     }
 
     public function originalDocument()
     {
         return $this->hasOne('App\OriginalDocument');
     }
+    public function tariff()
+    {
+        return $this->belongsTo('App\Tariff');
+    }
+
 }
