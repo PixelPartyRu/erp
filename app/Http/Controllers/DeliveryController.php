@@ -56,6 +56,9 @@ class DeliveryController extends Controller
 							$i = 11;
 							while ($stop === 0){
 								if($resultArray[$i][1] === 'накладная'){
+									$waybillDateVar = $carbon = new Carbon($resultArray[$i][3]);
+									$invoiceDateVar = $carbon = new Carbon($resultArray[$i + 1][3]);
+									$dateNowVar = new Carbon(Carbon::now());
 									$delivery = new Delivery;
 						            $delivery->client_id = $relation->client_id;
 						            $delivery->debtor_id = $relation->debtor_id;
@@ -64,25 +67,24 @@ class DeliveryController extends Controller
 						            $delivery->first_payment_amount = ($resultArray[$i][5] / 100.00) * $relation->rpp;
 						            $delivery->balance_owed = $resultArray[$i][5];//предварительно
 						            $delivery->remainder_of_the_debt_first_payment = ($resultArray[$i][5] / 100.00) * $relation->rpp;//предварительно
-						            $delivery->date_of_waybill = $resultArray[$i][3];
+						            $delivery->date_of_waybill = $waybillDateVar;
 						            $delivery->due_date = $relation->deferment;
-						            $delivery->date_of_recourse = $resultArray[$i][3] + $relation->deferment;//срок оплаты
-						            //$delivery->date_of_payment = ;//дата оплаты
-						            $delivery->date_of_regress = $resultArray[$i][3] + $relation->deferment + $relation->waiting_period;
-						            $delivery->the_date_of_termination_of_the_period_of_regression = $resultArray[$i][3] + $relation->deferment + $relation->waiting_period + $relation->regress_period;
-						            $delivery->the_date_of_a_registration_supply = Carbon::now()->format('Y-m-d');
-									$delivery->the_actual_deferment = Carbon::now()->format('Y-m-d') - $resultArray[$i][3] + $relation->deferment;
+						            $delivery->date_of_recourse = $waybillDateVar->addDays($relation->deferment);//срок оплаты
+						            $delivery->date_of_payment = $dateNowVar->format('Y-m-d');;//дата оплаты(ложь)
+						            $delivery->date_of_regress = $waybillDateVar->addDays($relation->deferment + $relation->waiting_period);
+						            $delivery->the_date_of_termination_of_the_period_of_regression = $waybillDateVar->addDays($relation->deferment + $relation->waiting_period + $relation->regress_period); 
+						            $delivery->the_date_of_a_registration_supply = $dateNowVar->format('Y-m-d');;
+									$delivery->the_actual_deferment = $dateNowVar->addDays($relation->deferment - $resultArray[$i][3])->format('Y-m-d');
 						            $delivery->invoice = $resultArray[$i + 1][2];
-						            $delivery->date_of_invoice = $resultArray[$i + 1][3];
+						            $delivery->date_of_invoice = $invoiceDateVar;
 						            $delivery->registry = $resultArray[1][6];
 						            $delivery->date_of_registry = $resultArray[1][4];
-
-						            //$delivery->date_of_funding = Input::get('kpp');
-						            //$delivery->end_date_of_funding = Input::get('inn');
+						            $delivery->date_of_funding = $dateNowVar->format('Y-m-d');;//(ложь)
+						            $delivery->end_date_of_funding = $dateNowVar->format('Y-m-d');;//(ложь)
 						            $delivery->notes = $resultArray[$i][6];
-						            //$delivery->return = Input::get('ogrn');
+						            $delivery->return = false;
 						            $delivery->status = 'Не верефицирована';
-						            //$delivery->state = Input::get('ogrn');
+						            $delivery->state = false;
 						            $delivery->the_presence_of_the_original_document = Input::get('the_presence_of_the_original_document');
 						            $delivery->type_of_factoring = $relation->confedential_factoring;
 						            $delivery->save();
