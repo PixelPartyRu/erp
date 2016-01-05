@@ -18,6 +18,7 @@ Route::resource('client', 'ClientController');
 Route::resource('debtor', 'DebtorController');
 Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
+Route::resource('tariff', 'TariffController');
 
 Route::post('delivery/verification', 'DeliveryController@verification');
 Route::resource('delivery', 'DeliveryController');

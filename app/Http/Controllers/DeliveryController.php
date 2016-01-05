@@ -56,10 +56,20 @@ class DeliveryController extends Controller
 							$i = 11;
 							while ($stop === 0){
 								if($resultArray[$i][1] === 'накладная'){
-									$waybillDateVar = $carbon = new Carbon($resultArray[$i][3]);
-									$invoiceDateVar = $carbon = new Carbon($resultArray[$i + 1][3]);
-									$dateNowVar = new Carbon(Carbon::now());
+									$waybillDateVar = new Carbon($resultArray[$i][3]);//Дата накладной
+									$invoiceDateVar = new Carbon($resultArray[$i + 1][3]);//Дата счет фактуры
+
+									$dateOfRecourse = clone $waybillDateVar;
+									$dateOfRecourse->addDays($relation->deferment);//Срок оплаты
+									$dateNowVar = new Carbon(Carbon::now());//Сегодняшнее число
+									$actualDeferment = clone $dateNowVar;
+									$actualDeferment = $actualDeferment->diffInDays($dateOfRecourse);//Фактическая просрочка
+									$dateOfRegress = clone $dateOfRecourse;
+									$dateOfRegress->addDays($relation->waiting_period);//Дата регресса
+									$theDateOfTerminationOfThePeriodOfRegression = clone $dateOfRegress;
+									$theDateOfTerminationOfThePeriodOfRegression->addDays($relation->regress_period);//Дата окончания регресса
 									$delivery = new Delivery;
+									var_dump($waybillDateVar);
 						            $delivery->client_id = $relation->client_id;
 						            $delivery->debtor_id = $relation->debtor_id;
 						            $delivery->waybill = $resultArray[$i][2];
@@ -69,21 +79,21 @@ class DeliveryController extends Controller
 						            $delivery->remainder_of_the_debt_first_payment = ($resultArray[$i][5] / 100.00) * $relation->rpp;//предварительно
 						            $delivery->date_of_waybill = $waybillDateVar;
 						            $delivery->due_date = $relation->deferment;
-						            $delivery->date_of_recourse = $waybillDateVar->addDays($relation->deferment);//срок оплаты
-						            $delivery->date_of_payment = $dateNowVar->format('Y-m-d');;//дата оплаты(ложь)
-						            $delivery->date_of_regress = $waybillDateVar->addDays($relation->deferment + $relation->waiting_period);
-						            $delivery->the_date_of_termination_of_the_period_of_regression = $waybillDateVar->addDays($relation->deferment + $relation->waiting_period + $relation->regress_period); 
+						            $delivery->date_of_recourse = $dateOfRecourse;//срок оплаты
+						            //$delivery->date_of_payment = $dateNowVar->format('Y-m-d');//дата оплаты(ложь)
+						            $delivery->date_of_regress = $dateOfRegress;
+						            $delivery->the_date_of_termination_of_the_period_of_regression = $theDateOfTerminationOfThePeriodOfRegression; 
 						            $delivery->the_date_of_a_registration_supply = $dateNowVar->format('Y-m-d');;
-									$delivery->the_actual_deferment = $dateNowVar->addDays($relation->deferment - $resultArray[$i][3])->format('Y-m-d');
+									$delivery->the_actual_deferment = $actualDeferment;
 						            $delivery->invoice = $resultArray[$i + 1][2];
 						            $delivery->date_of_invoice = $invoiceDateVar;
 						            $delivery->registry = $resultArray[1][6];
 						            $delivery->date_of_registry = $resultArray[1][4];
-						            $delivery->date_of_funding = $dateNowVar->format('Y-m-d');;//(ложь)
-						            $delivery->end_date_of_funding = $dateNowVar->format('Y-m-d');;//(ложь)
+						            //$delivery->date_of_funding = ;
+						            //$delivery->end_date_of_funding = $dateNowVar->format('Y-m-d');;//(ложь)
 						            $delivery->notes = $resultArray[$i][6];
-						            $delivery->return = false;
-						            $delivery->status = 'Не верефицирована';
+						            $delivery->return = "";
+						            $delivery->status = 'Зарегестрирован';
 						            $delivery->state = false;
 						            $delivery->the_presence_of_the_original_document = Input::get('the_presence_of_the_original_document');
 						            $delivery->type_of_factoring = $relation->confedential_factoring;
@@ -93,7 +103,7 @@ class DeliveryController extends Controller
 									$stop = 1;
 								}
 							}
-							return Redirect::to('delivery');
+							//return Redirect::to('delivery');
 						}else{
 							var_dump('Debtor');
 						}
@@ -122,11 +132,22 @@ class DeliveryController extends Controller
 
     public function verification(){
     	$verificationArray = Input::get('verificationArray');
-		foreach ($verificationArray as $cell){
-			$delivery = Delivery::find($cell);
-			$delivery->status = 'Верефицирован';
-			$delivery->save();
-		}
+    	$handler = Input::get('handler');
+
+    	if($handler == "verification"){
+    		foreach ($verificationArray as $cell){
+				$delivery = Delivery::find($cell);
+				$delivery->status = 'Верефицирован';
+				$delivery->save();
+			}
+    	}else{
+    		foreach ($verificationArray as $cell){
+				$delivery = Delivery::find($cell);
+				$delivery->status = 'Не верефицирован';
+				$delivery->save();
+			}
+    	}
+		
     }
 }
 

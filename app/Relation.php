@@ -23,7 +23,7 @@ class Relation extends Model
 
     public function originalDocument()
     {
-        return $this->hasOne('App\OriginalDocument');
+        return $this->belongsTo('App\OriginalDocument');
     }
     public function tariff()
     {

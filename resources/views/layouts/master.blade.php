@@ -30,7 +30,7 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Система<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Тарифные планы</a></li>
+			            <li><a href="/tariff">Тарифные планы</a></li>
 			            <li><a href="#">Шаблоны типовых документов</a></li>
 			            <li><a href="#">Календарь</a></li>
 			            <li><a href="#">Настройка соединения с 1С</a></li>
