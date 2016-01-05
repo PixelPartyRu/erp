@@ -63,7 +63,7 @@
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Операции<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
 			            <li><a href="/delivery">Поставки</a></li>
-			            <li><a href="#">Финансирование</a></li>
+			            <li><a href="/finance">Финансирование</a></li>
 			            <li><a href="#">Погашение</a></li>
 			            <li><a href="#">Выставление счетов</a></li>
 			            <li><a href="#">Документы 1С</a></li>

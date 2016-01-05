@@ -72,6 +72,7 @@ class DeliveryController extends Controller
 									$delivery = new Delivery;
 						            $delivery->client_id = $relation->client_id;
 						            $delivery->debtor_id = $relation->debtor_id;
+						            $delivery->relation_id = $relation->id;
 						            $delivery->waybill = $resultArray[$i][2];
 						            $delivery->waybill_amount = $resultArray[$i][5];
 						            $delivery->first_payment_amount = ($resultArray[$i][5] / 100.00) * $relation->rpp;
@@ -159,6 +160,12 @@ class DeliveryController extends Controller
         //Session::flash('message', 'Successfully deleted the nerd!');
         return Redirect::to('delivery');
     }
+
+     public function getDescription(){
+     	$idInput = Input::get('idInput');
+     	$contract = Delivery::find($idInput)->relation->contract->description;
+     	return $contract;
+     }
 }
 
 

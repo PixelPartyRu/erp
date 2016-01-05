@@ -15,4 +15,14 @@ class Delivery extends Model
     {
         return $this->belongsTo('App\Debtor');
     }
+
+    public function finance()
+    {
+        return $this->belongsTo('App\Finance');
+    }
+
+    public function relation()
+    {
+        return $this->belongsTo('App\Relation');
+    }
 }

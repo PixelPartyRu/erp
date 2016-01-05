@@ -20,8 +20,11 @@ Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
 Route::resource('tariff', 'TariffController');
 
+Route::post('delivery/getDescription', 'DeliveryController@getDescription');
 Route::post('delivery/verification', 'DeliveryController@verification');
 Route::resource('delivery', 'DeliveryController');
+
+Route::resource('finance', 'FinanceController');
 
 /*
 |--------------------------------------------------------------------------

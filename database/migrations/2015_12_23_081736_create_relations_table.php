@@ -30,7 +30,7 @@ class CreateRelationsTable extends Migration
             $table->string('regress_period_type',10);
 
             $table->integer('client_id')->unsigned();
-            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');;
+            $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
 
             $table->integer('original_document_id')->unsigned();
             $table->foreign('original_document_id')->references('id')->on('original_documents')->onDelete('cascade');
