@@ -22,7 +22,8 @@ class DeliveryController extends Controller
     public function index()
     {   
      	$deliveries = Delivery::all();
-       return view('delivery.index',['deliveries' => $deliveries]);
+     	$dateToday = Carbon::now()->format('Y-m-d');
+       	return view('delivery.index',['deliveries' => $deliveries,'dateToday' => $dateToday]);
     }
 
     public function store(){
@@ -69,7 +70,6 @@ class DeliveryController extends Controller
 									$theDateOfTerminationOfThePeriodOfRegression = clone $dateOfRegress;
 									$theDateOfTerminationOfThePeriodOfRegression->addDays($relation->regress_period);//Дата окончания регресса
 									$delivery = new Delivery;
-									var_dump($waybillDateVar);
 						            $delivery->client_id = $relation->client_id;
 						            $delivery->debtor_id = $relation->debtor_id;
 						            $delivery->waybill = $resultArray[$i][2];
@@ -83,7 +83,7 @@ class DeliveryController extends Controller
 						            //$delivery->date_of_payment = $dateNowVar->format('Y-m-d');//дата оплаты(ложь)
 						            $delivery->date_of_regress = $dateOfRegress;
 						            $delivery->the_date_of_termination_of_the_period_of_regression = $theDateOfTerminationOfThePeriodOfRegression; 
-						            $delivery->the_date_of_a_registration_supply = $dateNowVar->format('Y-m-d');;
+						            $delivery->the_date_of_a_registration_supply = $dateNowVar->format('Y-m-d');
 									$delivery->the_actual_deferment = $actualDeferment;
 						            $delivery->invoice = $resultArray[$i + 1][2];
 						            $delivery->date_of_invoice = $invoiceDateVar;
@@ -103,7 +103,7 @@ class DeliveryController extends Controller
 									$stop = 1;
 								}
 							}
-							//return Redirect::to('delivery');
+							return Redirect::to('delivery');
 						}else{
 							var_dump('Debtor');
 						}
@@ -148,6 +148,16 @@ class DeliveryController extends Controller
 			}
     	}
 		
+    }
+
+     public function destroy($id)
+    {
+        $delievery = Delivery::find($id);
+        $delievery->delete();
+
+        // redirect
+        //Session::flash('message', 'Successfully deleted the nerd!');
+        return Redirect::to('delivery');
     }
 }
 

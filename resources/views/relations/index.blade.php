@@ -63,7 +63,43 @@
 								{!! Form::text('original_documents_value',null,array('class' => 'form-control','id' => 'original_documents_value')) !!}	
 							</div>										
 						</div>
-
+						<div class="clearfix"></div>
+						<h4>Контракт</h4>
+						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<label for="contract_code">Номер договора:</label>
+							  	{!! Form::text('contract_code',null,array('class' => 'form-control','id' => 'contract_code')) !!}
+							</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<label for="contract_name">Наименование:</label>
+							  	{!! Form::text('contract_name',null,array('class' => 'form-control','id' => 'contract_name')) !!}
+							</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<label for="contract_code_1c">Номер договора для 1С:</label>
+							  	{!! Form::text('contract_code_1c',null,array('class' => 'form-control','id' => 'contract_code_1c')) !!}
+							</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<label for="contract_gd_debitor_1c">Номер ГД (дебитора) для 1С:</label>
+							  	{!! Form::text('contract_gd_debitor_1c',null,array('class' => 'form-control','id' => 'contract_gd_debitor_1c')) !!}
+							</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<label for="contract_created_at">Дата договора:</label>
+							  	{!! Form::date('contract_created_at') !!}
+							</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
+								<label for="contract_date_end">Действителен до:</label>
+							  	{!! Form::date('contract_date_end') !!}
+							</div>
+						</div>
+						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
+							<label for="contract_description">Коментарии:</label>
+						  	{!! Form::textarea('contract_description',null,array('class' => 'form-control','id' => 'contract_description')) !!}
+						</div>
+						<div class="clearfix"></div>
+						<h4>Тариф</h4>
+						<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+						  	{!! Form::select('tariff_id',['0' => 'Выбрать тариф'] + array_pluck($tariffs, 'name', 'id')) !!}
+						</div>
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 							{!! Form::submit('Создать связь') !!}
 							{!! Session::get('message') !!}
@@ -79,16 +115,44 @@
 				<table class="table table-striped" id="client-table">
 				  <thead>
 				  	<tr>
-				  		<th>Полное наименование</th>
-				  		<th>Наименование</th>
-				  		<th>ИНН</th>
-				  		<th>КПП</th>
-				  		<th>ОГРН</th>
-				  		<th></th>
+				  		<th>Связь</th>
+				  		<th>Статус</th>
+				  		<th>Коэффициент финансирования %</th>
+				  		<th>Отсчет начала отсрочки</th>
+				  		<th>Отсрочка</th>
+				  		<th>Период ожидания</th>
+				  		<th>Период регресса</th>
+				  		<th>Оригиналы первичных документов</th>
+
 				  		<th></th>
 				  	</tr>
 				  </thead>
 				  <tbody>
+				  	@forelse($relations as $relation)
+						<tr>
+							<td>{{ $relation->debtor->name }}<span>&nbsp&#x2012&nbsp</span>{{ $relation->client->name }}</td>
+							<td>{{ $relation->active == true ? 'Активна' : 'Не активна' }}</td>
+							<td>{{ $relation->rpp}}</td>
+							<td>{{ $relation->deferment_start == true ? 'Дата накладной' : 'Дата финансирования' }}</td>
+							<td>{{ $relation->deferment }}<span>&nbsp</span>{{ $relation->deferment_type }}</td>
+							<td>{{ $relation->waiting_period }}<span>&nbsp</span>{{ $relation->waiting_period_type }}</td>
+							<td>{{ $relation->regress_period }}<span>&nbsp</span>{{ $relation->regress_period_type }}</td>
+							<td>
+								@if ($relation->originalDocument->type == '0')
+								По оригиналам
+								@elseif($relation->originalDocument->type == '1')
+								Нет
+								@else
+								через &nbsp {{$relation->originalDocument->value}} &nbsp дней
+								@endif
+
+							</td>
+
+
+						</tr>
+					@empty
+						<p>Связей нет</p>
+					@endforelse
 				  </tbody>
 				</table>
 			</div>

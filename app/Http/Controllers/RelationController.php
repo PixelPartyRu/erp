@@ -18,6 +18,7 @@ use App\Client;
 use App\Debtor;
 use App\OriginalDocument;
 use App\Contract;
+use App\Tariff;
 
 class RelationController extends Controller
 {
@@ -26,7 +27,8 @@ class RelationController extends Controller
         $clients = Client::all();
         $debtors = Debtor::all();
         $relations = Relation::all();
-        return view('relations.index', ['relations' => $relations,'clients' => $clients, 'debtors' => $debtors]); 
+        $tariffs = Tariff::all();
+        return view('relations.index', ['relations' => $relations,'clients' => $clients,'tariffs' => $tariffs, 'debtors' => $debtors]); 
     }
     public function store()
     {
@@ -57,12 +59,13 @@ class RelationController extends Controller
             $original_document->value = $original_document_value;
             $original_document->save();
             $contract = new Contract;
-            $contract->code = 'test';
-            $contract->name = 'test';
-            $contract->code_1c = 'test';
-            $contract->gd_debitor_1c = 'test';
-            $contract->description = 'test';
-            $contract->date_end = Input::get('created_at');
+            $contract->code = Input::get('contract_code');
+            $contract->name = Input::get('contract_name');
+            $contract->code_1c = Input::get('contract_code_1c');
+            $contract->gd_debitor_1c = Input::get('contract_gd_debitor_1c');
+            $contract->description = Input::get('contract_description');
+            $contract->created_at = Input::get('contract_contract_created_at');
+            $contract->date_end = Input::get('contract_contract_date_end');
             $contract->save();
             $relation = new Relation;
             $relation->client_id = Input::get('client_id');
