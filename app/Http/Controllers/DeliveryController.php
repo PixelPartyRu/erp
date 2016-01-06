@@ -64,7 +64,9 @@ class DeliveryController extends Controller
 									$dateOfRecourse->addDays($relation->deferment);//Срок оплаты
 									$dateNowVar = new Carbon(Carbon::now());//Сегодняшнее число
 									$actualDeferment = clone $dateNowVar;
-									$actualDeferment = $actualDeferment->diffInDays($dateOfRecourse);//Фактическая просрочка
+									$dateOfRecourseClone = clone $dateOfRecourse;
+									$dateOfRecourseClone->addDays(1);//для включения в осрочку
+									$actualDeferment = $dateOfRecourseClone->diffInDays($actualDeferment,false);//Фактическая просрочка
 									$dateOfRegress = clone $dateOfRecourse;
 									$dateOfRegress->addDays($relation->waiting_period);//Дата регресса
 									$theDateOfTerminationOfThePeriodOfRegression = clone $dateOfRegress;
@@ -94,7 +96,7 @@ class DeliveryController extends Controller
 						            //$delivery->end_date_of_funding = $dateNowVar->format('Y-m-d');;//(ложь)
 						            $delivery->notes = $resultArray[$i][6];
 						            $delivery->return = "";
-						            $delivery->status = 'Зарегестрирован';
+						            $delivery->status = 'Зарегестрирована';
 						            $delivery->state = false;
 						            $delivery->the_presence_of_the_original_document = Input::get('the_presence_of_the_original_document');
 						            $delivery->type_of_factoring = $relation->confedential_factoring;
@@ -138,13 +140,19 @@ class DeliveryController extends Controller
     	if($handler == "verification"){
     		foreach ($verificationArray as $cell){
 				$delivery = Delivery::find($cell);
-				$delivery->status = 'Верефицирован';
+				$delivery->status = 'Верефицирована';
+				$delivery->save();
+			}
+    	}elseif($handler == "notVerification"){
+    		foreach ($verificationArray as $cell){
+				$delivery = Delivery::find($cell);
+				$delivery->status = 'Не верефицирована';
 				$delivery->save();
 			}
     	}else{
     		foreach ($verificationArray as $cell){
 				$delivery = Delivery::find($cell);
-				$delivery->status = 'Не верефицирован';
+				$delivery->status = 'К финансированию';
 				$delivery->save();
 			}
     	}
