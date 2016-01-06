@@ -25,6 +25,7 @@ Route::post('delivery/verification', 'DeliveryController@verification');
 Route::resource('delivery', 'DeliveryController');
 
 Route::resource('finance', 'FinanceController');
+Route::post('finance/financingSuccess', 'FinanceController@financingSuccess');
 
 /*
 |--------------------------------------------------------------------------

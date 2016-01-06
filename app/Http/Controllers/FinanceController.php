@@ -18,7 +18,8 @@ class FinanceController extends Controller
     public function index()
     {   
     	$finances = Finance::all();
-       	return view('finance.index',['finances' => $finances]);
+    	$dateToday = Carbon::now()->format('Y-m-d');
+       	return view('finance.index',['finances' => $finances,'dateToday' => $dateToday]);
     }
 
     public function store()
@@ -111,6 +112,24 @@ class FinanceController extends Controller
    			$deliveryFinanceId->finance_id = $financeMaxId;
    			$deliveryFinanceId->save();
    		}
+    }
+
+    public function financingSuccess(){
+        $financeArray = Input::get('financeArray');
+        $financingDate = Input::get('financingDate');
+        foreach ($financeArray as $key){
+            $finance = Finance::find($key);
+            $finance->date_of_funding = $financingDate;
+            $finance->status = 'Профинансировано';
+            $finance->save();
+
+            $deliveries = $finance->deliveries;
+            foreach($deliveries as $delivery){
+              $delivery->date_of_funding = $financingDate;
+              $delivery->status = 'Профинансировано';
+              $delivery->save();
+            }
+        }
     }
 }
 //
