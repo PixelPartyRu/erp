@@ -37,7 +37,7 @@
 						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
-							<label for="InputEmail5">КПП:</label>
+							<label for="InputEmail5">ОГРН:</label>
 						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5')) !!}
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container'>
