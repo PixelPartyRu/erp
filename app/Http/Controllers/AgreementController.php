@@ -31,7 +31,7 @@ class AgreementController extends Controller
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('client/'.Input::get('client_id').'/edit')
+            return Redirect::to('client/'.Input::get('client_id').'/agreement')
                 ->withErrors($validator);
         } else {
             // store
@@ -65,7 +65,7 @@ class AgreementController extends Controller
             $agreement->save();
             // redirect
            /* Request::flashOnly('message', 'Клиент добавлен');*/
-            return Redirect::to('client/'.Input::get('client_id').'/edit');
+            return Redirect::to('client/'.Input::get('client_id').'/agreement');
         }
     }
 
@@ -95,7 +95,7 @@ class AgreementController extends Controller
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('agreement/'.$id.'/edit')
+            return Redirect::to('agreement/'.$id.'/agreement')
                 ->withErrors($validator);
         } else {
             // store
@@ -130,7 +130,7 @@ class AgreementController extends Controller
 
             // redirect
             Session::flash('message', 'Изменения сохранены');
-            return Redirect::to('client/'.$agreement->client_id.'/edit');
+            return Redirect::to('client/'.$agreement->client_id.'/agreement');
         }
     }
 
@@ -142,6 +142,6 @@ class AgreementController extends Controller
 
         // redirect
         //Session::flash('message', 'Successfully deleted the nerd!');
-        return Redirect::to('client/'.$agreementId.'/edit');
+        return Redirect::to('client/'.$agreementId.'/agreement');
     }
 }

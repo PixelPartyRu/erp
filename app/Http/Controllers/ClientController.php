@@ -111,5 +111,10 @@ class ClientController extends Controller
         return Redirect::to('client');
     }
 
+    public function agreement($id){
+        $client = Client::find($id);
+        return view('clients.agreement',['client' => $client]);
+    }
+
 }
 

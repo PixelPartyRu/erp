@@ -120,16 +120,53 @@ class FinanceController extends Controller
         foreach ($financeArray as $key){
             $finance = Finance::find($key);
             $finance->date_of_funding = $financingDate;
-            $finance->status = 'Профинансировано';
+            $finance->status = 'Подтверждено';
             $finance->save();
 
             $deliveries = $finance->deliveries;
             foreach($deliveries as $delivery){
               $delivery->date_of_funding = $financingDate;
-              $delivery->status = 'Профинансировано';
+              $delivery->status = 'Подтверждено';
               $delivery->save();
             }
         }
     }
+
+    public function getSum(){
+      $financeId = Input::get('financeFormId');
+      $finance = Finance::find($financeId);
+      return $finance->sum;
+    }
+
+     public function getDeliveries(){
+        $financeId = Input::get('financeFormId');
+        $finance = Finance::find($financeId);
+        $deliveries = $finance->deliveries;
+        return view('finance.deliveryTemplate',['deliveries' => $deliveries]); 
+     }
+
+     public function filter(){
+        if (Input::get('filterArrayStatus')){
+          $filterArrayStatus = Input::get('filterArrayStatus');
+        }else{
+          $filterArrayStatus=array();
+        }
+        if (Input::get('filterArrayType')){
+          $filterArrayType = Input::get('filterArrayType');
+        }else{
+          $filterArrayType=array();
+        }
+        
+        if (count($filterArrayStatus) === 0 and count($filterArrayType) === 0){
+          $finances = Finance::all();
+        }else{
+                $finances = Finance::whereIn('type_of_funding', $filterArrayType)
+                                    ->orWhereIn('status', $filterArrayStatus)
+                                    ->get();
+        }
+
+        
+        return view('finance.tableRow',['finances' => $finances]);
+     }
 }
 //

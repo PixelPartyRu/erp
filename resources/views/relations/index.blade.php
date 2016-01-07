@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Заголовок страницы')
+@section('title', 'Связи')
 
 @section('stylesheet')
   	<link rel="stylesheet" type="text/css" href="/assets/css/clients.css">
@@ -147,7 +147,7 @@
 								@endif
 
 							</td>
-
+							<td><a href="/relation/{{ $relation->id }}/edit"><i class="fa fa-pencil"></i></a></td>
 
 						</tr>
 					@empty

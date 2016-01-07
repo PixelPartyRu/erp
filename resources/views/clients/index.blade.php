@@ -75,7 +75,7 @@
 							<td>{{ $client->inn }}</td>
 							<td>{{ $client->kpp }}</td>
 							<td>{{ $client->ogrn }}</td>
-							<td><a href="/client/{{ $client->id }}/"><i class="fa fa-file-text-o"></i></a></td>
+							<td><a href="/client/{{ $client->id }}/agreement"><i class="fa fa-file-text-o"></i></a></td>
 							<td><a href="/client/{{ $client->id }}/edit"><i class="fa fa-pencil"></i></a></td>
 							<td>
 								{{ Form::model($client, array('route' => array('client.destroy', $client->id), 'method' => 'DELETE')) }}

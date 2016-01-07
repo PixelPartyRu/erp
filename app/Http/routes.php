@@ -15,6 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::resource('client', 'ClientController');
+Route::get('client/{id}/agreement','ClientController@agreement');
+
 Route::resource('debtor', 'DebtorController');
 Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
@@ -26,6 +28,10 @@ Route::resource('delivery', 'DeliveryController');
 
 Route::resource('finance', 'FinanceController');
 Route::post('finance/financingSuccess', 'FinanceController@financingSuccess');
+Route::post('finance/getSum', 'FinanceController@getSum');
+Route::post('finance/getDeliveries', 'FinanceController@getDeliveries');
+Route::post('finance/filter', 'FinanceController@filter');
+
 
 /*
 |--------------------------------------------------------------------------
