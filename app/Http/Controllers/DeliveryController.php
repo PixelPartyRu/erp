@@ -192,14 +192,50 @@ class DeliveryController extends Controller
      	$deliveryFilterClient = Input::get('deliveryFilterClient');
      	$deliveryFilterDebtor = Input::get('deliveryFilterDebtor');
 
-     	$deliveries = Delivery::whereIn('status', $deliveryFilterStatusArray)
-                                ->whereIn('state', $deliveryFilterStateArray)
-                                ->whereIn('registry', $deliveryFilterRegitry)                   
-                                ->whereIn('client_id', $deliveryFilterClient)
-                                ->whereIn('debtor_id', $deliveryFilterDebtor)
-                                ->get();
-                                
-                   	            
+     	$deliveryFilterDateHandler = Input::get('deliveryFilterDateHandler');
+     	$deliveryFilterDateChoice = Input::get('deliveryFilterDateChoice');
+     	$deliveryFilterDateStart = Input::get('deliveryFilterDateStart');
+     	$deliveryFilterDateFinish = Input::get('deliveryFilterDateFinish');
+     	$arratBetween = [$deliveryFilterDateStart, $deliveryFilterDateFinish];
+
+     	if ($deliveryFilterDateHandler == 'true'){
+     		if($deliveryFilterDateChoice == '1'){
+     			$deliveries = Delivery::whereIn('status', $deliveryFilterStatusArray)
+	                                ->whereIn('state', $deliveryFilterStateArray)
+	                                ->whereIn('registry', $deliveryFilterRegitry)                   
+	                                ->whereIn('client_id', $deliveryFilterClient)
+	                                ->whereIn('debtor_id', $deliveryFilterDebtor)
+	                                ->whereBetween('date_of_registry',$arratBetween)
+	                                ->get();
+	                               
+     		}
+     		elseif($deliveryFilterDateChoice == '2'){
+     			$deliveries = Delivery::whereIn('status', $deliveryFilterStatusArray)
+	                                ->whereIn('state', $deliveryFilterStateArray)
+	                                ->whereIn('registry', $deliveryFilterRegitry)                   
+	                                ->whereIn('client_id', $deliveryFilterClient)
+	                                ->whereIn('debtor_id', $deliveryFilterDebtor)
+	                                ->whereBetween('date_of_waybill',$arratBetween)
+	                                ->get();
+     		}else{
+     			$deliveries = Delivery::whereIn('status', $deliveryFilterStatusArray)
+	                                ->whereIn('state', $deliveryFilterStateArray)
+	                                ->whereIn('registry', $deliveryFilterRegitry)                   
+	                                ->whereIn('client_id', $deliveryFilterClient)
+	                                ->whereIn('debtor_id', $deliveryFilterDebtor)
+	                                ->whereBetween('date_of_funding',$arratBetween)
+	                                ->get();
+     		}
+
+     	}else{
+	     	$deliveries = Delivery::whereIn('status', $deliveryFilterStatusArray)
+	                                ->whereIn('state', $deliveryFilterStateArray)
+	                                ->whereIn('registry', $deliveryFilterRegitry)                   
+	                                ->whereIn('client_id', $deliveryFilterClient)
+	                                ->whereIn('debtor_id', $deliveryFilterDebtor)
+	                                ->get();
+	    }
+                                      	            
         return view('delivery.deliveryTable',['deliveries' => $deliveries]);
      }
 }
