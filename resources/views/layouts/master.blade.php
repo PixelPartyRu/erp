@@ -6,11 +6,14 @@
       	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
+      	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-select.css">
+
       	<meta charset="UTF-8">
       	@yield('stylesheet')
       	<script type="text/javascript" src="/assets/js/jquery-2.1.4.min.js"></script>
       	<script type="text/javascript" src="/assets/js/main.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
+      	<script type="text/javascript" src="/assets/js/bootstrap-select.js"></script>
       	@yield('javascript')
     </head>
     <body>
@@ -52,7 +55,7 @@
 			        <li class="dropdown">
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Отчеты<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
-			            <li><a href="#">Начисленные комиссии</a></li>
+			            <li><a href="/chargeCommission">Начисленные комиссии</a></li>
 			            <li><a href="#">Отчет о наличии оригиналов документов</a></li>
 			            <li><a href="#">Лимиты</a></li>
 			          </ul>

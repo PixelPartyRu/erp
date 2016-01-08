@@ -67,7 +67,7 @@
 				  		<th></th>
 				  	</tr>
 				  </thead>
-				  <tbody>
+				  <tbody class='layoutTable'>
 				  	@forelse($clients as $client)
 						<tr>
 							<td>{{ $client->full_name }}</td>

@@ -21,9 +21,11 @@ Route::resource('debtor', 'DebtorController');
 Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
 Route::resource('tariff', 'TariffController');
+Route::resource('commission', 'CommissionController',['except' => ['show','index']]);
 
 Route::post('delivery/getDescription', 'DeliveryController@getDescription');
 Route::post('delivery/verification', 'DeliveryController@verification');
+Route::post('delivery/getFilterData', 'DeliveryController@getFilterData');
 Route::resource('delivery', 'DeliveryController');
 
 Route::resource('finance', 'FinanceController');
@@ -32,6 +34,12 @@ Route::post('finance/getSum', 'FinanceController@getSum');
 Route::post('finance/getDeliveries', 'FinanceController@getDeliveries');
 Route::post('finance/filter', 'FinanceController@filter');
 
+Route::get('commission/document', 'CommissionController@document');
+Route::get('commission/finance', 'CommissionController@finance');
+Route::get('commission/peni', 'CommissionController@peni');
+Route::get('commission/udz', 'CommissionController@udz');
+
+Route::resource('chargeCommission', 'ChargeCommissionController');
 
 /*
 |--------------------------------------------------------------------------

@@ -160,9 +160,15 @@ class FinanceController extends Controller
         if (count($filterArrayStatus) === 0 and count($filterArrayType) === 0){
           $finances = Finance::all();
         }else{
+                if(count($filterArrayStatus) === 0){
+                  $finances = Finance::whereIn('type_of_funding', $filterArrayType)->get();
+                }elseif(count($filterArrayType) === 0){
+                  $finances = Finance::WhereIn('status', $filterArrayStatus)->get();                  
+                }else{
                 $finances = Finance::whereIn('type_of_funding', $filterArrayType)
-                                    ->orWhereIn('status', $filterArrayStatus)
+                                    ->WhereIn('status', $filterArrayStatus)
                                     ->get();
+                }
         }
 
         

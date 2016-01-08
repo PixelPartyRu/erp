@@ -38,26 +38,26 @@ class ClientController extends Controller
 
         // process the login
         if ($validator->fails()) {
+            
             return Redirect::to('client')
                 ->withErrors($validator);
         } else {
-            // store
-            $client = new Client;
-            $client->full_name = Input::get('full_name');
-            $client->name = Input::get('name');
-            $client->inn = Input::get('inn');
-            $client->kpp = Input::get('kpp');
-            $client->ogrn = Input::get('ogrn');
-
-            if ($this->is_valid_inn((int)$client->inn)){//Проверка инн
+            if($this->is_valid_inn((int)Input::get('inn'))){ //Проверка инн
+                $client = new Client;
+                $client->full_name = Input::get('full_name');
+                $client->name = Input::get('name');
+                $client->inn = Input::get('inn');
+                $client->kpp = Input::get('kpp');
+                $client->ogrn = Input::get('ogrn');
                 $client->save();
-            }else{
-                var_dump('Error');
-            }
-
-            // redirect
-           /* Request::flashOnly('message', 'Клиент добавлен');*/
+                // redirect
+               /* Request::flashOnly('message', 'Клиент добавлен');*/
             return Redirect::to('client');
+            }else{
+                return Redirect::to('client')
+                ->withErrors($validator);
+            }
+            
         }
     }
 

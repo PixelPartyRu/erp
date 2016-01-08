@@ -22,8 +22,10 @@ class DeliveryController extends Controller
     public function index()
     {   
      	$deliveries = Delivery::all();
+     	$clients = Client::all();
+     	$debtors = Debtor::all();
      	$dateToday = Carbon::now()->format('Y-m-d');
-       	return view('delivery.index',['deliveries' => $deliveries,'dateToday' => $dateToday]);
+       	return view('delivery.index',['deliveries' => $deliveries,'clients' => $clients,'debtors' => $debtors, 'dateToday' => $dateToday]);
     }
 
     public function store(){
@@ -140,13 +142,13 @@ class DeliveryController extends Controller
     	if($handler == "verification"){
     		foreach ($verificationArray as $cell){
 				$delivery = Delivery::find($cell);
-				$delivery->status = 'Верефицирована';
+				$delivery->status = 'Верифицирована';
 				$delivery->save();
 			}
     	}elseif($handler == "notVerification"){
     		foreach ($verificationArray as $cell){
 				$delivery = Delivery::find($cell);
-				$delivery->status = 'Не верефицирована';
+				$delivery->status = 'Неверифицирована';
 				$delivery->save();
 			}
     	}else{
@@ -173,6 +175,32 @@ class DeliveryController extends Controller
      	$idInput = Input::get('idInput');
      	$contract = Delivery::find($idInput)->relation->contract->description;
      	return $contract;
+     }
+
+     public function getFilterData(){
+     	$deliveryFilterStatusArray = Input::get('deliveryFilterStatusArray');
+     	$deliveryFilterState = Input::get('deliveryFilterState');
+     	$deliveryFilterStateArray = [];
+     	foreach ($deliveryFilterState as $cell) {
+     		if ($cell === 'true'){
+     			array_push($deliveryFilterStateArray,TRUE);
+     		}else{
+     			array_push($deliveryFilterStateArray,FALSE);
+     		}
+     	}
+     	$deliveryFilterRegitry = Input::get('deliveryFilterRegitry');
+     	$deliveryFilterClient = Input::get('deliveryFilterClient');
+     	$deliveryFilterDebtor = Input::get('deliveryFilterDebtor');
+
+     	$deliveries = Delivery::whereIn('status', $deliveryFilterStatusArray)
+                                ->whereIn('state', $deliveryFilterStateArray)
+                                ->whereIn('registry', $deliveryFilterRegitry)                   
+                                ->whereIn('client_id', $deliveryFilterClient)
+                                ->whereIn('debtor_id', $deliveryFilterDebtor)
+                                ->get();
+                                
+                   	            
+        return view('delivery.deliveryTable',['deliveries' => $deliveries]);
      }
 }
 
