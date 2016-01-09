@@ -12,7 +12,7 @@
 
 @section('content')
 	<h1><strong>Клиенты</strong></h1>
-	<div class="panel panel-success" id="clientCreate">
+	<div class="panel panel-success openClickTable" id="clientCreate">
 		<div class="panel-heading">
 			<span>Заполните данные клиента</span>
 			<i class="fa fa-chevron-down"></i> 

@@ -57,6 +57,12 @@ class TariffController extends Controller
         Session::flash('message', 'Successfully deleted the nerd!');
         return Redirect::to('tariff');
     }
+    public function edit($id)
+    {
+        $tariff = Tariff::find($id);
+
+        return view('tariffs.edit', ['tariff' => $tariff]); 
+    }
      public function show($id)
     {
         $tariff = Tariff::find($id);

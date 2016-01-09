@@ -12,7 +12,7 @@
 
 @section('content')
 	<h1><strong>Дебиторы</strong></h1>
-	<div class="panel panel-success" id="debtorCreate">
+	<div class="panel panel-success openClickTable" id="debtorCreate">
 		<div class="panel-heading">
 			<span>Заполните данные дебитора</span>
 			<i class="fa fa-chevron-down"></i> 

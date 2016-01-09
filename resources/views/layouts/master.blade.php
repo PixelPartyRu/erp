@@ -5,8 +5,8 @@
         <title>TAG.Factor - @yield('title')</title>
       	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap.min.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css">
-      	<link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-select.css">
+      	<link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
 
       	<meta charset="UTF-8">
       	@yield('stylesheet')
@@ -14,6 +14,8 @@
       	<script type="text/javascript" src="/assets/js/main.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap-select.js"></script>
+      	<script type="text/javascript" src="/assets/js/layout.js"></script>
+
       	@yield('javascript')
     </head>
     <body>

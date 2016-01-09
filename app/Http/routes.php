@@ -38,6 +38,8 @@ Route::get('commission/document', 'CommissionController@document');
 Route::get('commission/finance', 'CommissionController@finance');
 Route::get('commission/peni', 'CommissionController@peni');
 Route::get('commission/udz', 'CommissionController@udz');
+Route::get('commission/lastTariffId', 'CommissionController@lastTariffId');
+Route::get('commission/putAllCommissionsForTariff', 'CommissionController@putAllCommissionsForTariff');
 
 Route::resource('chargeCommission', 'ChargeCommissionController');
 
