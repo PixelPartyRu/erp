@@ -10,4 +10,8 @@ class Tariff extends Model
     {
         return $this->hasMany('App\Relation');
     }
+    public function commissions()
+    {
+        return $this->hasMany('App\Commission');
+    }
 }

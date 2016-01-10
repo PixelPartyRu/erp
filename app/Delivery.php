@@ -25,4 +25,9 @@ class Delivery extends Model
     {
         return $this->belongsTo('App\Relation');
     }
+
+    public function chargeCommission()
+    {
+        return $this->hasOne('App\ChargeCommission');
+    }
 }

@@ -60,10 +60,14 @@ class TariffController extends Controller
     public function edit($id)
     {
         $tariff = Tariff::find($id);
-
         return view('tariffs.edit', ['tariff' => $tariff]); 
     }
-     public function show($id)
+    public function show($id)
+    {
+        $tariff = Tariff::find($id);
+        return view('tariffs.show', ['tariff' => $tariff]); 
+    }
+     public function activateTariff($id)
     {
         $tariff = Tariff::find($id);
         $tariff->active = 1;

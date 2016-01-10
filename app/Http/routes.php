@@ -22,6 +22,7 @@ Route::resource('relation', 'RelationController');
 Route::resource('agreement', 'AgreementController');
 Route::resource('tariff', 'TariffController');
 Route::resource('commission', 'CommissionController',['except' => ['show','index']]);
+Route::get('activateTariff/{id}', 'TariffController@activateTariff');
 
 Route::post('delivery/getDescription', 'DeliveryController@getDescription');
 Route::post('delivery/verification', 'DeliveryController@verification');
@@ -39,9 +40,11 @@ Route::get('commission/finance', 'CommissionController@finance');
 Route::get('commission/peni', 'CommissionController@peni');
 Route::get('commission/udz', 'CommissionController@udz');
 Route::get('commission/lastTariffId', 'CommissionController@lastTariffId');
-Route::get('commission/putAllCommissionsForTariff', 'CommissionController@putAllCommissionsForTariff');
+Route::get('commission/putAllCommissionsForTariff/{id}', 'CommissionController@putAllCommissionsForTariff');
 
 Route::resource('chargeCommission', 'ChargeCommissionController');
+Route::post('chargeCommission/recalculationTest', 'ChargeCommissionController@recalculationTest');
+
 
 /*
 |--------------------------------------------------------------------------

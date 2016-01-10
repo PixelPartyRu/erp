@@ -38,7 +38,7 @@
 						</div>
 					</div>
 					<div class= "col-xs-12 col-sm-12 col-md-6 col-lg-6">
-						<div class="panel panel-success">
+						<div class="panel panel-success" id="pcfg">
 							<div class="panel-heading">Настройки</div>
 							<div class="panel-body">
 								<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
