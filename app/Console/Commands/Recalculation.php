@@ -155,7 +155,6 @@ class Recalculation extends Command
                             $udz_w_nds = (($delivery->remainder_of_the_debt_first_payment / 100.00) * $udz) * $dateOfFundingDiff;
                             $commission->udz = $udz_w_nds;
                         }
-                        echo $udz;
                         if ($udz_commission->nds == true){
                             $udz_nds = ($udz_w_nds / 100.00) * $nds;
                         }

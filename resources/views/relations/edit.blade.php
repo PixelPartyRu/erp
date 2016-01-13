@@ -106,7 +106,8 @@
 						  	{!! Form::select('tariff_id',['0' => 'Выбрать тариф'] + array_pluck($tariffs, 'name', 'id')) !!}
 						</div>
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-							{!! Form::submit('Обновить связь') !!}
+							{!! Form::submit('Обновить связь',array('class' => 'btn btn-success')) !!}
+							<a href='{{URL::route('relation.index')}}' class="btn btn-danger">Отменить</a>
 							{!! Session::get('message') !!}
 						</div>
 					</div>

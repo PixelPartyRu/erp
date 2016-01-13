@@ -57,6 +57,7 @@
 				<table class="table table-striped" id="client-table">
 				  <thead>
 				  	<tr>
+						<th>№</th>
 				  		<th>Полное наименование</th>
 				  		<th>Наименование</th>
 				  		<th>ИНН</th>
@@ -68,8 +69,10 @@
 				  	</tr>
 				  </thead>
 				  <tbody class='layoutTable'>
+				  	  {{-- */ $num = 0; /* --}}
 				  	@forelse($clients as $client)
 						<tr>
+							<td>{{ $num += 1 }}</td>
 							<td>{{ $client->full_name }}</td>
 							<td>{{ $client->name }}</td>
 							<td>{{ $client->inn }}</td>

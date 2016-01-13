@@ -15,165 +15,125 @@
 @section('content')
 	<div class="panel panel-success openClickTable" id="relationsCD">
 		<div class="panel-heading">
-			<span>Связи клиент-дебитор</span>
+			<span>Создание cвязи клиент-дебитор</span>
 			<i class="fa fa-chevron-down"></i>
 		</div>
 
 		<div class="panel-body">
 			{!! Form::open(array('action' => 'RelationController@store')) !!}
 				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-						<div class="panel panel-success">
-								<div class="panel-heading">Контрагенты</div>
-								<div class="panel-body">
-									<div class="form-group col-xs-12"> 
-										<label for="client_id">Клиент:</label>
-							  			{!! Form::select('client_id',['0' => 'Выбрать клиента'] + array_pluck($clients, 'full_name', 'id'),0, array('class'=>'selectpicker')) !!}
+									<div class="form-group col-xs-3 col-sm-3 col-md-3 col-lg-2"> 
+							  			{!! Form::select('client_id',['0' => 'Выберите клиента'] + array_pluck($clients, 'full_name', 'id'),0, array('class'=>'selectpicker')) !!}
 									</div>
-									<div class="form-group col-xs-12">
-										<label for="debtor_id"> Дебитор:</label>
-							  			{!! Form::select('debtor_id',['0' => 'Выбрать дебитора'] + array_pluck($debtors, 'full_name', 'id'),0, array('class'=>'selectpicker')) !!}
+									<div class="form-group col-xs-3 col-sm-3 col-md-3 col-lg-2"> 
+							  			{!! Form::select('debtor_id',['0' => 'Выберите дебитора'] + array_pluck($debtors, 'full_name', 'id'),0, array('class'=>'selectpicker')) !!}
 							  		</div>
-								</div>
-						</div>
-					</div>
-					<div class= "col-xs-12 col-sm-12 col-md-6 col-lg-6">
-						<div class="panel panel-success" id="pcfg">
-							<div class="panel-heading">Настройки</div>
-							<div class="panel-body">
-								<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
-									<label for="created_at">Условия вступают в силу:</label>
-								  	{!! Form::date('created_at') !!}
-								</div>
-								<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12" id="act">
-							  		<label for="active"> Активно</label>
-									{!! Form::checkbox('active', 'true', true);!!}
-								</div>
-							</div>
-						</div>
-					</div>
+									<div class="form-group col-xs-3 col-sm-3 col-md-3 col-lg-2" id="relation_selectors" style=""> 
+									{!! Form::select('agreement_id',['0' => 'Договоров нет'],0, array('class'=>'selectpicker','disabled','id'=>'agreement_id')) !!}
+									</div>
+									
+									<div class="form-group col-xs-2 col-sm-2 col-md-2 col-lg-3">
+									<label for="created_at">Условия вступают в силу</label>
+								  	{!! Form::date('created_at',null, array('class'=>'inline')) !!}
+									</div>
+									<div class="form-group col-xs-3 col-sm-3 col-md-3 col-lg-3" id="act">
+										<label for="confedential_factoring">Конфеденциальный факторинг</label>
+										{!! Form::checkbox('confedential_factoring', 'true');!!}<br />
+										{!! Form::checkbox('active', 'true', true, array('style'=>'display:none'));!!}
+									</div>
 				</div>
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 						<div class="panel panel-success">
-							<div class="panel-heading">Свойтва</div>
+							<div class="panel-heading">Условия связи</div>
 							<div class="panel-body">
+							<div class="row">
 								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="rpp">Коэфициент финансирования(%):</label>
-								  	{!! Form::text('rpp',null,array('class' => 'form-control','id' => 'rpp')) !!}
+									<label for="rpp">Коэфициент финансирования(%)</label>
+								  	{!! Form::text('rpp',null,array('class' => 'form-control small_checkbox inline','id' => 'rpp')) !!}
 								</div>
-								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="confedential_factoring">Конфеденциальный факторинг:</label>
-									{!! Form::checkbox('confedential_factoring', 'true');!!}
+
+								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-4">
+									<label for="deferment_start">Отсчет начала отсрочки</label>
+									{!! Form::select('size', array('true' => 'Дата накладной', 'false' => 'Дата финансирования'), 'true',array('class'=>'selectpicker inline date_naklad')) !!}
 								</div>
-								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="deferment_start">Отсчет начала отсрочки:</label>
-									{!! Form::select('size', array('true' => 'Дата накладной', 'false' => 'Дата финансирования'), 'true',array('class'=>'selectpicker')) !!}
-								</div>
-								<div class="clearfix"></div>
-								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="deferment">Отсрочка:</label>
-								  	{!! Form::text('deferment',null,array('class' => 'form-control','id' => 'deferment')) !!}
-								  	{!! Form::select('deferment_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней', array('class'=>'selectpicker')) !!}
-								</div>
-								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="deferment">Период ожидания:</label>
-								  	{!! Form::text('waiting_period',null,array('class' => 'form-control','id' => 'waiting_period')) !!}
-								  	{!! Form::select('waiting_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней', array('class'=>'selectpicker')) !!}
-								</div>
-								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="regress_period">Период регресса:</label>
-								  	{!! Form::text('regress_period',null,array('class' => 'form-control','id' => 'regress_period')) !!}
-								  	{!! Form::select('regress_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней', array('class'=>'selectpicker')) !!}
-								</div>
-								<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-									<label for="original_documents_select">Оригиналы первичных документов:</label>
-									<div class="clearfix"></div>
-									<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
-									  	{!! Form::select('original_documents_select', array('0' => 'Финансирование по оригиналам', '1' => 'Нет', '2' => 'Первичные документы через'), '0', array('class'=>'selectpicker')) !!}
+									<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-5">
+									  	<label for="original_documents_select">Документы</label>
+										{!! Form::select('original_documents_select', array('2' => 'Первичные документы через', '0' => 'Финансирование по оригиналам', '1' => 'Оригиналы по запросу'), '2', array('class'=>'selectpicker inline document_finance','id'=>'original_documents_select')) !!}
+										<span id="original_documents_value">
+										{!! Form::text('original_documents_value',null,array('class' => 'form-control small_checkbox inline','id' => '')) !!}	
+										дней
+										</span>
 									</div>
-									<div class="form-group col-xs-12 col-sm-4 col-md-4 col-lg-4" id="o_documents_value">
-										{!! Form::text('original_documents_value',null,array('class' => 'form-control','id' => 'original_documents_value')) !!}	
-									</div>
+							</div>
+							<div class="row">
+								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-4">
+									<label for="deferment">Отсрочка</label>
+								  	{!! Form::text('deferment',null,array('class' => 'form-control small_checkbox inline','id' => 'deferment')) !!}
+								  	{!! Form::select('deferment_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней', array('class'=>'selectpicker select_period_type')) !!}
+								</div>
+								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-4">
+									<label for="deferment">Период ожидания</label>
+								  	{!! Form::text('waiting_period',null,array('class' => 'form-control small_checkbox inline','id' => 'waiting_period')) !!}
+								  	{!! Form::select('waiting_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней', array('class'=>'selectpicker select_period_type')) !!}
+								</div>
+								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-4">
+									<label for="regress_period">Период регресса</label>
+								  	{!! Form::text('regress_period',null,array('class' => 'form-control small_checkbox inline','id' => 'regress_period')) !!}
+								  	{!! Form::select('regress_period_type', array('Календарных дней' => 'Календарных дней', 'Банковских дней' => 'Банковских дней'), 'Календарных дней', array('class'=>'selectpicker select_period_type')) !!}
 								</div>
 							</div>
 						</div>										
-					</div>
 					<div class="clearfix"></div>
 				</div>
-
-				<div class="row">
-					<div class="col-xs-12 col-sm-12 col-md-8 col-lg-8">
-						<div class="row">
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 								<div class="panel panel-success">
-									<div class="panel-heading">Контракт</div>
+									<div class="panel-heading">Условия контракта</div>
 									<div class="panel-body">
-										<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
-											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-												<label for="contract_code">Номер договора:</label>
-											  	{!! Form::text('contract_code',null,array('class' => 'form-control','id' => 'contract_code')) !!}
+										<div class="row contract">
+											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-4">
+												<div class="conctract_input_block"> 
+												<label for="contract_code">Номер договора</label>
+											  	{!! Form::text('contract_code',null,array('class' => 'form-control inline input_contract','id' => 'contract_code')) !!}
+												</div>
+												<div class="conctract_input_block">
+												<label for="contract_name">Наименование</label>
+											  	{!! Form::text('contract_name',null,array('class' => 'form-control inline input_contract','id' => 'contract_name')) !!}
+												</div>
+												<div class="conctract_input_block">
+												<label for="contract_code_1c">Номер договора для 1С</label>
+											  	{!! Form::text('contract_code_1c',null,array('class' => 'form-control inline input_contract','id' => 'contract_code_1c')) !!}
+												</div>
 											</div>
-											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-												<label for="contract_name">Наименование:</label>
-											  	{!! Form::text('contract_name',null,array('class' => 'form-control','id' => 'contract_name')) !!}
+											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-4">
+												<div class="conctract_input_block">
+												<label for="contract_gd_debitor_1c">Номер ГД (дебитора) для 1С</label>
+											  	{!! Form::text('contract_gd_debitor_1c',null,array('class' => 'form-control inline input_contract','id' => 'contract_gd_debitor_1c')) !!}
+												</div>
+												<div class="conctract_input_block">
+												<label for="contract_created_at">Дата договора</label>
+											  	{!! Form::date('contract_created_at',null,array('class' => 'form-control inline input_contract')) !!}
+												</div>
+												<div class="conctract_input_block">
+												<label for="contract_date_end">Действителен до</label>
+											  	{!! Form::date('contract_date_end',null,array('class' => 'form-control inline input_contract')) !!}
+												</div>
 											</div>
-											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-												<label for="contract_code_1c">Номер договора для 1С:</label>
-											  	{!! Form::text('contract_code_1c',null,array('class' => 'form-control','id' => 'contract_code_1c')) !!}
-											</div>
-											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-												<label for="contract_gd_debitor_1c">Номер ГД (дебитора) для 1С:</label>
-											  	{!! Form::text('contract_gd_debitor_1c',null,array('class' => 'form-control','id' => 'contract_gd_debitor_1c')) !!}
-											</div>
-											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-												<label for="contract_created_at">Дата договора:</label>
-											  	{!! Form::date('contract_created_at',null,array('class' => 'form-control')) !!}
-											</div>
-											<div class="form-group col-xs-12 col-sm-12 col-md-6 col-lg-6">
-												<label for="contract_date_end">Действителен до:</label>
-											  	{!! Form::date('contract_date_end',null,array('class' => 'form-control')) !!}
+											<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-4">
+												{!! Form::textarea('contract_description',null,array('class' => 'form-control','id' => 'contract_description', 'rows'=>'5', 'placeholder'=>'Коментарии')) !!}
 											</div>
 										</div>
 									</div>
 								</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-3">
+										  	{!! Form::select('tariff_id',['0' => 'Выберите тариф'] + array_pluck($tariffs, 'name', 'id'), 0, array('class'=>'selectpicker')) !!}
 							</div>
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-								<div class="panel panel-success">
-									<div class="panel-heading">Тарифы</div>
-									<div class="panel-body">
-										<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
-										  	{!! Form::select('tariff_id',['0' => 'Выбрать тариф'] + array_pluck($tariffs, 'name', 'id'), 0, array('class'=>'selectpicker')) !!}
-										</div>
-									</div>
-								</div>
+							<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-3">							
+							{!! Form::submit('Создать связь', array('class' => 'btn btn-success')) !!}
 							</div>
-						</div>
-					</div>
-					<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
-						<div class="row">
-							<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-								<div class="panel panel-success">
-									<div class="panel-heading">Коментарии</div>
-									<div class="panel-body">
-										<div class="form-group col-xs-12 col-sm-12 col-md-12 col-lg-12">
-										  	{!! Form::textarea('contract_description',null,array('class' => 'form-control','id' => 'contract_description')) !!}
-										</div>
-									</div>
-								</div>
-							</div>
-							<div class="col-xs-12">
-								<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6">
-									{!! Form::submit('Создать связь', array('class' => 'btn btn-success')) !!}
-									{!! Session::get('message') !!}
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			{!! Form::close() !!}
+											{!! Session::get('message') !!}
+							
 		</div>
+			{!! Form::close() !!}
 	</div>
+
 	<div class="panel panel-info">
 		<div class="panel-heading">Связи</div>
 		<div class="panel-body">
@@ -181,6 +141,7 @@
 				<table class="table table-striped" id="client-table">
 				  <thead>
 				  	<tr class="sv">
+						<th>№</th>
 				  		<th>Связь</th>
 				  		<th>Статус</th>
 				  		<th>Коэффициент финансирования %</th>
@@ -194,8 +155,10 @@
 				  	</tr>
 				  </thead>
 				  <tbody>
+				  {{-- */ $num = 0; /* --}}
 				  	@forelse($relations as $relation)
 						<tr>
+							<td>{{ $num += 1 }}</td>
 							<td>{{ $relation->debtor->name }}<span>&nbsp&#x2012&nbsp</span>{{ $relation->client->name }}</td>
 							<td>{{ $relation->active == true ? 'Активна' : 'Не активна' }}</td>
 							<td>{{ $relation->rpp}}</td>

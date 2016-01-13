@@ -110,8 +110,8 @@
 									false
 								@endif
 							</td>
-							<td>{{ $agreements->created_at }}</td>
-							<td>{{ $agreements->date_end }}</td>
+							<td>{{ @date_format($agreements->created_at,'d/m/Y') }}</td>
+							<td>{{ @date('d/m/Y',strtotime($agreements->date_end))}}</td>
 							<td><a href="/agreement/{{ $agreements->id }}/edit"><i class="fa fa-pencil"></i></a></td>
 							<td>
 								{{ Form::model($agreements, array('route' => array('agreement.destroy', $agreements->id), 'method' => 'DELETE')) }}

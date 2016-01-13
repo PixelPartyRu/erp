@@ -37,8 +37,8 @@
 			  @endif
 			  {!! Form::hidden('client_id',@$agreement->client_td) !!}
 			  {!! Form::date('date_end',@$agreement->date_end) !!}
-
-			  {!! Form::submit('Сохранить') !!}
+				<a href="{{URL::route('client.index')}}" class="btn btn-danger">Отменить</a>
+			  {!! Form::submit('Сохранить',array('class' => 'btn btn-success')) !!}
 
 		{!! Form::close() !!}
 		</div>

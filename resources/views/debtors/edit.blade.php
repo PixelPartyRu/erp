@@ -36,6 +36,9 @@
 				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" id='btn-container'>
 			  		{!! Form::submit('Сохранить',array('class' => 'btn btn-success')) !!}
 				</div>
+				<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4" id='btn-container'>
+				<a href='{{URL::route('debtor.index')}}' class="btn btn-danger">Отменить</a>
+				</div>
 		{!! Form::close() !!}
     </div>
 @stop

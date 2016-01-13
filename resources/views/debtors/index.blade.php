@@ -67,9 +67,10 @@
 				  	</tr>
 				  </thead>
 				  <tbody>
+				  {{-- */ $num = 0; /* --}}
 				  	@forelse($debtors as $debtor)
 						<tr>
-							<td>{{ $debtor->id }}</td>
+							<td>{{ $num += 1 }}</td>
 							<td>{{ $debtor->full_name }}</td>
 							<td>{{ $debtor->name }}</td>
 							<td>{{ $debtor->inn }}</td>

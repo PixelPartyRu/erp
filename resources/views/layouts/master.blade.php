@@ -7,6 +7,7 @@
       	<link rel="stylesheet" type="text/css" href="/assets/css/font-awesome.min.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-select.css">
       	<link rel="stylesheet" type="text/css" href="/assets/css/layout.css">
+      	<link rel="stylesheet" type="text/css" href="/assets/css/bootstrap-editable.css">
 
       	<meta charset="UTF-8">
       	@yield('stylesheet')
@@ -15,6 +16,7 @@
       	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap-select.js"></script>
       	<script type="text/javascript" src="/assets/js/layout.js"></script>
+      	<script type="text/javascript" src="/assets/js/bootstrap-editable/bootstrap-editable.js"></script>
 
       	@yield('javascript')
     </head>
@@ -69,7 +71,7 @@
 			          <ul class="dropdown-menu">
 			            <li><a href="/delivery">Поставки</a></li>
 			            <li><a href="/finance">Финансирование</a></li>
-			            <li><a href="#">Погашение</a></li>
+			            <li><a href="/repayment">Погашения</a></li>
 			            <li><a href="#">Выставление счетов</a></li>
 			            <li><a href="#">Документы 1С</a></li>
 			          </ul>
@@ -89,6 +91,9 @@
 			</nav>
 			
             @yield('content')
+        </div>
+        <div class="alert">
+          <strong id="message_shot"></strong><span id="message"></span>
         </div>
     </body>
 </html>

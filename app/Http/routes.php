@@ -35,16 +35,15 @@ Route::post('finance/getSum', 'FinanceController@getSum');
 Route::post('finance/getDeliveries', 'FinanceController@getDeliveries');
 Route::post('finance/filter', 'FinanceController@filter');
 
-Route::get('commission/document', 'CommissionController@document');
-Route::get('commission/finance', 'CommissionController@finance');
-Route::get('commission/peni', 'CommissionController@peni');
-Route::get('commission/udz', 'CommissionController@udz');
+Route::get('commission/{type}', 'CommissionController@commissionType');
 Route::get('commission/lastTariffId', 'CommissionController@lastTariffId');
 Route::get('commission/putAllCommissionsForTariff/{id}', 'CommissionController@putAllCommissionsForTariff');
 
 Route::resource('chargeCommission', 'ChargeCommissionController');
 Route::post('chargeCommission/recalculationTest', 'ChargeCommissionController@recalculationTest');
 
+Route::resource('repayment', 'RepaymentController');
+Route::post('repayment/getImportFile', 'RepaymentController@getImportFile');
 
 /*
 |--------------------------------------------------------------------------

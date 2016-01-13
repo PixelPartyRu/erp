@@ -19,27 +19,14 @@ use App\CommissionsRage;
 
 class CommissionController extends Controller
 {
-    public function document()
+    public function commissionType($type)
     {   
-        return view('commissions.document'); 
-    }
-    public function finance()
-    {   
-        return view('commissions.finance'); 
-    }
-    public function peni()
-    {   
-        return view('commissions.peni'); 
-    }
-    public function udz()
-    {   
-        return view('commissions.udz'); 
-    }
-    public function lastTariffId()
-    {   
-        $tariff_id = Tariff::all()->pluck('id')->last();
-
-        return response()->json(['id' => $tariff_id]);
+        if (null !== Input::get('id')){
+            $commission = Commission::find(Input::get('id'));
+            return view('commissions.'.$type,['commission' => $commission]); 
+        }
+        else
+            return view('commissions.'.$type); 
     }
     public function store()
     {
@@ -58,6 +45,7 @@ class CommissionController extends Controller
             $commission = new Commission;
             $commission->name = Input::get('name');
             $commission->tariff_id = Input::get('tariff_id');
+            $commission->type = Input::get('commission_select');
             if (null !== Input::get('nds'))
                 $commission->nds = Input::get('nds');
             if (null !== Input::get('deduction'))
@@ -73,8 +61,6 @@ class CommissionController extends Controller
             if (null !== Input::get('commission_value'))
                 $commission->commission_value = Input::get('commission_value');
             $commission->save();
-
-            $commission_id = Commission::all()->pluck('id')->last();
             if (null !== Input::get('range_commission_value'))
             foreach (Input::get('range_commission_value') as $key =>  $range_commission_value){
                 $commissions_rage = new CommissionsRage;
@@ -84,12 +70,44 @@ class CommissionController extends Controller
                 if ('' !== Input::get('range_commission_max')[$key])
                     $commissions_rage->max = Input::get('range_commission_max')[$key];
                 $commissions_rage->value = Input::get('range_commission_value')[$key];
-                $commissions_rage->commission_id = $commission_id;
+                $commissions_rage->commission_id = $commission->id;
                 $commissions_rage->save();
             }
             // redirect
-            Session::flash('message', 'Дебитор добавлен');
-            return Redirect::to('tariff');
+            return response()->json($commission->tariff_id);
         }
     }
+     public function update($id){
+        $commission = Commission::find($id);
+        $commission->nds = Input::get('nds');
+        $commission->deduction = Input::get('deduction');
+        $commission->payer = Input::get('payer');
+        $commission->additional_sum = Input::get('additional_sum');
+        $commission->rate_stitching = Input::get('rate_stitching');
+        $commission->time_of_settlement = Input::get('time_of_settlement');
+        if (null !== Input::get('commission_value'))
+            $commission->commission_value = Input::get('commission_value');
+        $commission->save();
+        if (null !== Input::get('range_commission_value'))
+        foreach (Input::get('range_commission_value') as $key =>  $range_commission_value){
+            if ( "" !== Input::get('range_commission_id')[$key])
+                $commissions_rage = CommissionsRage::find(Input::get('range_commission_id')[$key]);
+            else
+                $commissions_rage = new CommissionsRage;
+            $commissions_rage->min = Input::get('range_commission_min')[$key];
+            $commissions_rage->max = Input::get('range_commission_max')[$key];
+            $commissions_rage->value = Input::get('range_commission_value')[$key];
+            $commissions_rage->commission_id = $commission->id;
+            $commissions_rage->save();
+        }
+        // redirect
+        return response()->json($commission->tariff_id);
+    }
+    public function destroy($id)
+    {
+        $client = CommissionsRage::find($id);
+        $client->delete();
+    }
+
+
 }

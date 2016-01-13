@@ -13,18 +13,10 @@
 @section('content')
 	@include('delivery.popup',['dateToday' => $dateToday])
 	@include('delivery.deliveryFilter')
+	@include('delivery.importModal')
 	<div class="panel panel-success">
 		<div class="panel-heading">Поставки</div>
 		<div class="panel-body">
-			<div class="form-group">
-			{!! Form::open(array('action' => 'DeliveryController@store', 'files' => true)) !!}
-			    {!! Form::label('getFile', 'Загрузить файл с исходными данными:')!!}
-			    {!! Form::file('report')!!}
-				<label for="Input1">Наличие оригинала документа:</label>
-			  	{!! Form::checkbox('the_presence_of_the_original_document',null,array('class' => 'form-control','id' => 'Input1')) !!}
-			    {!! Form::submit('Импортирт поставок') !!}
-			{!! Form::close() !!}
-			</div>
 			<div class="row">
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
 					<input type="button" id="popupOpen" value="Верификация" class="form-control btn btn-success">
@@ -36,29 +28,30 @@
 					<input type="button" value="Удалить" class="form-control btn btn-success">
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-					<input type="button" value="Импортировать" class="form-control btn btn-success">
+					<input type="button" value="Импорт поставок" data-toggle="modal" data-target="#importModal" class="form-control btn btn-success">
 				</div>
 			</div>		
 			<div class="table-responsive">
-				<table class="table table-striped">
+				<table class="table table-striped" id="delivery-table">
 				  <thead>
 					  <tr>
-					  	<th>Верификация</th>
+					  	<th><input type="checkbox" id="checkAll_checkbox"></th>
+						<th>№</th>
 					  	<th>Клиент</th>
-					  	<th>Инн клиента</th>
+					  	<th>ИНН клиента</th>
 					  	<th>Дебитор</th>
-					  	<th>Инн дебитора</th>
+					  	<th>ИНН дебитора</th>
 					  	<th>Накладная</th>
 					  	<th>Сумма накладной</th>
+						<th>Остаток долга</th>
 					  	<th>Сумма первого платежа</th>
-					  	<th>Остаток долга</th>
-					  	<th>Остаток долга первого платежа</th>
+					  	<th>Остаток первого платежа</th>
 					  	<th>Дата накладной</th>
 					  	<th>Отсрочка</th>
 					  	<th>Срок оплаты</th>
 					  	<th>Дата оплаты</th>
 					  	<th>Дата регресса</th>
-					  	<th>Дата окончания периода регресса</th>
+					  	<th>Дата окончания регресса</th>
 					  	<th>Дата рег. поставок</th>
 					  	<th>Просрочка</th>
 					  	<th>Счет фактура</th>

@@ -15,4 +15,9 @@ class Debtor extends Model
     {
         return $this->hasMany('App\Delivery');
     }
+
+	public function repayments()
+    {
+        return $this->hasMany('App\Repayment');
+    }
 }
