@@ -30,9 +30,13 @@ class Relation extends Model
         return $this->belongsTo('App\Tariff');
     }
 
-    public function delivery()
+    public function deliveries()
     {
-        return $this->hasOne('App\Delivery');
+        return $this->hasMany('App\Delivery');
+    }
+    public function limit()
+    {
+        return $this->hasOne('App\Limit');
     }
 
 }

@@ -13,7 +13,11 @@
 		<td>{{ number_format($commission->nds,2,',',' ') }}</td>
 		<td>{{ number_format($commission->with_nds,2,',',' ') }}</td>
 		<td>{{ number_format($commission->debt,2,',',' ') }}</td>
-		<td>{{ date('d/m/Y', strtotime($commission->date_of_repayment)) }}</td>
+		<td>
+			@if($commission->date_of_repayment != 0)
+				{{ date('d/m/Y', strtotime($commission->date_of_repayment)) }}
+			@endif
+		</td>
 		<td>{{ date('d/m/Y', strtotime($commission->date_of_funding)) }}</td>
 		<td>
 			@if ($commission->waybill_status == true)

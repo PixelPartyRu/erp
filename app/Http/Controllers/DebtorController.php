@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
 use App\Debtor;
+use App\Repayment;
+
 
 class DebtorController extends Controller
 {
@@ -41,22 +43,26 @@ class DebtorController extends Controller
             return Redirect::to('debtor')
                 ->withErrors($validator);
         } else {
-            // store
-            $debtor = new Debtor;
-            $debtor->full_name = Input::get('full_name');
-            $debtor->name = Input::get('name');
-            $debtor->inn = Input::get('inn');
-            $debtor->kpp = Input::get('kpp');
-            $debtor->ogrn = Input::get('ogrn');
-            if ($this->is_valid_inn((int)$debtor->inn)){//Проверка инн
-                $debtor->save();
+            if(count(Debtor::where('inn','=',Input::get('inn'))->get())>0){
+                return redirect()->back()->with('danger','Дебитор с данным ИНН уже имеется в базе')->withInput();
             }else{
-                var_dump('Error');
-            }
+                // store
+                $debtor = new Debtor;
+                $debtor->full_name = Input::get('full_name');
+                $debtor->name = Input::get('name');
+                $debtor->inn = Input::get('inn');
+                $debtor->kpp = Input::get('kpp');
+                $debtor->ogrn = Input::get('ogrn');
+                if ($this->is_valid_inn((int)$debtor->inn)){//Проверка инн
+                    $debtor->save();
+                }else{
+                    var_dump('Error');
+                }
 
-            // redirect
-            Session::flash('message', 'Дебитор добавлен');
-            return Redirect::to('debtor');
+                // redirect
+                Session::flash('success', 'Дебитор добавлен');
+                return Redirect::to('debtor');
+            }
         }
     }
 
@@ -70,8 +76,20 @@ class DebtorController extends Controller
     {
         $debtor = Debtor::find($id);
 
+
         return view('debtors.edit', ['debtor' => $debtor]); 
     }
+	
+	public function destroy($id)
+    {
+        $repayment = Repayment::where('debtor_id', '=', $id);
+		$repayment->delete();
+		$debtor = Debtor::find($id);
+        $debtor->delete();
+        Session::flash('message', 'Дебитор удален успешно!');
+        //return Redirect::to('debtor');
+    }
+	
     public function update($id)
     {
         // validate
@@ -104,7 +122,7 @@ class DebtorController extends Controller
             }
 
             // redirect
-            Session::flash('message', 'Изменения сохранены');
+            Session::flash('success', 'Изменения сохранены');
             return Redirect::to('debtor');
         }
     }

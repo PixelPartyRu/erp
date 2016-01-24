@@ -23,7 +23,7 @@ class AgreementController extends Controller
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'code'  => 'required',
-            'penalty'       => 'required',
+           // 'penalty'       => 'required',
             'code_1c'       => 'required',
             'date_end'       => 'required',
         );
@@ -47,14 +47,18 @@ class AgreementController extends Controller
             }else{
                 $agreement->account = FALSE;
             }
-            $agreement->penalty = Input::get('penalty');
+            if(Input::get('penalty')){ 
+				$agreement->penalty = Input::get('penalty');
+			}else{
+				$agreement->penalty = '2099-12-31';// Заглушка надо исправить! У нас 85 лет осталось!
+			}
             if (Input::get('second_pay')){
                 $agreement->second_pay = TRUE;
             }else{
                 $agreement->second_pay = FALSE;
             }
             $agreement->code_1c = Input::get('code_1c');
-            $agreement->description = Input::get('description');
+            $agreement->description = ' ';
             if (Input::get('active')){
                 $agreement->active = TRUE;
             }else{
@@ -62,6 +66,7 @@ class AgreementController extends Controller
             }
             $agreement->client_id = Input::get('client_id');
             $agreement->date_end= Input::get('date_end');
+			$agreement->created_at= Input::get('created_at');
             $agreement->save();
             // redirect
            /* Request::flashOnly('message', 'Клиент добавлен');*/
@@ -87,7 +92,7 @@ class AgreementController extends Controller
         // read more on validation at http://laravel.com/docs/validation
         $rules = array(
             'code'  => 'required',
-            'penalty'       => 'required',
+            //'penalty'       => 'required',
             'code_1c'       => 'required',
             'date_end'       => 'required',
         );
@@ -95,7 +100,7 @@ class AgreementController extends Controller
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('agreement/'.$id.'/agreement')
+            return Redirect::to('client/'.$id.'/agreement')
                 ->withErrors($validator);
         } else {
             // store
@@ -111,20 +116,25 @@ class AgreementController extends Controller
             }else{
                 $agreement->account = FALSE;
             }
-            $agreement->penalty = Input::get('penalty');
+            //$agreement->penalty = Input::get('penalty');
+			if(Input::get('penalty')){ 
+				$agreement->penalty = Input::get('penalty');
+			}else{
+				$agreement->penalty = '2099-12-31';// Заглушка надо исправить! У нас 85 лет осталось!
+			}
             if (Input::get('second_pay')){
                 $agreement->second_pay = TRUE;
             }else{
                 $agreement->second_pay = FALSE;
             }
             $agreement->code_1c = Input::get('code_1c');
-            $agreement->description = Input::get('description');
+            $agreement->description = ' ';
             if (Input::get('active')){
                 $agreement->active = TRUE;
             }else{
                 $agreement->active = FALSE;
             }
-            $agreement->client_id = Input::get('client_id');
+            //$agreement->client_id = Input::get('client_id');
             $agreement->date_end= Input::get('date_end');
             $agreement->save();
 

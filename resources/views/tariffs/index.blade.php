@@ -1,3 +1,4 @@
+
 @extends('layouts.master')
 
 @section('title', 'Заголовок страницы')
@@ -32,31 +33,31 @@
   		</div>
 	</div>
 	<div class="panel panel-info">
-		<div class="panel-heading">Доступные тарифы <br> {{ Form::checkbox('active', 1, true, ['id' => 'active']) }} <label for="active">активные</label><span>&nbsp &nbsp &nbsp</span> {{ Form::checkbox('deactive', 1, null, ['id' => 'deactive']) }} <label for="deactive">не активные</label></div>
+		<div class="panel-heading">Доступные тарифы <br> {{ Form::checkbox('active', 1, null, ['id' => 'active', 'class'=>'filtrCheckbox']) }} <label for="active">активные</label><span>&nbsp &nbsp &nbsp</span> {{ Form::checkbox('deactive', 1, null, ['id' => 'deactive', 'class'=>'filtrCheckbox']) }} <label for="deactive">не активные</label></div>
 			<div class="table-responsive">
 				<table class="table table-striped" id="debtor-table">
 				  <thead>
 				  	<tr>
-				  		<th>Наименование</th>
-				  		<th>Дата создания</th>
-				  		<th>Статус</th>
-				  		<th>Дата прекращения действия</th>
+				  		<th><a href="{{URL::current()}}?sort=name&active=1" name="name" class="sort">Наименование </a><i class="fa"></i></th>
+				  		<th><a href="{{URL::current()}}?sort=created_at&active=1" name="created_at" class="sort active-sort">Дата создания </a><i class="fa fa-arrow-circle-o-up"></i></th>
+				  		<th><a href="{{URL::current()}}?sort=active&active=1" name="active" class="sort">Статус </a><i class="fa"></i></th>
+				  		<th><a href="{{URL::current()}}?sort=deactivated_at&active=1" name="deactivated_at" class="sort">Дата прекращения действия </a><i class="fa"></i></th>
 				  		<th></th>
 				  		<th></th>
 				  		<th></th>
 				  		<th></th>
 				  	</tr>
 				  </thead>
-				  <tbody>
+				  <tbody id="ajaxUpdate" sortDirection='DESC'>
 				  	@forelse($tariffs as $tariff)
-						<tr {{ $tariff->active == true ? 'class=active' : 'class=deactive' }}>
-							<td><a href="#" id="name" class="editable" data-type="text" data-pk="1" data-url="/tariff/{{$tariff->id}}" data-title="Название тарифа">{{ $tariff->name }}</a></td>
+						<tr>
+							<td><a href="#" id="name" class="editable" data-params="_token:'{{csrf_token}}"data-type="text" data-pk="1" data-url="/tariff/{{$tariff->id}}" data-toggle="tooltip" title="Название тарифа">{{ $tariff->name }}</a></td>
 							<td>{{ $tariff->created_at ? date_format($tariff->created_at,'d/m/Y') : ' '}}</td>
 							<td>{{ $tariff->active == true ? 'Активный' : 'Не активный' }}</td>
-							<td>{{ $tariff->deactivated_at ? @date('d/m/Y',strtotime($tariff->deactivated_at)) : ' ' }}</td>
+							<td>{{ $tariff->deactivated_at ? @date('d/m/Y',strtotime($tariff->deactivated_at)) : '' }}</td>
 							<td>
 								<a href="" class="copy_tariff_button">
-									<i class="table_icons fa fa-files-o" data-title="Копировать тариф"></i>
+									<i class="table_icons fa fa-files-o" data-toggle="tooltip" title="Копировать тариф"></i>
 									<div class="modal-content">
 										<div class="modal-header">
 							          		<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -83,7 +84,7 @@
 								</a>
 							</td>
 							<td class="tariffs_clients_link {{ count($tariff->relations)>0 ? 'client_show_active' : 'client_show_deactive'}} " >
-								<i class="fa fa-users table_icons" data-title="{{ count($tariff->relations)>0 ? 'Клиенты' : 'Нет клиентов'}}"></i>
+								<i class="fa fa-users table_icons" data-toggle="tooltip" title="{{ count($tariff->relations)>0 ? 'Клиенты' : 'Нет клиентов'}}"></i>
 								<div class="modal-content tariffs_clients">
 									<div class="modal-header">
 	          							<button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -91,7 +92,7 @@
 							        </div>
 							        <div class="modal-body">
 										@forelse($tariff->relations as $relation)
-											{{ $relation->client->name }} <a href="/client/{{ $relation->client->id }}/edit"><i class="table_icons fa fa-pencil" data-title="Редактировать клиента"></i></a>
+											{{ $relation->client->name }} <a href="/client/{{ $relation->client->id }}/edit"><i class="table_icons fa fa-pencil" data-toggle="tooltip" title="Редактировать клиента"></i></a><br>
 										@empty
 										@endforelse
 									</div>
@@ -100,24 +101,24 @@
 							        </div>
 							    </div>
 							</td>
-							<td><a class="comissions_edit" href="/tariff/{{ $tariff->id }}"><i class="table_icons fa fa-money" data-title="Редактирование комиссий"></i></a></td>
+							<td><a class="comissions_edit" href="/tariff/{{ $tariff->id }}"><i class="table_icons fa fa-money" data-toggle="tooltip" title="Редактирование комиссий"></i></a></td>
 
 							@if ( $tariff->active == true)
 								<td>
 								{{ Form::model($tariff, array('route' => array('tariff.destroy', $tariff->id), 'method' => 'DELETE')) }}
-									{{ Form::button('<i class="fa fa-close" data-title="Отключить"></i>', array('class'=>'', 'type'=>'submit')) }}
+									{{ Form::button('<i class="fa fa-minus" data-toggle="tooltip" title="Отключить"></i></i>', array('class'=>'', 'type'=>'submit')) }}
 								{{ Form::close() }}
 								</td>
 							@else
 								<td>
 									{{ Form::open(array('action' => array('TariffController@activateTariff', $tariff->id), 'method' => 'GET')) }}
-										{{ Form::button('<i class="fa fa-check" data-title="Включить"></i>', array('class'=>'', 'type'=>'submit')) }}
+										{{ Form::button('<i class="fa fa-minus" data-toggle="tooltip" title="Включить"></i></i>', array('class'=>'', 'type'=>'submit')) }}
 									{{ Form::close() }}
 								</td>
 							@endif
 						</tr>
 					@empty
-						<p>Тарифов нет</p>
+						<tr><td><p>Тарифов нет</p></td></tr>
 					@endforelse
 				  </tbody>
 				</table>
@@ -131,14 +132,9 @@
   </div>
 <div id="addCommissions" class="modal fade" role="dialog">
   <div class="modal-dialog modal-lg">
-
     <!-- Modal content-->
-    <div class="modal-content">
-
-
-      
+    <div class="modal-content AjaxUpdateList" data-update="">
     </div>
-
   </div>
 </div>
 @stop

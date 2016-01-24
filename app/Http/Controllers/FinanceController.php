@@ -13,13 +13,17 @@ use Illuminate\Support\Facades\Input;
 use Carbon\Carbon;
 use App\Delivery;
 use App\Finance;
+use Session;
+
 class FinanceController extends Controller
 {
     public function index()
     {   
-    	$finances = Finance::all();
-    	$dateToday = Carbon::now()->format('Y-m-d');
-       	return view('finance.index',['finances' => $finances,'dateToday' => $dateToday]);
+    	
+		$finances = Finance::all();
+    $sum = Finance::sum('sum');
+		$dateToday = Carbon::now()->format('Y-m-d');
+       	return view('finance.index',['finances' => $finances,'dateToday' => $dateToday,'sum'=>$sum]);
     }
 
     public function store()
@@ -31,20 +35,20 @@ class FinanceController extends Controller
       	$i = 0;
        	foreach ($idDeliveryArray as $id){
        		$delivery = Delivery::find($id);
-			$stek[$i][0] = $delivery->client->name;
-			$stek[$i][1] = $delivery->waybill_amount;
-			$stek[$i][2] = $delivery->registry;
-			$stek[$i][3] = $delivery->date_of_registry;
-			$stek[$i][4] = $delivery->id;
-			$i++;
-       	}
+    			$stek[$i][0] = $delivery->client->name;
+    			$stek[$i][1] = $delivery->first_payment_amount;
+    			$stek[$i][2] = $delivery->registry;
+    			$stek[$i][3] = $delivery->date_of_registry;
+    			$stek[$i][4] = $delivery->id;
+    			$i++;
+        }
 
        	$size = count($stek);
        	if ($size > 1){
 	       	usort($stek,function($a, $b){
 	       		return $a[2] - $b[2];
 	       	});
-	    }
+  	    }
 
 	    $keyStek = [];
        	$client = $stek[0][0];
@@ -117,19 +121,24 @@ class FinanceController extends Controller
     public function financingSuccess(){
         $financeArray = Input::get('financeArray');
         $financingDate = Input::get('financingDate');
+        $financeArrayFirstPayment = [];
         foreach ($financeArray as $key){
-            $finance = Finance::find($key);
-            $finance->date_of_funding = $financingDate;
-            $finance->status = 'Подтверждено';
-            $finance->save();
+          $finance = Finance::find($key);
+          if ($finance->type_of_funding != 'Второй платеж'){
+            array_push($financeArrayFirstPayment,$key);
+          }
+          $finance->date_of_funding = $financingDate;
+          $finance->status = 'Подтверждено';
+          $finance->save();
 
-            $deliveries = $finance->deliveries;
-            foreach($deliveries as $delivery){
-              $delivery->date_of_funding = $financingDate;
-              $delivery->status = 'Подтверждено';
-              $delivery->save();
-            }
+          $deliveries = $finance->deliveries;
+          foreach($deliveries as $delivery){
+            $delivery->date_of_funding = $financingDate;
+            $delivery->status = 'Профинансирована';
+            $delivery->save();
+          }
         }
+        return $financeArrayFirstPayment;
     }
 
     public function getSum(){
@@ -146,33 +155,32 @@ class FinanceController extends Controller
      }
 
      public function filter(){
-        if (Input::get('filterArrayStatus')){
-          $filterArrayStatus = Input::get('filterArrayStatus');
-        }else{
-          $filterArrayStatus=array();
-        }
+
+        $filterStatus = Input::get('filterStatus');
+  
         if (Input::get('filterArrayType')){
           $filterArrayType = Input::get('filterArrayType');
         }else{
           $filterArrayType=array();
         }
-        
-        if (count($filterArrayStatus) === 0 and count($filterArrayType) === 0){
-          $finances = Finance::all();
-        }else{
-                if(count($filterArrayStatus) === 0){
-                  $finances = Finance::whereIn('type_of_funding', $filterArrayType)->get();
-                }elseif(count($filterArrayType) === 0){
-                  $finances = Finance::WhereIn('status', $filterArrayStatus)->get();                  
-                }else{
-                $finances = Finance::whereIn('type_of_funding', $filterArrayType)
-                                    ->WhereIn('status', $filterArrayStatus)
-                                    ->get();
-                }
+		
+        $q_finance = Finance::query();
+		
+		if(count($filterArrayType) != 0){
+            $q_finance = $q_finance->whereIn('type_of_funding', $filterArrayType);
         }
+		if($filterStatus != '0'){
+            $q_finance = $q_finance->where('status', '=', $filterStatus);                  
+        }
+		$q_sum = clone $q_finance;
+		
+		$sum = $q_sum->sum('sum');
+		
+		$finances = $q_finance->get();
+        
 
         
-        return view('finance.tableRow',['finances' => $finances]);
+        return view('finance.tableRow',['finances' => $finances,'sum'=>$sum]);
      }
 }
 //

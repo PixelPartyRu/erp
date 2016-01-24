@@ -13,14 +13,37 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
+
 use App\Tariff;
+use App\Commission;
 
 class TariffController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {   
-        $tariffs=Tariff::orderBy('name')->get();
-		return view('tariffs.index', ['tariffs' => $tariffs]); 
+        //Input::get('active')
+        $sort = Input::get('sort') == null ? 'id' : Input::get('sort');
+        $sortDirection = Input::get('sortDirection') == null ? 'DESC' : Input::get('sortDirection');
+        $tariffs = Tariff::orderBy($sort,$sortDirection);
+        if(Input::has('deactive')){
+            if(Input::has('active')){
+                $tariffs = $tariffs->get();
+            }else{
+                $tariffs = $tariffs->where('active','=',false);
+                $tariffs = $tariffs->get();
+            }
+        }else{
+            if(Input::has('active')){
+                $tariffs = $tariffs->where('active','=',true);
+                $tariffs = $tariffs->get();
+            }
+        }
+            
+       
+       if($request->ajax())
+            return view('tariffs.indexAjax', ['tariffs' => $tariffs]); 
+        else
+		    return view('tariffs.index', ['tariffs' => $tariffs]); 
     }
      public function store()
     {
@@ -42,15 +65,20 @@ class TariffController extends Controller
                 // store
                 if(Input::get('tariff_id') !== null){
                     $oldtariff = Tariff::find(Input::get('tariff_id'));
-                    $oldtariff->load('commissions');
                     $tariff = $oldtariff->replicate();
                     $tariff->name = Input::get('name');
-                    $tariff->push();
-
-
-   
-
-                    return response()->json(['callback' => 'success','message_shot'=>'Тест!', 'message' => ' Тариф скопирован ','tariff_id'=>$tariff->id]);
+                    $tariff->save();
+                    foreach ($oldtariff->commissions as  $oldcommission) {
+                        $commission = $oldcommission->replicate();
+                        $commission->tariff_id = $tariff->id;
+                        $commission->save();
+                        foreach ($oldcommission->commissionsRages as  $oldcommissionsRage) {
+                            $commissionsRage = $oldcommissionsRage->replicate();
+                            $commissionsRage->commission_id = $commission->id;
+                            $commissionsRage->save();
+                        }
+                    }
+                    return response()->json(['callback' => 'success','message_shot'=>'Успешно!', 'message' => ' Тариф "'.$oldtariff->name.'"скопирован, теперь вы можете приступить к редактированию комиссий','tariff_id'=>$tariff->id]);
                 }else{
                     $tariff = new Tariff;
                     $tariff->name = Input::get('name');
@@ -87,7 +115,15 @@ class TariffController extends Controller
     public function show($id)
     {
         $tariff = Tariff::find($id);
-        return view('tariffs.show', ['tariff' => $tariff]); 
+        if (count($tariff->commissions)>0)
+            foreach ($tariff->commissions as $commission) {
+                $commissionTypesAdded[ $commission->type] = $commission->name;
+            }
+        else
+            $commissionTypesAdded = array();
+        $commissionTypesList=array('finance' => 'Вознаграждение за пользование денежными средствами', 'document' => 'Плата за обработку одного документа','peni' => 'Пеня за просрочку','udz' => 'Вознаграждение за УДЗ');
+        $commissionTypes = array_diff($commissionTypesList,$commissionTypesAdded);
+        return view('tariffs.show', ['tariff' => $tariff,'commissionTypes' => $commissionTypes]); 
     }
     public function activateTariff($id)
     {

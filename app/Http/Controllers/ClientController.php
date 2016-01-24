@@ -35,29 +35,33 @@ class ClientController extends Controller
             'ogrn'       => array('required', 'size:13'),
         );
         $validator = Validator::make(Input::all(), $rules);
-
         // process the login
         if ($validator->fails()) {
             
             return Redirect::to('client')
                 ->withErrors($validator);
         } else {
-            if($this->is_valid_inn((int)Input::get('inn'))){ //Проверка инн
-                $client = new Client;
-                $client->full_name = Input::get('full_name');
-                $client->name = Input::get('name');
-                $client->inn = Input::get('inn');
-                $client->kpp = Input::get('kpp');
-                $client->ogrn = Input::get('ogrn');
-                $client->save();
-                // redirect
-               /* Request::flashOnly('message', 'Клиент добавлен');*/
-            return Redirect::to('client');
+            if(count(Client::where('inn','=',Input::get('inn'))->get())>0){
+                return redirect()->back()->with('danger','Клиент с данным ИНН уже имеется в базе')->withInput();
             }else{
-                return Redirect::to('client')
-                ->withErrors($validator);
+                var_dump($this->is_valid_inn((int)Input::get('inn')));
+                if($this->is_valid_inn((int)Input::get('inn'))){ //Проверка инн
+                    $client = new Client;
+                    $client->full_name = Input::get('full_name');
+                    $client->name = Input::get('name');
+                    $client->inn = Input::get('inn');
+                    $client->kpp = Input::get('kpp');
+                    $client->ogrn = Input::get('ogrn');
+                    $client->save();
+                    // redirect
+                   //*Request::flashOnly('message', 'Клиент добавлен');*/
+				    Session::flash('success', 'Клиент добавлен');
+                return Redirect::to('client/'.$client->id.'/agreement');
+                }else{
+                    return Redirect::to('client')
+                    ->withErrors($validator);
+                }
             }
-            
         }
     }
 
@@ -106,18 +110,18 @@ class ClientController extends Controller
             }
 
             // redirect
-            Session::flash('message', 'Изменения сохранены');
+            Session::flash('success', 'Изменения сохранены');
             return Redirect::to('client');
         }
     }
     public function destroy($id)
     {
-        $client = Client::find($id);
-        $client->delete();
+        Client::destroy($id);
+       // $client->delete();
 
         // redirect
-        Session::flash('message', 'Successfully deleted the nerd!');
-        return Redirect::to('client');
+        //Session::flash('message', 'Successfully deleted the nerd!');
+        //return Redirect::to('client');
     }
 
     public function agreement($id){

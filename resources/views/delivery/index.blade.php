@@ -11,9 +11,13 @@
 @stop
 
 @section('content')
-	@include('delivery.popup',['dateToday' => $dateToday])
+	<h1><strong>Поставки</strong></h1>
+	@include('delivery.verificationModal',['dateToday' => $dateToday])
 	@include('delivery.deliveryFilter')
 	@include('delivery.importModal')
+	@include('delivery.importModalDelete')
+	@include('delivery.importDeleteConfirm')
+	@include('global.messages')
 	<div class="panel panel-success">
 		<div class="panel-heading">Поставки</div>
 		<div class="panel-body">
@@ -25,7 +29,7 @@
 					<input type="button" value="Отклонить" class="form-control btn btn-success">
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
-					<input type="button" value="Удалить" class="form-control btn btn-success">
+					<input type="button" value="Удалить" data-toggle="modal" id="modalConfirm" class="form-control btn btn-success">
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-3">
 					<input type="button" value="Импорт поставок" data-toggle="modal" data-target="#importModal" class="form-control btn btn-success">
@@ -69,7 +73,6 @@
 					  </tr>
 				  </thead>
 				  <tbody id="deliveryTableTemplate">
-				  	 @include('delivery.deliveryTable')
 				  </tbody>
 				</table>
 			</div>

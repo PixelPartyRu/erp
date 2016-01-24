@@ -1,3 +1,4 @@
+<?php $sum = 0 ?>
 @forelse($deliveries as $delivery)
 	<tr>
 		<td>{{ $delivery->client->name }}</td>
@@ -8,8 +9,10 @@
 		<td>{{ number_format($delivery->waybill_amount,2,',',' ') }}</td>
 		<!-- <td>{{ number_format($delivery->first_payment_amount, 2,',',' ') }}</td>
 		<td>{{ number_format($delivery->balance_owed,2,',',' ') }}</td>
-		<td>{{ number_format($delivery->remainder_of_the_debt_first_payment,2,',',' ') }}</td> -->
+		-->
 		<td>{{ date('d/m/Y', strtotime($delivery->date_of_waybill)) }}</td>
+		<td>{{ number_format($delivery->remainder_of_the_debt_first_payment,2,',',' ') }}</td>
+		<?php $sum +=  $delivery->remainder_of_the_debt_first_payment ?> 
 		<!-- <td>{{ $delivery->due_date }}</td>
 		<td>{{ date('d/m/Y', strtotime($delivery->date_of_recourse)) }}</td>
 		<td>
@@ -60,8 +63,15 @@
 			Конфиденциальный
 			@endif
 		</td> -->
-		<td>Здесь будет сумма финансирования</td>
 	</tr>
 @empty
 	<tr><td>Поставок нет</td></tr>
 @endforelse
+	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><strong>Итого:</strong></td>
+		<td><strong>{{ $sum }}</strong></td>
+	</tr>

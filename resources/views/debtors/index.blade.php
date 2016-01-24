@@ -8,17 +8,18 @@
 
 @section('javascript')
   	<script type="text/javascript" src="/assets/js/debtor.js"></script>
+	<script type="text/javascript" src="/assets/js/validator.js"></script>
 @stop
 
 @section('content')
 	<h1><strong>Дебиторы</strong></h1>
 	<div class="panel panel-success openClickTable" id="debtorCreate">
 		<div class="panel-heading">
-			<span>Заполните данные дебитора</span>
+			<span>Создание нового дебитора</span>
 			<i class="fa fa-chevron-down"></i> 
 		</div>		
 		<div class="panel-body">
-				{!! Form::open(array('action' => 'DebtorController@store')) !!}
+				{!! Form::open(array('action' => 'DebtorController@store','id'=>'debtor-form')) !!}
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="InputEmail1">Полное наименование:</label>
@@ -30,15 +31,18 @@
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="InputEmail3">ИНН:</label>
-						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'InputEmail3')) !!}
+						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'InputEmail3','data-inns'=>'bar','maxlength'=>'12')) !!}
+							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="InputEmail4">КПП:</label>
-						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4')) !!}
+						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4','data-minlength'=>'9', 'maxlength'=>'9', 'data-error'=>"КПП введен не верно")) !!}
+							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="InputEmail5">ОГРН:</label>
-						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5')) !!}
+						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5', 'data-minlength'=>'13', 'maxlength'=>'13', 'data-error'=>"ОРГН введен не верно")) !!}
+							<div class="help-block with-errors"></div>
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container'>
 						  	{!! Form::submit('Добавить',array('class' => 'btn btn-success')) !!}
@@ -76,15 +80,13 @@
 							<td>{{ $debtor->inn }}</td>
 							<td>{{ $debtor->kpp }}</td>
 							<td>{{ $debtor->ogrn }}</td>
-							<td><a href="/debtor/{{ $debtor->id }}/edit"><i class="fa fa-pencil"></i></a></td>
+							<td><a href="/debtor/{{ $debtor->id }}/edit"><i class="fa fa-pencil" data-toggle="tooltip" title="Редактировать"></i></a></td>
 							<td>
-								{{ Form::model($debtor, array('route' => array('debtor.destroy', $debtor->id), 'method' => 'DELETE')) }}
-									{{ Form::button('<i class="fa fa-close"></i>', array('class'=>'', 'type'=>'submit')) }}
-								{{ Form::close() }}
+							<a class="deleteItem" data-toggle="tooltip" title="Удалить" data-delete="/debtor/{{$debtor->id}}" data-method="delete"><i class="fa fa-close"></i></a>
 							</td>
 						</tr>
 					@empty
-						<p>Клиентов нет</p>
+						<p>Дебиторов нет</p>
 					@endforelse
 				  </tbody>
 				</table>

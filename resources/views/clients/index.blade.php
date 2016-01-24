@@ -8,17 +8,18 @@
 
 @section('javascript')
   	<script type="text/javascript" src="/assets/js/clients.js"></script>
+	<script type="text/javascript" src="/assets/js/validator.js"></script>
 @stop
 
 @section('content')
 	<h1><strong>Клиенты</strong></h1>
 	<div class="panel panel-success openClickTable" id="clientCreate">
 		<div class="panel-heading">
-			<span>Заполните данные клиента</span>
+			<span>Создание нового клиента</span>
 			<i class="fa fa-chevron-down"></i> 
 		</div>
 		<div class="panel-body">
-				{!! Form::open(array('action' => 'ClientController@store')) !!}
+				{!! Form::open(array('action' => 'ClientController@store','id'=>'form-client')) !!}
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="Input1">Полное наименование:</label>
@@ -30,17 +31,20 @@
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="Input3">ИНН:</label>
-						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'Input3')) !!}
+						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'Input3', 'data-inns'=>'bar', 'maxlength'=>'12')) !!}
+							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="Input4">КПП:</label>
-						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'Input4')) !!}
+						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'Input4','data-minlength'=>'9', 'maxlength'=>'9', 'data-error'=>"КПП введен не верно")) !!}
+							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="Input5">ОГРН:</label>
-						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'Input5')) !!}
+						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'Input5','data-minlength'=>'13', 'maxlength'=>'13', 'data-error'=>"ОРГН введен не верно")) !!}
+							<div class="help-block with-errors"></div>
 						</div>
-						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container'>
+						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container-label'>
 						  	{!! Form::submit('Добавить',array('class' => 'btn btn-success')) !!}
 						</div>
 						<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
@@ -78,13 +82,9 @@
 							<td>{{ $client->inn }}</td>
 							<td>{{ $client->kpp }}</td>
 							<td>{{ $client->ogrn }}</td>
-							<td><a href="/client/{{ $client->id }}/agreement"><i class="fa fa-file-text-o"></i></a></td>
-							<td><a href="/client/{{ $client->id }}/edit"><i class="fa fa-pencil"></i></a></td>
-							<td>
-								{{ Form::model($client, array('route' => array('client.destroy', $client->id), 'method' => 'DELETE')) }}
-									{{ Form::button('<i class="fa fa-close"></i>', array('class'=>'', 'type'=>'submit')) }}
-								{{ Form::close() }}
-							</td>
+							<td><a href="/client/{{ $client->id }}/agreement"><i class="fa fa-file-text-o" data-toggle="tooltip" title="Договора"></i></a></td>
+							<td><a href="/client/{{ $client->id }}/edit"><i class="fa fa-pencil" data-toggle="tooltip" title="Редактировать"></i></a></td>
+							<td><a class="deleteItem" data-delete="/client/{{ $client->id }}" data-method="delete"><i class="fa fa-close"  data-toggle="tooltip" title="Удалить"></a></i></td>
 						</tr>
 					@empty
 						<p>Клиентов нет</p>

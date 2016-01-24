@@ -10,18 +10,18 @@
 {{-- */ $sum_balance_owed += $delivery->balance_owed; /* --}}
 {{-- */ $sum_remainder_of_the_debt_first_payment += $delivery->remainder_of_the_debt_first_payment; /* --}}
 		<tr>
-			<td><input type="checkbox" data-id='{{ $delivery->id }}' class='verification'></td>
-			<td>{{$num = $num +1}}</td>
+			<td class="add_popup"><input type="checkbox" data-id='{{ $delivery->id }}' class='verification'></td>
+			<td class="add_popup">{{$num = $num +1}}</td>
 			<td>{{ $delivery->client->name }}</td>
 			<td>{{ $delivery->client->inn }}</td>
-			<td>{{ $delivery->debtor->name }}</td>
+			<td class="add_popup">{{ $delivery->debtor->name }}</td>
 			<td>{{ $delivery->debtor->inn }}</td>
-			<td>{{ $delivery->waybill }}</td>
-			<td nowrap>{{ number_format($delivery->waybill_amount,2,',',' ') }}</td>
+			<td class="add_popup">{{ $delivery->waybill }}</td>
+			<td  class="add_popup"nowrap>{{ number_format($delivery->waybill_amount,2,',',' ') }}</td>
 			<td nowrap>{{ number_format($delivery->balance_owed,2,',',' ') }}</td>
-			<td nowrap>{{ number_format($delivery->first_payment_amount, 2,',',' ') }}</td>
+			<td  class="add_popup" nowrap>{{ number_format($delivery->first_payment_amount, 2,',',' ') }}</td>
 			<td nowrap>{{ number_format($delivery->remainder_of_the_debt_first_payment,2,',',' ') }}</td>
-			<td>{{ date('d/m/Y', strtotime($delivery->date_of_waybill)) }}</td>
+			<td class="add_popup">{{ date('d/m/Y', strtotime($delivery->date_of_waybill)) }}</td>
 			<td>{{ $delivery->due_date }}</td>
 			<td>{{ date('d/m/Y', strtotime($delivery->date_of_recourse)) }}</td>
 			<td>
@@ -52,12 +52,12 @@
 			<td>{{ $delivery->return }}</td>
 			<td>
 				@if ( $delivery->state )
-					Погасил
+					Погашено
 				@else
-				Непогашено
+					Непогашено
 				@endif
 			</td>
-			<td>{{ $delivery->status }}</td>
+			<td nowrap>{{ $delivery->status }}</td>
 			<td>
 				@if ($delivery->the_presence_of_the_original_document)
 					Да
@@ -67,9 +67,9 @@
 			</td>
 			<td>
 				@if ($delivery->type_of_factoring)
-					Открытый
+					Конфиденциальный
 				@else
-				Конфиденциальный
+					Открытый
 				@endif
 			</td>
 			<!-- <td class="destroyDelivery">

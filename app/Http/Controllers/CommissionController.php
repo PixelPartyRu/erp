@@ -21,12 +21,15 @@ class CommissionController extends Controller
 {
     public function commissionType($type)
     {   
-        if (null !== Input::get('id')){
+        if ('0' !== Input::get('id')){
             $commission = Commission::find(Input::get('id'));
             return view('commissions.'.$type,['commission' => $commission]); 
         }
-        else
-            return view('commissions.'.$type); 
+        else{
+            $tariff_id = Input::get('tariff_id');
+            $commissionName = Input::get('commissionName');
+            return view('commissions.'.$type,['tariff_id' => $tariff_id, 'commission_type' => $type,'commissionName' =>$commissionName]); 
+        }
     }
     public function store()
     {
@@ -45,7 +48,7 @@ class CommissionController extends Controller
             $commission = new Commission;
             $commission->name = Input::get('name');
             $commission->tariff_id = Input::get('tariff_id');
-            $commission->type = Input::get('commission_select');
+            $commission->type = Input::get('commission_type');
             if (null !== Input::get('nds'))
                 $commission->nds = Input::get('nds');
             if (null !== Input::get('deduction'))
@@ -94,8 +97,10 @@ class CommissionController extends Controller
                 $commissions_rage = CommissionsRage::find(Input::get('range_commission_id')[$key]);
             else
                 $commissions_rage = new CommissionsRage;
-            $commissions_rage->min = Input::get('range_commission_min')[$key];
-            $commissions_rage->max = Input::get('range_commission_max')[$key];
+            if ('' !== Input::get('range_commission_min')[$key])
+                $commissions_rage->min = Input::get('range_commission_min')[$key];
+            if ('' !== Input::get('range_commission_max')[$key])
+                $commissions_rage->max = Input::get('range_commission_max')[$key];
             $commissions_rage->value = Input::get('range_commission_value')[$key];
             $commissions_rage->commission_id = $commission->id;
             $commissions_rage->save();
@@ -104,9 +109,13 @@ class CommissionController extends Controller
         return response()->json($commission->tariff_id);
     }
     public function destroy($id)
-    {
-        $client = CommissionsRage::find($id);
-        $client->delete();
+    { 
+        $commission = Commission::find($id);
+        var_dump($commission->commissions_rages);
+        foreach ($commission->commissionsRages as $commissions_rage) {
+            $commissions_rage->delete();
+        }
+        $commission->delete();
     }
 
 
