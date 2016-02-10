@@ -25,4 +25,14 @@ class Client extends Model
     {
         return $this->hasMany('App\Repayment');
     }
+
+    public function chargeCommissionView()
+    {
+        return $this->hasMany('App\ChargeCommissionView');
+    }
+
+    public function dailyChargeCommission()
+    {
+        return $this->hasMany('App\DailyChargeCommission');
+    }
 }

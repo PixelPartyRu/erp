@@ -27,6 +27,7 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')
         //          ->hourly();
-        $schedule->command('recalculation')->dailyAt('00:00');
+       // $schedule->command('recalculation')->dailyAt('00:00');
+        $schedule->command('Recalculation')->everyFiveMinutes();
     }
 }

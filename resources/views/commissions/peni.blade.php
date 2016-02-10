@@ -15,10 +15,10 @@
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label for="nds">Начислять НДС</label>
-			{!! Form::checkbox('nds', 'true', isset($commission->nds)?$commission->nds:false, array('id'=>'nds'));!!}
+			{!! Form::checkbox('nds', 'true', isset($commission->nds)?$commission->nds:true, array('id'=>'nds'));!!}
 			<div class="clearfix"></div>
 			<label for="deduction">Удержать комиссию</label>
-			{!! Form::checkbox('deduction', 'true', isset($commission->deduction)?$commission->deduction:false, array('id'=>'deduction'));!!}
+			{!! Form::checkbox('deduction', 'true', isset($commission->deduction)?$commission->deduction:true, array('id'=>'deduction'));!!}
 		</div>
 		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
 			<label for="additional_sum">Начислять на сумму:</label>

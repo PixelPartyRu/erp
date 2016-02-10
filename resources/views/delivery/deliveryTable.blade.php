@@ -34,7 +34,11 @@
 			<td>{{ date('d/m/Y', strtotime($delivery->the_date_of_a_registration_supply)) }}</td>
 			<td>{{ $delivery->the_actual_deferment }}</td>
 			<td>{{ $delivery->invoice }}</td>
-			<td>{{ date('d/m/Y', strtotime($delivery->date_of_invoice)) }}</td>
+			<td>
+				@if ($delivery->date_of_invoice)
+					{{ date('d/m/Y', strtotime($delivery->date_of_invoice)) }}
+				@endif
+			</td>
 			<td>{{ $delivery->registry }}</td>
 			<td>{{ date('d/m/Y', strtotime($delivery->date_of_registry)) }}</td>
 			<td>
@@ -84,9 +88,9 @@
 <tr style="background-color:rgb(179, 255, 255);">	
 <td><b>Сумма</b></td>
 <td colspan="6"></td>
-<td nowrap><b>{{ number_format($sum_waybill_amount,2,',',' ') }}</b></td>
-<td nowrap><b>{{ number_format($sum_balance_owed,2,',',' ') }}</b></td>		
-<td nowrap><b>{{ number_format($sum_first_payment_amount,2,',',' ') }}</b></td>	
-<td nowrap><b>{{ number_format($sum_remainder_of_the_debt_first_payment,2,',',' ') }}</b></td>
+<td nowrap><b><nobr>{{ number_format($sum_waybill_amount,2,',',' ') }}</nobr></b></td>
+<td nowrap><b><nobr>{{ number_format($sum_balance_owed,2,',',' ') }}</nobr></b></td>		
+<td nowrap><b><nobr>{{ number_format($sum_first_payment_amount,2,',',' ') }}</nobr></b></td>	
+<td nowrap><b><nobr>{{ number_format($sum_remainder_of_the_debt_first_payment,2,',',' ') }}</nobr></b></td>
 <td colspan="99"></td>
 </tr>		

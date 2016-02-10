@@ -25,7 +25,7 @@ class AgreementController extends Controller
             'code'  => 'required',
            // 'penalty'       => 'required',
             'code_1c'       => 'required',
-            'date_end'       => 'required',
+            //'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
 
@@ -47,17 +47,17 @@ class AgreementController extends Controller
             }else{
                 $agreement->account = FALSE;
             }
-            if(Input::get('penalty')){ 
+            if(Input::get('penalty') != NULL){ 
 				$agreement->penalty = Input::get('penalty');
-			}else{
-				$agreement->penalty = '2099-12-31';// Заглушка надо исправить! У нас 85 лет осталось!
 			}
             if (Input::get('second_pay')){
                 $agreement->second_pay = TRUE;
             }else{
                 $agreement->second_pay = FALSE;
             }
-            $agreement->code_1c = Input::get('code_1c');
+            if (Input::get('code_1c')){
+                $agreement->code_1c = Input::get('code_1c');
+            }
             $agreement->description = ' ';
             if (Input::get('active')){
                 $agreement->active = TRUE;
@@ -65,8 +65,12 @@ class AgreementController extends Controller
                 $agreement->active = FALSE;
             }
             $agreement->client_id = Input::get('client_id');
-            $agreement->date_end= Input::get('date_end');
-			$agreement->created_at= Input::get('created_at');
+
+            if (Input::get('date_end') != NULL){
+                $agreement->date_end = Input::get('date_end');
+            }
+
+			$agreement->created_at = Input::get('created_at');
             $agreement->save();
             // redirect
            /* Request::flashOnly('message', 'Клиент добавлен');*/
@@ -94,7 +98,7 @@ class AgreementController extends Controller
             'code'  => 'required',
             //'penalty'       => 'required',
             'code_1c'       => 'required',
-            'date_end'       => 'required',
+            //'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
 
@@ -117,11 +121,10 @@ class AgreementController extends Controller
                 $agreement->account = FALSE;
             }
             //$agreement->penalty = Input::get('penalty');
-			if(Input::get('penalty')){ 
-				$agreement->penalty = Input::get('penalty');
-			}else{
-				$agreement->penalty = '2099-12-31';// Заглушка надо исправить! У нас 85 лет осталось!
-			}
+			if(Input::get('penalty') != NULL){ 
+                $agreement->penalty = Input::get('penalty');
+            }
+
             if (Input::get('second_pay')){
                 $agreement->second_pay = TRUE;
             }else{
@@ -135,7 +138,10 @@ class AgreementController extends Controller
                 $agreement->active = FALSE;
             }
             //$agreement->client_id = Input::get('client_id');
-            $agreement->date_end= Input::get('date_end');
+            if (Input::get('date_end') != NULL){
+                $agreement->date_end = Input::get('date_end');
+            }
+           
             $agreement->save();
 
             // redirect

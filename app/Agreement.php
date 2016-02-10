@@ -10,4 +10,8 @@ class Agreement extends Model
     {
         return $this->belongsTo('App\Client');
     }
+    public function relation()
+    {
+        return $this->HasOne('App\Relation');
+    }
 }

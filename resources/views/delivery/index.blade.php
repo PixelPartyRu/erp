@@ -17,7 +17,6 @@
 	@include('delivery.importModal')
 	@include('delivery.importModalDelete')
 	@include('delivery.importDeleteConfirm')
-	@include('global.messages')
 	<div class="panel panel-success">
 		<div class="panel-heading">Поставки</div>
 		<div class="panel-body">

@@ -10,4 +10,9 @@ class Finance extends Model
     {
         return $this->hasMany('App\Delivery');
     }
+
+    public function deliveryToFinance()
+    {
+        return $this->hasMany('App\DeliveryToFinance');
+    }
 }

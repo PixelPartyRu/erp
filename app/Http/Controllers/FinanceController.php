@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Input;
 use Carbon\Carbon;
 use App\Delivery;
+use App\DeliveryToFinance;
 use App\Finance;
 use Session;
 
@@ -98,10 +99,9 @@ class FinanceController extends Controller
    		$finance->registry = $registry;
    		$finance->date_of_registry = $date_of_registry;
    		$finance->status = "К финансированию";
-   		if ($finance->save()){
-   			$this->saveKey($keyStek);
-   			$keyStek = [];
-   		};
+   		$finance->save();
+ 			$this->saveKey($keyStek);
+ 			$keyStek = [];
     }
 
     protected function saveKey($keyStek){
@@ -112,33 +112,81 @@ class FinanceController extends Controller
    		}
    		
    		foreach ($keyStek as $key){
-   			$deliveryFinanceId = Delivery::find($key);
-   			$deliveryFinanceId->finance_id = $financeMaxId;
-   			$deliveryFinanceId->save();
+        $deliveryToFinance = new DeliveryToFinance;
+        $deliveryToFinance->delivery_id = $key;
+        $deliveryToFinance->finance_id = $financeMaxId;
+        $deliveryToFinance->save();
    		}
     }
 
     public function financingSuccess(){
         $financeArray = Input::get('financeArray');
         $financingDate = Input::get('financingDate');
-        $financeArrayFirstPayment = [];
+        $messageArray = [];
         foreach ($financeArray as $key){
           $finance = Finance::find($key);
-          if ($finance->type_of_funding != 'Второй платеж'){
-            array_push($financeArrayFirstPayment,$key);
-          }
-          $finance->date_of_funding = $financingDate;
-          $finance->status = 'Подтверждено';
-          $finance->save();
-
-          $deliveries = $finance->deliveries;
-          foreach($deliveries as $delivery){
-            $delivery->date_of_funding = $financingDate;
-            $delivery->status = 'Профинансирована';
-            $delivery->save();
+          $registryDate = new Carbon($finance->date_of_registry);
+          $fundingDate = new Carbon($financingDate);
+          $diffDate = $registryDate->diffInDays($fundingDate,false);
+          if ($diffDate >= 0){
+            if ($finance->type_of_funding === 'Первый платеж'){
+              $deliveryToFinances = $finance->deliveryToFinance;
+              //проверка лимита
+              $relation = $deliveryToFinances->first()->delivery->relation;
+              $deliveries = $relation->deliveries()->where('state',false)->get();
+              $usedLimit = 0;
+              foreach($deliveries as $delivery){
+                $usedLimit += $delivery->remainder_of_the_debt_first_payment;
+              }
+              $limit = $relation->limit;
+              if ($limit) {
+                $limitValue = $limit->value;
+                $freeLimit = $limitValue - $usedLimit;
+                if ($finance->sum <= $freeLimit){
+                  $finance->date_of_funding = $financingDate;
+                  $finance->status = 'Подтверждено';
+                  $finance->save();
+                  $callback = 'success';
+                  $messageShot = 'Успешно!';
+                  $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
+                  array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type'=>true, 'data'=>$key]);
+                  
+                  foreach($deliveryToFinances as $deliveryToFinance){
+                    $delivery = $deliveryToFinance->delivery;
+                    $delivery->date_of_funding = $financingDate;
+                    $delivery->status = 'Профинансирована';
+                    $delivery->save();
+                  }
+                }else{
+                  $callback = 'danger';
+                  $messageShot = 'Ошибка!';
+                  $message = 'Превышен лимит для связи. Клиент: '.$relation->client->name.' и Дебитор: '.$relation->debtor->name;
+                  array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+                }
+              }else{
+                $callback = 'danger';
+                $messageShot = 'Ошибка!';
+                $message = 'Лимит для связи не найден. Клиент: '.$relation->client->name.' и Дебитор: '.$relation->debtor->name;
+                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+              }
+            }else{
+                $finance->date_of_funding = $financingDate;
+                $finance->status = 'Подтверждено';
+                $finance->save();
+                $callback = 'success';
+                $messageShot = 'Успешно!';
+                $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
+                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type' => false]);
+            }
+          }else{
+                $callback = 'danger';
+                $messageShot = 'Ошибка!';
+                $message = 'Дата реестра превышает дату финансирования';
+                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
           }
         }
-        return $financeArrayFirstPayment;
+        
+        return $messageArray;
     }
 
     public function getSum(){
@@ -150,8 +198,38 @@ class FinanceController extends Controller
      public function getDeliveries(){
         $financeId = Input::get('financeFormId');
         $finance = Finance::find($financeId);
-        $deliveries = $finance->deliveries;
-        return view('finance.deliveryTemplate',['deliveries' => $deliveries]); 
+        $financeToDeliveries = $finance->deliveryToFinance;
+        return view('finance.deliveryTemplate',['financeToDeliveries' => $financeToDeliveries]);
+     }
+
+     public function getFinances(){
+        $arrayId = Input::get('data');
+        $finances = [];
+        $messageArray = [];
+        if (count($arrayId) > 0){
+          foreach ($arrayId as $id) {
+            $finance = Finance::find($id);
+            if ($finance->status != 'Подтверждено'){
+              array_push($finances,$finance);
+            }
+          }
+          if (count($finances) > 0) {
+            $callback = 'success';
+            $view = view('finance.modalTableRow',['finances' => $finances])->render();
+            $messageArray = ['callback' => $callback,'view' => $view];
+          }else{
+              $callback = 'danger';
+              $messageShot = 'Ошибка!';
+              $message = 'Выберите хотя бы одно не подтвержденное финансирование';
+              $messageArray = ['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot];
+          }
+        }else{
+          $callback = 'danger';
+          $messageShot = 'Ошибка!';
+          $message = 'Выберите финансирование';
+          $messageArray = ['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot];
+        }
+        return $messageArray;
      }
 
      public function filter(){
@@ -166,19 +244,17 @@ class FinanceController extends Controller
 		
         $q_finance = Finance::query();
 		
-		if(count($filterArrayType) != 0){
-            $q_finance = $q_finance->whereIn('type_of_funding', $filterArrayType);
-        }
-		if($filterStatus != '0'){
-            $q_finance = $q_finance->where('status', '=', $filterStatus);                  
-        }
-		$q_sum = clone $q_finance;
-		
-		$sum = $q_sum->sum('sum');
-		
-		$finances = $q_finance->get();
-        
-
+    		if(count($filterArrayType) != 0){
+                $q_finance = $q_finance->whereIn('type_of_funding', $filterArrayType);
+            }
+    		if($filterStatus != '0'){
+                $q_finance = $q_finance->where('status', '=', $filterStatus);                  
+            }
+    		$q_sum = clone $q_finance;
+    		
+    		$sum = $q_sum->sum('sum');
+    		
+    		$finances = $q_finance->get();
         
         return view('finance.tableRow',['finances' => $finances,'sum'=>$sum]);
      }

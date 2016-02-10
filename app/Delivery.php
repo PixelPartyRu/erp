@@ -30,4 +30,20 @@ class Delivery extends Model
     {
         return $this->hasOne('App\ChargeCommission');
     }
+
+    public function repaymentInvoice()
+    {
+        return $this->hasMany('App\RepaymentInvoice');
+    }
+
+    public function deliveryToFinance()
+    {
+        return $this->hasMany('App\DeliveryToFinance');
+    }
+    
+    public function dailyChargeCommission()
+    {
+        return $this->hasMany('App\DailyChargeCommission');
+    }
+    
 }

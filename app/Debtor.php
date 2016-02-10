@@ -21,4 +21,9 @@ class Debtor extends Model
         return $this->hasMany('App\Repayment');
     }
 
+    public function chargeCommissionView()
+    {
+        return $this->hasMany('App\ChargeCommissionView');
+    }
+
 }

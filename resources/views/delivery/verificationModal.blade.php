@@ -15,6 +15,10 @@
             <label for="verificationDate">Дата верификации</label>
             <input type="date" id="verificationDate" value='{{ $dateToday }}' class="form-control">
           </div>
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            <label for="verificationRespondent">ФИО респондента</label>
+            <input type="text" id="verificationRespondent" class="form-control">
+          </div>
         </div>
         <div class="table-responsive">
           <table class="table table-striped">
@@ -24,9 +28,9 @@
                 <th>NN</th>
                 <th>Дебитор</th>
                 <th>Накладная</th>
+                <th>Дата накладной</th>
                 <th>Сумма накладной</th>
                 <th>Сумма первого платежа</th>
-                <th>Дата накладной</th>
               </tr>
             </thead>
             <tbody id="popup-table">
@@ -34,9 +38,9 @@
           </table>
         </div>
         <div class="row">
-          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            <textarea name="verificationComents" readonly id="verificationComents" cols="30" rows="10"></textarea>
-          </div>
+            <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                <textarea name="verificationComents" readonly id="verificationComents" class='form-control' cols="30" rows="3"></textarea>
+            </div>
         </div>
       </div>
       
@@ -47,6 +51,5 @@
         <button type="button" class="btn btn-danger verificationModalClose">Отменить</button>
       </div>
     </div>
-
   </div>
 </div>

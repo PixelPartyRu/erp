@@ -38,5 +38,9 @@ class Relation extends Model
     {
         return $this->hasOne('App\Limit');
     }
+    public function agreement()
+    {
+        return $this->belongsTo('App\Agreement');
+    }
 
 }

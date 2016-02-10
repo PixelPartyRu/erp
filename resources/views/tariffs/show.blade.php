@@ -49,7 +49,7 @@
 	@endforeach
 	@if(count($commissionTypes)>0)
 						<tr class='commisions' id="0" data-tariff-id="{{$tariff->id}}">
-							<td> 
+							<td class="no-space"> 
 								{{ Form::select('commission_select', $commissionTypes, 'balance_owed',array('id' => 'commission_select','class'=>'selectpicker')) }}
 							</td>
 							<td></td><td></td><td></td><td></td>

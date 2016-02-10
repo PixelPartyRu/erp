@@ -1,7 +1,6 @@
 	<div class="panel panel-success">
 		<div class="panel-heading">
-		<span>Фильтр поставок</span>
-			<i class="fa fa-chevron-down"></i>
+			<span>Фильтр поставок</span>
 		</div>
 		<div class="panel-body">
 			<div class="row">
@@ -9,7 +8,7 @@
 				<div class="row">
 					<div class="col-xs-12 col-sm-12 col-md-8 col-lg-4">
 							<label for="StatusRegistration">Зарегистрированные</label>
-			  				{!! Form::checkbox('StatusRegistration','Зарегестрирована',false,['class' => "deliveryFilter deliveryFilterStatus checkbox-inline pull-right",'id' => 'StatusRegistration']) !!}
+			  				{!! Form::checkbox('StatusRegistration','Зарегистрирована',false,['class' => "deliveryFilter deliveryFilterStatus checkbox-inline pull-right",'id' => 'StatusRegistration']) !!}
 			  		</div>
 					<div class="col-xs-12 col-sm-12 col-md-8 col-lg-4">
 							<label for="StatusNotVerefication">Не верифицированные</label>
@@ -47,7 +46,7 @@
 					{!! Form::select('filterDebtor', ['0' => 'Дебитор (ИНН)'] + select_inn($debtors, 'name', 'id'),'0',['class' => "deliveryFilter selectpicker",'id' => 'filterDebtor']) !!}
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-8 col-lg-2">					
-					{!! Form::select('filterRegistry',  ['0' => 'Все реестры'] + array_pluck($deliveries, 'registry', 'registry'),'0',['class' => "deliveryFilter selectpicker",'id' => 'filterRegistry']) !!}
+					{!! Form::select('filterRegistry',  ['0' => 'Все реестры'] + $registries,'0',['class' => "deliveryFilter selectpicker",'id' => 'filterRegistry']) !!}
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-8 col-lg-2">	
 					{!! Form::select('filterDebtor', ['0' => 'Выберите период для','Реестра','Накладной','Финансирования'],'0',['class' => "deliveryFilter selectpicker",'id' => 'filterDateRadioRegistry']) !!}
@@ -60,7 +59,7 @@
 						</div>
 					</div>	
 						<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-							{!! Form::date('filterDateRadio',null,['class' => "form-control deliveryFilter deliveryRadioDate",'id' => 'filterDateRadioDateStart','disabled']) !!}
+							{!! Form::date('filterDateRadio',date('Y-m-d'),['class' => "form-control deliveryFilter deliveryRadioDate",'id' => 'filterDateRadioDateStart','disabled']) !!}
 						</div>
 					<div class="col-xs-12 col-sm-12 col-md-8 col-lg-1">	
 						<div class="col-xs-12 col-sm-12 col-md-1 col-lg-2">
@@ -68,7 +67,7 @@
 						</div>
 					</div>	
 						<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
-							{!! Form::date('filterDateRadio',null,['class' => "form-control deliveryFilter deliveryRadioDate",'id' => 'filterDateRadioDateFinish','disabled']) !!}
+							{!! Form::date('filterDateRadio',date('Y-m-d'),['class' => "form-control deliveryFilter deliveryRadioDate",'id' => 'filterDateRadioDateFinish','disabled']) !!}
 						</div>
 					</div>	
 				</div>

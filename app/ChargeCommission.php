@@ -10,4 +10,14 @@ class ChargeCommission extends Model
     {
         return $this->belongsTo('App\Delivery');
     }
+
+    public function chargeCommissionView()
+    {
+        return $this->hasOne('App\ChargeCommissionView');
+    }
+
+    public function dailyChargeCommission()
+    {
+        return $this->hasMany('App\DailyChargeCommission');
+    }
 }

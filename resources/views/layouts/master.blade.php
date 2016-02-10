@@ -76,7 +76,7 @@
 			            <li><a href="/delivery">Поставки</a></li>
 			            <li><a href="/finance">Финансирование</a></li>
 			            <li><a href="/repayment">Погашения</a></li>
-			            <li><a href="#">Выставление счетов</a></li>
+			            <li><a href="/invoicing">Выставление счетов</a></li>
 			            <li><a href="#">Документы 1С</a></li>
 			          </ul>
 			        </li>
@@ -95,6 +95,7 @@
                     <!-- Authentication Links -->
                     @if (Auth::guest())
                     @else
+                    	<li id="filter"><a href="#"><i class="fa fa-btn fa-filter"></i>Фильтр</a></li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
                                 {{ Auth::user()->name }} <span class="caret"></span>
@@ -109,6 +110,11 @@
 			    </div><!-- /.navbar-collapse -->
 			  </div><!-- /.container-fluid -->
 			</nav>
+			<div class="row" id="filter-container">
+				@section('filter')
+		            
+		        @show
+			</div>
 			@include('global.messages')
             @yield('content')
         </div>
@@ -147,8 +153,8 @@
 		      </div>
 		    </div>
 		</div>
-        <div class="alert">
-          <strong id="message_shot"></strong><span id="message"></span>
-        </div>
+		<div class="container message-box">
+			
+		</div>
     </body>
 </html>

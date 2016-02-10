@@ -23,25 +23,25 @@
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="Input1">Полное наименование:</label>
-						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'Input1')) !!}
+						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'Input1','required' => 'required')) !!}
 						</div>		
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="Input2">Наименование:</label>
-						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'Input2')) !!}
+						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'Input2','required' => 'required')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="Input3">ИНН:</label>
-						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'Input3', 'data-inns'=>'bar', 'maxlength'=>'12')) !!}
+						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'Input3', 'data-inns'=>'bar', 'maxlength'=>'12','required' => 'required')) !!}
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="Input4">КПП:</label>
-						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'Input4','data-minlength'=>'9', 'maxlength'=>'9', 'data-error'=>"КПП введен не верно")) !!}
+						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'Input4','data-minlength'=>'9', 'maxlength'=>'9', 'data-error'=>"КПП введен не верно",'required' => 'required')) !!}
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="Input5">ОГРН:</label>
-						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'Input5','data-minlength'=>'13', 'maxlength'=>'13', 'data-error'=>"ОРГН введен не верно")) !!}
+						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'Input5','data-minlength'=>'13', 'maxlength'=>'13', 'data-error'=>"ОРГН введен не верно",'required' => 'required')) !!}
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container-label'>
@@ -87,7 +87,11 @@
 							<td><a class="deleteItem" data-delete="/client/{{ $client->id }}" data-method="delete"><i class="fa fa-close"  data-toggle="tooltip" title="Удалить"></a></i></td>
 						</tr>
 					@empty
-						<p>Клиентов нет</p>
+						<tr>
+							<td>
+								<p>Нет клиентов</p>
+							</td>
+						</tr>
 					@endforelse
 				  </tbody>
 				</table>

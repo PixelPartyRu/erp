@@ -24,21 +24,21 @@
 							<label for="Input1">Номер договора</label>
 						</div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-							{!! Form::text('code',null,array('class' => 'form-control','id' => 'Input1')) !!}
+							{!! Form::text('code',null,array('class' => 'form-control','id' => 'Input1','required' => 'required')) !!}
 						</div>
 						<div class='clearfix'></div>	
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 							<label for="Input5">Код в 1С</label>
 						</div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-							{{ Form::text('code_1c',null,array('class' => 'form-control','id' => 'Input5')) }}
+							{{ Form::text('code_1c',null,array('class' => 'form-control','id' => 'Input5','required' => 'required')) }}
 						</div>
 						<div class='clearfix'></div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
 							<label for="Input8">Дата договора</label>
 						</div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-							{{ Form::date('created_at',null,array('class' => 'form-control ','id' => 'Input9')) }}
+							{{ Form::date('created_at',null,array('class' => 'form-control ','id' => 'Input9','required' => 'required')) }}
 						</div>
 						<div class='clearfix'></div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -56,7 +56,7 @@
 							<label for="Input3">Выставление счетов</label>
 						</div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
-							{{ Form::select('account',['1'=>'В месяц оплаты', '0'=>'Ежемесячно'],0,array('class' => 'form-control selectpicker ','id' => 'Input3')) }}
+							{{ Form::select('account',['1'=>'В месяц оплаты', '0'=>'Ежемесячно'],0,array('class' => 'form-control selectpicker ','id' => 'Input3','required' => 'required')) }}
 						</div>
 						<div class="clearfix"></div>
 						<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
@@ -119,50 +119,52 @@
 				  	</tr>
 				  </thead>
 				  <tbody class='layoutTable'>
-				  	@forelse($client->agreements as $agreements)
+				  	@forelse($client->agreements as $agreement)
 						<tr>
-							<td>{{ $agreements->code }}</td>
+							<td>{{ $agreement->code }}</td>
 							<td>
-								@if ($agreements->type)
+								@if ($agreement->type)
 									C регрессом
 								@else
 									Без регресса
 								@endif
 							</td>
-							<td>{{ @date_format($agreements->created_at,'d/m/Y') }}</td>
-							<td>{{ @date('d/m/Y',strtotime($agreements->date_end))}}</td>
-							<td>{{ $agreements->code_1c }}</td>
+							<td>{{ date('d/m/Y', strtotime($agreement->created_at)) }}</td>
 							<td>
-								@if ($agreements->second_pay)
+								@if ($agreement->date_end)
+									{{ date('d/m/Y', strtotime($agreement->date_end)) }}
+								@endif
+							</td>
+							<td>{{ $agreement->code_1c }}</td>
+							<td>
+								@if ($agreement->second_pay)
 									Полное погашение уступки
 								@else
 									Погашение финансирования
 								@endif
 							</td>
 							<td>
-								@if ($agreements->account)
+								@if ($agreement->account)
 									В месяц оплаты
 								@else
 									Ежемесячно
 								@endif
 							</td>
 							<td>
-								@if ($agreements->penalty != '2099-12-31')
-								{{$agreements->penalty}}
-								@else
-									Нет
+								@if ($agreement->penalty)
+									{{ date('d/m/Y', strtotime($agreement->penalty)) }}
 								@endif
 							</td>
 							<td>
-								@if ($agreements->active)
+								@if ($agreement->active)
 									Действующий
 								@else
 									Не активен
 								@endif
 							</td>
-							<td><a href="/agreement/{{ $agreements->id }}/edit"><i class="fa fa-pencil" data-toggle="tooltip" title="Редактировать"></i></a></td>
+							<td><a href="/agreement/{{ $agreement->id }}/edit"><i class="fa fa-pencil" data-toggle="tooltip" title="Редактировать"></i></a></td>
 							<td>
-								{{ Form::model($agreements, array('route' => array('agreement.destroy', $agreements->id), 'method' => 'DELETE')) }}
+								{{ Form::model($agreement, array('route' => array('agreement.destroy', $agreement->id), 'method' => 'DELETE')) }}
 									{{ Form::button('<i class="fa fa-close"  data-toggle="tooltip" title="Удалить"  id="delete"></i>', array('class'=>'', 'type'=>'submit')) }}
 								{{ Form::close() }}
 							</td>

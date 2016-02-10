@@ -4,11 +4,11 @@
 
 @section('stylesheet')
   	<link rel="stylesheet" type="text/css" href="/assets/css/chargeCommission.css">
+	<link rel="stylesheet" type="text/css" href="/assets/css/form.css">
 @stop	
 
 @section('javascript')
   	<script type="text/javascript" src="/assets/js/chargeCommission.js"></script>
-
 @stop
 
 @section('content')
@@ -62,7 +62,6 @@
 			  	</tr>
 			  </thead>
 			  <tbody class='layoutTable'>
-			  	@include('chargeCommission.tableRow')
 			  </tbody>
 			</table>
 		</div>

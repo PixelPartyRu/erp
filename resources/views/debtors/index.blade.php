@@ -23,25 +23,25 @@
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="InputEmail1">Полное наименование:</label>
-						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'InputEmail1')) !!}
+						  	{!! Form::text('full_name',null,array('class' => 'form-control','id' => 'InputEmail1','required' => 'required')) !!}
 						</div>		
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="InputEmail2">Наименование:</label>
-						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'InputEmail2')) !!}
+						  	{!! Form::text('name',null,array('class' => 'form-control','id' => 'InputEmail2','required' => 'required')) !!}
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="InputEmail3">ИНН:</label>
-						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'InputEmail3','data-inns'=>'bar','maxlength'=>'12')) !!}
+						  	{!! Form::text('inn',null,array('class' => 'form-control','id' => 'InputEmail3','data-inns'=>'bar','maxlength'=>'12','required' => 'required')) !!}
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="InputEmail4">КПП:</label>
-						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4','data-minlength'=>'9', 'maxlength'=>'9', 'data-error'=>"КПП введен не верно")) !!}
+						  	{!! Form::text('kpp',null,array('class' => 'form-control','id' => 'InputEmail4','data-minlength'=>'9', 'maxlength'=>'9', 'data-error'=>"КПП введен не верно",'required' => 'required')) !!}
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="form-group col-xs-12 col-sm-6 col-md-3 col-lg-3">
 							<label for="InputEmail5">ОГРН:</label>
-						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5', 'data-minlength'=>'13', 'maxlength'=>'13', 'data-error'=>"ОРГН введен не верно")) !!}
+						  	{!! Form::text('ogrn',null,array('class' => 'form-control','id' => 'InputEmail5', 'data-minlength'=>'13', 'maxlength'=>'13', 'data-error'=>"ОРГН введен не верно",'required' => 'required')) !!}
 							<div class="help-block with-errors"></div>
 						</div>
 						<div class="col-xs-12 col-sm-6 col-md-3 col-lg-3" id='btn-container'>
@@ -86,7 +86,9 @@
 							</td>
 						</tr>
 					@empty
-						<p>Дебиторов нет</p>
+						<tr>
+							<td>Дебиторов нет</td>
+						</tr>
 					@endforelse
 				  </tbody>
 				</table>

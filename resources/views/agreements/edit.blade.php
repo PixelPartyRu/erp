@@ -29,7 +29,11 @@
 						</div>
 						<div class="input_text_a">
 						<label for="Input8">Окончания договора</label>
-						{{ Form::date('date_end',$agreement->date_end,array('class' => 'form-control left1','id' => 'Input10')) }}
+						@if($agreement->penalty)
+							{{ Form::date('date_end',$agreement->date_end,array('class' => 'form-control left1','id' => 'Input10')) }}
+						@else
+							{{ Form::date('date_end',NULL,array('class' => 'form-control left1','id' => 'Input10')) }}
+						@endif	
 						</div>
 					</div>
 				</div>
@@ -42,10 +46,10 @@
 						</div>
 						<div class="input_text_a">
 							<label for="Input8">Остановить расчет пеней с</label>
-							@if($agreement->penalty == '2099-12-31')
-							{{ Form::date('penalty','0000-00-00',array('class' => 'form-control left2','id' => 'Input8')) }}
+							@if($agreement->penalty)
+								{{ Form::date('penalty',$agreement->penalty,array('class' => 'form-control left2','id' => 'Input8')) }}
 							@else
-							{{ Form::date('penalty',$agreement->penalty,array('class' => 'form-control left2','id' => 'Input8')) }}
+								{{ Form::date('penalty',NULL,array('class' => 'form-control left2','id' => 'Input8')) }}
 							@endif	
 						</div>
 						<div class="input_text_a">						
