@@ -1,0 +1,33 @@
+#popup{
+	display: none;
+	position: fixed;
+	background-color: white;
+	border: 4px solid black;
+	z-index: 9999;
+}
+
+#popup-table>tr:hover{
+	cursor: pointer;
+	background-color:rgb(179, 255, 255);
+}
+
+.destroyDelivery button{
+	background: transparent;
+	border: none;
+	color: #337AB7;
+}
+#delivery-table{
+	text-align: center;
+}
+
+#delivery-table thead th{
+	font-size:12px;
+	text-align: center;
+}
+
+.malin{
+	background-color:rgb(179, 255, 255);
+}
+label{
+line-height: 10px;
+}

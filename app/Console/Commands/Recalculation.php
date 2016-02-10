@@ -47,7 +47,7 @@ class Recalculation extends Command
     public function handle()
     {   
         $agreement = Agreement::first();
-        $agreement->description = 'vrervwrvwerververvst';
+        $agreement->description = 'Misha rabotaet';
         $agreement->save();
        //  if ( $this->argument('dateTest')){
        //      $dateTest = $this->argument('dateTest');

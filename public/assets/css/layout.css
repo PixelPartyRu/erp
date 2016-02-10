@@ -1,0 +1,161 @@
+.dropdown-menu>.disabled>a, .dropdown-menu>.disabled>a:focus, .dropdown-menu>.disabled>a:hover {
+	background-color: #C3E4B8;
+}
+h1 {
+	padding-left: 10px;
+}
+label {
+	white-space: nowrap;
+}
+td {
+	white-space: nowrap;
+	overflow: hidden;
+	max-width: 150px;
+	text-overflow: ellipsis;
+}
+td.no-space{
+	white-space: normal;
+	overflow: visible;
+	max-width: none;
+}
+td:hover {
+	white-space: normal;
+}
+.navbar-brand{
+	padding: 10px;
+}
+.navbar-brand img {
+	height: 100%;
+}
+.tooltip-inner {
+    background-color: #BE76FF;
+    color: #fff;
+}
+
+.tooltip.top .tooltip-arrow {
+    border-top-color: #BE76FF;
+}
+
+#nav-dropdown-menu>ul>li>a:hover {
+	background-color: #DFF0D8;
+}
+
+.dropdown-menu {
+	background-color: #DFF0D8;
+	margin-top: 3px !important;
+}
+
+#nav-dropdown-menu .open>a {
+	background-color: #DFF0D8 ;
+}
+.table_icons {
+	color: #337AB7;
+}
+tbody>tr:hover {
+	cursor: pointer;
+	background-color:rgb(213, 208, 247) !important
+}
+
+.bootstrap-select {
+	width: 100% !important;
+}
+#original_documents_select {
+	display: none;
+}
+.openClickTable>.panel-body {
+	display: none;	
+}
+
+.openClickTable:hover {
+	cursor: pointer;
+}
+
+.openClickTable:hover>.panel-heading {
+	background: #d2eac8;
+}
+.panel-info>.panel-heading { 
+	font-size: 100%;
+}
+.activeTableTd td{
+	background-color:rgb(155, 194, 227) !important;
+}
+.ActiveTableTrConst td{
+	background-color:rgb(155, 194, 227) !important;
+}
+.input_tag {
+	position: absolute;
+	right: -5px;
+	top: 7px;
+}
+label {
+	line-height: 34px;
+}
+#btn-container {
+	margin-top: 39px;
+	text-align: center;
+}
+#btn-container-line {
+	text-align: center;
+}
+#btn-container-label {
+	margin-top: 39px;
+	text-align: center;
+}
+#btn-container input,#btn-container-line input,#btn-container-label input {
+	width: 100%;
+}
+
+.message-box {
+	position: fixed;
+	top: 0;
+	width: 100%;
+	text-align: center;
+	z-index: 1100;
+}
+.alert {
+	    margin-bottom:1px;
+}
+.fa-minus {
+	color:#FF5E5E;
+}
+#DeleteAlert {
+	background: rgba(255, 255, 255, 0.4) !important;
+}
+#DeleteAlert .btn-info {
+	left: 15px;
+    position: absolute;
+}
+.fa-2 {
+  font-size: 2em;
+}
+.fa-3 {
+  font-size: 4em;
+}
+.fa-4 {
+  font-size: 7em;
+}
+.fa-5 {
+  font-size: 12em;
+}
+.fa-6 {
+  font-size: 20em;
+}
+ 
+.green{
+color:#32CD32;		
+} 
+
+.red{
+color:#B22222;	
+	
+}
+.center_text {
+	text-align:center;
+}
+table td, table th {
+	text-align:center;
+}
+
+.text_in_forms {
+	line-height: 34px;
+}

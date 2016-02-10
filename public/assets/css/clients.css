@@ -1,0 +1,27 @@
+
+#btn-container{
+	text-align: center;
+	margin-top: 25px;
+}
+
+#btn-container input, #btn-container a{
+	width: 100%;
+}
+
+.panel-info i{
+	padding-top: 4px;
+}
+
+#client-table form{
+	margin: 0px;
+}
+
+#client-table form button{
+	background: transparent;
+	border: none;
+	color: #337AB7;
+}
+
+#client-table form button:hover{
+	color: #23527C;
+}

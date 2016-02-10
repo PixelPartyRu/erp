@@ -1,0 +1,15 @@
+.modal-dialog {
+	width: 900px !important;
+}
+
+.radio-hide {
+	display: none;
+}
+
+#importBtn {
+	margin-top: 5px;
+}
+
+.modal-dialog { 
+	width: 90% !important;
+}

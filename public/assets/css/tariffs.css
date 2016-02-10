@@ -1,0 +1,58 @@
+.deactive{
+	display: none;
+}
+.client_show_deactive .table_icons {
+	color:#555 !important;
+}
+.table_icons {
+	color: #337AB7;
+}
+td .modal-content {
+	display: none;
+}
+.rage_controls {
+	width: 100%;
+	text-align: center;
+	padding-top: 10px;
+}
+.fa-plus,.fa-pencil {
+	color: #337AB7;
+}
+.fa-minus {
+	color: #FF5E5E;
+}
+.delete_rage, .add_rage {
+	cursor: pointer;
+}
+h1{
+	padding-left: 10px;
+}
+
+
+#btn-container input{
+	width: 100%;
+}
+
+.panel-info i{
+	padding-top: 4px;
+}
+
+#debtor-table form{
+	margin: 0px;
+}
+
+#debtor-table form button{
+	background: transparent;
+	border: none;
+	color: #337AB7;
+}
+
+#debtor-table form button:hover{
+	color: #23527C;
+}
+.fa-rage-add {
+	padding-top: 5px;
+	padding-left:5px;
+	color:#5cb85c;
+}
+.sort {color: #333}

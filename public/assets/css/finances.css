@@ -1,0 +1,15 @@
+.deliveryOpenModal {
+	color: #337AB7;
+}
+
+.deliveryOpenModal:hover {
+	color: #2d6b9f;
+}
+
+.disabledTr {
+	opacity: 0.5;
+}
+
+.modal-dialog{
+	width: 800px !important;
+}

@@ -1,0 +1,55 @@
+.small_checkbox{
+width: 50px;	
+}
+.inline{
+  display: inline-block;
+}
+form{
+  font-size: 12px;
+}
+form .date_naklad{
+	    width: 150px !important;
+}
+form .document_finance{
+width: 260px !important;
+}
+
+form .select_period_type{
+	width: 210px !important;
+	top: -2px;
+}
+
+form .input_contract{
+    width: 190px !important;
+    float: left;
+    position: absolute;
+    left: 204px;
+}
+form .contract label{
+	
+}
+form .input_text_a input, form .input_text_a .bootstrap-select{
+    width: 170px !important;
+	float: right !important;
+    display: inline;
+	position: absolute;	
+}
+form .input_text_a {
+	 display: block;
+    margin-top: 7px;
+}
+form .absolute label{
+    display: inline !important;
+    width: 30% !important;
+}
+form .left1{
+	    left: 150px !important;
+
+}
+form .left2{
+	    left: 200px !important;
+
+}
+form .absolute{
+
+}

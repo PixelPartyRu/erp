@@ -1,0 +1,54 @@
+
+#btn-container{
+	text-align: center;
+	margin-top: 25px;
+}
+
+#btn-container input{
+	width: 100%;
+}
+
+.panel-info i{
+	padding-top: 4px;
+}
+
+#client-table form{
+	margin: 0px;
+}
+
+#client-table form button{
+	background: transparent;
+	border: none;    
+	border: 1px solid #d6e9c6;
+    padding: 0;
+    border-radius: 10px;
+	color: #337AB7;
+}
+
+#client-table form button:hover{
+	color: #23527C;
+}
+
+#act{
+float: left;
+}
+
+#btn-container{
+	text-align: center;
+	margin-top: 25px;
+}
+
+#btn-container input{
+	width: 100%;
+}
+
+#pcfg{
+	height: 32.8%;
+}
+.filter_bottom{
+	margin-top: 32px;
+}
+
+.conctract_input_block{
+	
+} 
