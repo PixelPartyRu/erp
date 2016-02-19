@@ -1,7 +1,7 @@
 
 <!-- Modal -->
 <div id="importModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
+  <div class="modal-dialog big-modal">
 
     <!-- Modal content-->
     <div class="modal-content">

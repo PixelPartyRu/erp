@@ -66,8 +66,7 @@ class DeliveryController extends Controller
 				$contractDate = $resultArray[4][2];
 				$registryVar = $resultArray[0][3];
 				$registryDate = $resultArray[0][1];
-				$client = Client::where('inn','=',$clientInn)->first();
-								  
+				$client = Client::where('inn','=',$clientInn)->first();			  
 				$debtor = Debtor::where('inn','=',$debtorInn)->first();
 								  
 				$registryDelivery = Delivery::where('registry','=',$registryVar)
@@ -141,9 +140,8 @@ class DeliveryController extends Controller
 										            $delivery->relation_id = $relation->id;
 										            $delivery->waybill = $waybillVar;
 										            $delivery->waybill_amount = $sum;
-										            $delivery->first_payment_amount = ($sum / 100.00) * $relation->rpp;
-										            $delivery->balance_owed = $sum;//предварительно
-										            $delivery->remainder_of_the_debt_first_payment = ($sum / 100.00) * $relation->rpp;//предварительно
+										            $rpp = $relation->rpp;
+    												$delivery->first_payment_amount = ($sum / 100.00) * $rpp;
 										            $delivery->date_of_waybill = $waybillDateVar;
 										            $delivery->due_date = $relation->deferment;
 										            $delivery->date_of_recourse = $dateOfRecourse;//срок оплаты
@@ -211,6 +209,7 @@ class DeliveryController extends Controller
     	$verificationArray = Input::get('verificationArray');
     	$handler = Input::get('handler');
     	$messageArray = [];
+    	$data = 0;
     	foreach ($verificationArray as $cell){
     		$delivery = Delivery::find($cell);
     		$status = $delivery->status;
@@ -239,20 +238,44 @@ class DeliveryController extends Controller
 					$message = 'Накладная '.$delivery->waybill.' не может получить статус "не верифицирована"';
     			}
     		}else{
-    			if (($status == 'Зарегистрирована') || ($status == 'Не верифицирована') || ($status == 'Верифицирована') || ($status == 'Отклонена')){
-    				$delivery->status = 'К финансированию';
-					$delivery->save();
-					$callback = 'success';
-					$messageShot = 'Успешно!';
-					$message = 'Накладная '.$delivery->waybill.' отправлена на финансирование';
-    			}else{
-    				$callback = 'danger';
+    			$relation = $delivery->relation;
+    			$deliveries = $relation->deliveries()->where('state',false)->get();
+	            $usedLimit = 0;
+				foreach($deliveries as $limitDelivery){
+					$usedLimit += $limitDelivery->balance_owed;
+				}
+	            $limit = $relation->limit;
+	            if ($limit) {
+	                $limitValue = $limit->value;
+	                $freeLimit = $limitValue - $usedLimit;
+	                if ($delivery->balance_owed <= $freeLimit){
+		    			if ($status == 'Верифицирована'){
+		    				$delivery->status = 'К финансированию';
+		    				$sum = $delivery->waybill_amount;
+		    				$delivery->remainder_of_the_debt_first_payment = $delivery->first_payment_amount;
+							$delivery->balance_owed = $sum;
+							$delivery->save();
+							$data = $delivery->id;
+							$callback = 'success';
+							$messageShot = 'Успешно!';
+							$message = 'Накладная '.$delivery->waybill.' отправлена на финансирование';
+		    			}else{
+		    				$callback = 'danger';
+							$messageShot = 'Ошибка!';
+							$message = 'Накладная '.$delivery->waybill.' не может быть профинансирована';		
+						}
+		    		}else{
+			    		$callback = 'danger';
+						$messageShot = 'Ошибка!';
+						$message = 'По накладной '.$delivery->waybill.' превышен лимит';
+			    	}
+		    	}else{
+		    		$callback = 'danger';
 					$messageShot = 'Ошибка!';
-					$message = 'Накладная '.$delivery->waybill.' не может быть профинансирована';
-					
-    			}
+					$message = 'Отсутствует лимит по накладной '.$delivery->waybill;
+		    	}
     		}
-    		array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+    		array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'data'=>$data]);
     	}
 
     	return $messageArray;

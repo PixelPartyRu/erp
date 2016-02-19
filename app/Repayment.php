@@ -20,4 +20,9 @@ class Repayment extends Model
     {
         return $this->hasMany('App\RepaymentInvoice');
     }
+
+    public function dayliChargeCommission()
+    {
+        return $this->hasOne('App\dayliChargeCommission');
+    }
 }

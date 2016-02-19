@@ -17,10 +17,22 @@ use App\Client;
 
 class ClientController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {   
-        $clients=Client::all();
-        return view('clients.index', ['clients' => $clients]); 
+        if($request->ajax()){
+            $handler = Input::get('handler');
+            if ($handler == 0){
+                $clients = Client::all();
+            }elseif($handler == 1){
+                $clients = Client::where('active',true)->get();
+            }else{
+                $clients = Client::where('active',false)->get();
+            }
+            return view('clients.table', ['clients' => $clients]);
+        }else{
+            $clients=Client::all();
+            return view('clients.index', ['clients' => $clients]); 
+        }  
     }
 
     public function store()
@@ -32,14 +44,12 @@ class ClientController extends Controller
             'name'       => 'required',
             'inn'       => 'required',
             'kpp'       => array('required', 'size:9'),
-            'ogrn'       => array('required', 'size:13'),
+            'ogrn'       => array('required','unique', 'size:13')
         );
         $validator = Validator::make(Input::all(), $rules);
         // process the login
         if ($validator->fails()) {
-            
-            return Redirect::to('client')
-                ->withErrors($validator);
+            return redirect()->back()->with('danger','Данные клиента введены неверно')->withInput();
         } else {
             if(count(Client::where('inn','=',Input::get('inn'))->get())>0){
                 return redirect()->back()->with('danger','Клиент с данным ИНН уже имеется в базе')->withInput();
@@ -165,6 +175,5 @@ class ClientController extends Controller
         
         return false;
     }
-
 }
 

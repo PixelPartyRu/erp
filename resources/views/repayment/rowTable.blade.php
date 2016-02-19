@@ -15,8 +15,8 @@
       @foreach ($resultArray as $row)
          @if (strpos($row['Получатель'],'Факторинг-Финанс'))
             <?php 
-                  $client = $clients->where('inn',$row['ПолучательИНН'])->first(); 
-                  $debtor = $debtors->where('inn',$row['ПолучательИНН'])->first(); 
+                  $client = $clients->where('inn',$row['ПлательщикИНН'])->first(); 
+                  $debtor = $debtors->where('inn',$row['ПлательщикИНН'])->first(); 
                   $clientChoice = '0'; 
                   $debtorChoice = '0'; 
 
@@ -25,17 +25,17 @@
                      $debtorChoice = '0'; 
                   }elseif($client != null){
                      $clientChoice = $client->id;
-                     $relation = $client->relation;
-                     if ($relation->count() == 1){
-                        $debtorChoice = $relation->debtor->id;
+                     $relations = $client->relations;
+                     if ($relations->count() == 1){
+                        $debtorChoice = $relations[0]->debtor->id;
                      }else{
                         $debtorChoice = '0'; 
                      } 
                   }elseif($debtor != null){
                      $debtorChoice = $debtor->id;
-                     $relation = $debtor->relation;
-                     if ($relation->count() == 1){
-                        $clientChoice = $relation->debtor->id;
+                     $relations = $debtor->relations;
+                     if ($relations->count() == 1){
+                        $clientChoice = $relations[0]->client->id;
                      }else{
                         $clientChoice = '0';
                      }  

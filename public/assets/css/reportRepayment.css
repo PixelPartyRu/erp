@@ -1,0 +1,13 @@
+.margin-top-bottom {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.padding-top {
+	padding-top: 7px;
+    display: inline-block;
+}
+
+#report-repayment-table th {
+	font-size: 12px; 
+}

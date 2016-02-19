@@ -29,6 +29,13 @@
 			<td><nobr class="repaymentIndexBalance">{{ number_format($repayment->balance,2,',',' ') }}</nobr></td>
 			<?php $balance +=  $repayment->balance ?> 
 			<td>{{ $repayment->purpose_of_payment }}</td>
+			<td>
+				@if ($repayment->balance != $repayment->sum)
+					<i class="fa fa-close text-muted repaymentDelete" data-id='{{$repayment->id}}' title="Удалить"></i>
+				@else
+					<i class="fa fa-close text-danger repaymentDelete" data-id='{{$repayment->id}}' title="Удалить"></i>
+				@endif
+			</td>
 		</tr>
 	@empty
 		<tr>
@@ -44,6 +51,7 @@
 			<td><strong>Итого:</strong></td>
 			<td><strong>{{ number_format($sum,2,',',' ') }}</strong></td>
 			<td><strong>{{ number_format($balance,2,',',' ') }}</strong></td>
+			<td></td>
 			<td></td>
 		</tr>
 </tbody>

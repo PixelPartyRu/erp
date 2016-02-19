@@ -52,7 +52,7 @@ class FinanceController extends Controller
   	    }
 
 	    $keyStek = [];
-       	$client = $stek[0][0];
+      $client = $stek[0][0];
    		$sum = (float)$stek[0][1];
    		$number_of_waybill = 1;
    		$registry = $stek[0][2];
@@ -136,7 +136,7 @@ class FinanceController extends Controller
               $deliveries = $relation->deliveries()->where('state',false)->get();
               $usedLimit = 0;
               foreach($deliveries as $delivery){
-                $usedLimit += $delivery->remainder_of_the_debt_first_payment;
+                $usedLimit += $delivery->balance_owed;
               }
               $limit = $relation->limit;
               if ($limit) {

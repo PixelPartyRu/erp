@@ -10,6 +10,10 @@ class Client extends Model
     {
         return $this->hasMany('App\Agreement');
     }
+    public function bills()
+    {
+        return $this->hasMany('App\Bill');
+    }
 
     public function relations()
     {
@@ -31,8 +35,4 @@ class Client extends Model
         return $this->hasMany('App\ChargeCommissionView');
     }
 
-    public function dailyChargeCommission()
-    {
-        return $this->hasMany('App\DailyChargeCommission');
-    }
 }

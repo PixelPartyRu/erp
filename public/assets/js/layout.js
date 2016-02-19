@@ -12,6 +12,11 @@ $(document).ajaxComplete(function(){
 });
 $(document).ready(function(){
 	tableChecked();
+
+	//table scroll
+	var win_height = $(window).height();
+	$('.table-responsive').css('maxHeight',win_height * 0.9);
+	//----------
 	$('body').on('click','.openClickTable>.panel-heading',function(){
 		var icon = $(this).find('i');
 		$(this).closest('.openClickTable').find('.panel-body').first().toggle('fast',function(){
@@ -82,6 +87,58 @@ $(document).ready(function(){
 
 		        }
 	    });
+	})
+
+	$('body').on('click','.export-excel',function(event){
+		var headerArray = [];
+		var intervalArray = [];
+		var bodyArray = [];
+		var table = $('.excel-table');
+		var th = table.find('thead th');
+		var direction = false;
+		th.each(function (){
+			if ($(this).hasClass('head-start')){
+				direction = true;
+			}
+			if (direction === true){
+				headerArray.push($(this).html());
+			}
+			if ($(this).hasClass('head-finish')){
+				direction = false;
+			}
+		});
+
+		var tr = table.find('tbody tr');
+		tr.each(function (index){
+			var td = $(this).find('td');
+			intervalArray = [];
+			var direction = false;
+			td.each(function (){
+				if ($(this).hasClass('body-start')){
+					direction = true;
+				}
+				if (direction === true){
+					intervalArray.push($(this).html());
+				}
+				if ($(this).hasClass('body-finish')){
+					direction = false;
+				}
+			});
+
+			if (intervalArray.length > 0){
+				bodyArray.push(intervalArray);
+			}
+		});
+		var name = $(this).data('name');
+		bodyArray.unshift(headerArray);
+
+		$.ajax({
+			type: "POST",
+		  	url: "excelCreate",
+		  	data: {_token: _token,body:bodyArray,name:name}
+		}).done(function(data) {
+			var url = '/storage/exports/'+data;
+		});
 	})
 });
 

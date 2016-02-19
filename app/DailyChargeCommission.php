@@ -6,10 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class DailyChargeCommission extends Model
 {
-    public function client()
-    {
-        return $this->belongsTo('App\Client');
-    }
 
     public function delivery()
     {
@@ -19,5 +15,10 @@ class DailyChargeCommission extends Model
     public function chargeCommission()
     {
         return $this->belongsTo('App\ChargeCommission');
+    }
+
+    public function Repayment()
+    {
+        return $this->belongsTo('App\Repayment');
     }
 }

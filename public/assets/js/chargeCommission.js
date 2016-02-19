@@ -9,12 +9,7 @@ $(function () {
             url: "chargeCommission/getFilterData",
             data: {_token: _token, DebtorId: DebtorId, ClientId: ClientId, Status: Status}
         }).done(function (data) {
-            if (data['callback'] == 'success'){
-                $('#client-table tbody').html(data['view']);
-            }else{
-                message(data);
-            }
-            //console.log(data);
+            $('#client-table tbody').html(data);
         });
 
     });

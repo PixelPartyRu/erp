@@ -1,6 +1,6 @@
 @extends('layouts.master')
 
-@section('title', 'Погашение')
+@section('title', 'Поступившие платежи')
 
 @section('stylesheet')
   	<link rel="stylesheet" type="text/css" href="/assets/css/repayment.css">
@@ -12,10 +12,11 @@
 @stop
 
 @section('content')
-	<h1><strong>Погашение</strong></h1>
+	<h1><strong>Поступившие платежи</strong></h1>
 	@include('repayment.importModal')
 	@include('repayment.createModal')
 	@include('repayment.repaymentModal')
+	@include('repayment.deleteModal')
 	<div class="panel panel-info">
 		<div class="panel-heading">Платежи</div>
 		<div class="panel-body">

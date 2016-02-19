@@ -13,6 +13,14 @@
 
 @section('content')
 	<h1><strong>Клиенты</strong></h1>
+	<div class="panel panel-success" id="filter_client">
+		<div class="panel-heading">
+			<span>Фильтр</span>
+		</div>
+		<div class="panel-body">
+			@include('clients.filter')
+		</div>	
+	</div>
 	<div class="panel panel-success openClickTable" id="clientCreate">
 		<div class="panel-heading">
 			<span>Создание нового клиента</span>
@@ -55,50 +63,14 @@
   		</div>
 	</div>
 	<div class="panel panel-info">
-		<div class="panel-heading">Наши клиенты</div>
-		<div class="panel-body">
-			<div class="table-responsive">
-				<table class="table table-striped" id="client-table">
-				  <thead>
-				  	<tr>
-						<th>№</th>
-				  		<th>Полное наименование</th>
-				  		<th>Наименование</th>
-				  		<th>ИНН</th>
-				  		<th>КПП</th>
-				  		<th>ОГРН</th>
-				  		<th></th>
-				  		<th></th>
-				  		<th></th>
-				  	</tr>
-				  </thead>
-				  <tbody class='layoutTable'>
-				  	  {{-- */ $num = 0; /* --}}
-				  	@forelse($clients as $client)
-						<tr>
-							<td>{{ $num += 1 }}</td>
-							<td>{{ $client->full_name }}</td>
-							<td>{{ $client->name }}</td>
-							<td>{{ $client->inn }}</td>
-							<td>{{ $client->kpp }}</td>
-							<td>{{ $client->ogrn }}</td>
-							<td><a href="/client/{{ $client->id }}/agreement"><i class="fa fa-file-text-o" data-toggle="tooltip" title="Договора"></i></a></td>
-							<td><a href="/client/{{ $client->id }}/edit"><i class="fa fa-pencil" data-toggle="tooltip" title="Редактировать"></i></a></td>
-							<td><a class="deleteItem" data-delete="/client/{{ $client->id }}" data-method="delete"><i class="fa fa-close"  data-toggle="tooltip" title="Удалить"></a></i></td>
-						</tr>
-					@empty
-						<tr>
-							<td>
-								<p>Нет клиентов</p>
-							</td>
-						</tr>
-					@endforelse
-				  </tbody>
-				</table>
-			</div>
+		<div class="panel-heading">
+			<span>Наши клиенты</span>
+			<i class="fa fa-file-excel-o pull-right export-excel" data-name='Clients'></i>	
+		</div>
+		<div class="panel-body" id='client-table'>
+			
 		</div>
 	</div>
-
 @stop
 
 <!--, array('class' => 'btn btn-warning'-->

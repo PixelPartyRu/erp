@@ -62,7 +62,7 @@
 
 						</tr>
 					@empty
-						<p>Связей нет</p>
+						<tr><td>Связей нет</td></tr>
 					@endforelse
 				  </tbody>
 				</table>

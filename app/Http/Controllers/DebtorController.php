@@ -34,7 +34,7 @@ class DebtorController extends Controller
             'name'       => 'required',
             'inn'       => 'required',
             'kpp'       => array('required', 'size:9'),
-            'ogrn'       => array('required', 'size:13'),
+            'ogrn'       => array('required','unique', 'size:13'),
         );
         $validator = Validator::make(Input::all(), $rules);
 
@@ -44,7 +44,7 @@ class DebtorController extends Controller
                 ->withErrors($validator);
         } else {
             if(count(Debtor::where('inn','=',Input::get('inn'))->get())>0){
-                return redirect()->back()->with('danger','Дебитор с данным ИНН уже имеется в базе')->withInput();
+                return redirect()->back()->with('danger','Данные дебитора введены неверно')->withInput();
             }else{
                 // store
                 $debtor = new Debtor;
@@ -163,6 +163,5 @@ class DebtorController extends Controller
         
         return false;
     }
-
 }
 

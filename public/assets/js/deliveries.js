@@ -39,10 +39,26 @@ $(document).ready(function(){
 	});//not verefication
 
 	$('body').on('click','#financeBtn',function(){
-		var financeArray = [];
-		verification('finance');
-		financeArray = getCheckedArray(); 
-		pushToFinance(financeArray);
+		var verificationArray = [];
+		verificationArray = getCheckedArray();
+		if (verificationArray.length != 0){
+			$.ajax({
+				type: "GET",
+			  	url: "delivery/verification",
+			  	data: {handler: 'finance', verificationArray: verificationArray}
+			}).done(function(data) {
+				var financeArray = [];
+				data.forEach(function(item) {
+					if (item['data'] != 0){
+						financeArray.push(item['data']);
+					}
+	           		message(item);			
+				});
+				pushToFinance(financeArray);
+				$('#filterUpdate').click();
+			});
+		}
+
 		$('.verificationModalClose').click();
 		
 	});//finance
@@ -299,8 +315,6 @@ function pushToFinance(arrayFinance){
 		  	url: "finance",
 		  	data: {arrayFinance: arrayFinance,_token:_token}
 		}).done(function(data) {
-			//console.log(data);
-			//location.reload();
 			$('#filterUpdate').click();
 		});
 	}

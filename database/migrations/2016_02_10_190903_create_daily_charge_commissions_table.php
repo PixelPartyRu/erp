@@ -15,21 +15,13 @@ class CreateDailyChargeCommissionsTable extends Migration
         Schema::create('daily_charge_commissions', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->integer('client_id')->unsigned();
-            $table->foreign('client_id')->references('id')->on('clients');
-
-            $table->integer('registry')->nullable();
-            $table->string('waybill',50)->nullable();
-            $table->date('date_of_waybill')->nullable();
             $table->float('fixed_charge')->nullable();
             $table->float('percent')->nullable();
             $table->float('udz')->nullable();
-            $table->float('info_commission')->nullable();
             $table->float('deferment_penalty')->nullable();
             $table->float('without_nds')->nullable();
             $table->float('nds')->nullable();
             $table->float('with_nds')->nullable();
-            $table->float('debt')->nullable();
 
             $table->boolean('handler')->default(false)->nullable();
 

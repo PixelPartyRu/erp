@@ -7,7 +7,6 @@
 		<td>{{ $delivery->waybill }}</td>
 		<td>{{ date('d/m/Y', strtotime($delivery->date_of_waybill)) }}</td>
 		<td nowrap>{{ number_format($delivery->waybill_amount,2,',',' ') }}</td>
-		<td nowrap>{{ number_format($delivery->first_payment_amount, 2,',',' ') }}</td>
 	</tr>
 	<?php $num++; ?>
 @empty

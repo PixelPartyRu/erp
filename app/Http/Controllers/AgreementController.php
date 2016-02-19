@@ -24,7 +24,7 @@ class AgreementController extends Controller
         $rules = array(
             'code'  => 'required',
            // 'penalty'       => 'required',
-            'code_1c'       => 'required',
+            'code_1c'       => 'required,unique:agreements',
             //'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
@@ -97,7 +97,7 @@ class AgreementController extends Controller
         $rules = array(
             'code'  => 'required',
             //'penalty'       => 'required',
-            'code_1c'       => 'required',
+            'code_1c'       => 'required,unique:agreements',
             //'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);

@@ -27,9 +27,10 @@
 						@endforeach
 					</select>
 				</div>
-				<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
+<!-- 				<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
 					{{ Form::select('count_congestion', ['remainder_of_the_debt_first_payment'=>'по сумме финансирования','balance_owed'=>'по номиналу накладной'], 'remainder_of_the_debt_first_payment',array('id' => 'count_congestion','class'=>'selectpicker')) }}
-				</div>
+				</div> -->
+				<input type="hidden" name="count_congestion" id="count_congestion" value='balance_owed'>
 			</div>			
   		</div>
 	</div>

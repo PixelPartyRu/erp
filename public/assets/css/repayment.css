@@ -1,7 +1,3 @@
-.modal-dialog {
-	width: 900px !important;
-}
-
 .radio-hide {
 	display: none;
 }
@@ -10,6 +6,14 @@
 	margin-top: 5px;
 }
 
-.modal-dialog { 
+.repaymentDelete {
+	opacity: 0.5;
+}
+
+.repaymentDelete:hover {
+	opacity: 1;
+}
+
+.big-modal {
 	width: 90% !important;
 }

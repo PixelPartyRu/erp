@@ -14,9 +14,8 @@
 Route::group(['middleware' => ['web']], function () {
 	Route::get('/', 'HomeController@index');
 	Route::resource('client', 'ClientController');
+	#Route::post('debtor/filter', 'DebtorController@filter');
 	Route::get('client/{id}/agreement','ClientController@agreement');
-
-	Route::resource('invoicing','InvoicingController');
 	Route::resource('debtor', 'DebtorController');
 	Route::resource('relation', 'RelationController');
 	Route::post('relation/getFilterData', 'RelationController@getFilterData');
@@ -61,6 +60,10 @@ Route::group(['middleware' => ['web']], function () {
 	Route::post('repayment/getCommissionData', 'RepaymentController@getCommissionData');
 	Route::post('repayment/getWaybillAmount', 'RepaymentController@getWaybillAmount');
 	Route::post('repayment/getIndexRepayment', 'RepaymentController@getIndexRepayment');
+	Route::post('repayment/deleteRepayment', 'RepaymentController@deleteRepayment');
+	Route::post('repayment/deleteConfirm', 'RepaymentController@deleteConfirm');
+
+	Route::resource('reportRepayment', 'ReportRepaymentController');
 	/*
 	|--------------------------------------------------------------------------
 	| Application Routes
@@ -77,3 +80,9 @@ Route::group(['middleware' => 'web'], function () {
     Route::auth();
     Route::get('/', 'HomeController@index');
 });
+Route::resource('invoicing','InvoicingController');
+Route::get('recalculation', 'NightChargeController@index');
+Route::post('recalculation/recalculate', 'NightChargeController@recalculate');
+Route::post('excelCreate', 'ExcelController@index');
+
+

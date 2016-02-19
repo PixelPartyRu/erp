@@ -7,6 +7,9 @@ h1 {
 label {
 	white-space: nowrap;
 }
+.form-control[disabled].btn-success {
+	background-color: #5cb85c !important;
+}
 td {
 	white-space: nowrap;
 	overflow: hidden;
@@ -158,4 +161,17 @@ table td, table th {
 
 .text_in_forms {
 	line-height: 34px;
+}
+
+.table-responsive {
+	padding-top: 30px;
+}
+
+.export-excel:hover {
+	cursor: pointer;
+	color: #5CB85C;
+}
+
+.in-total td {
+	font-weight: bold;
 }

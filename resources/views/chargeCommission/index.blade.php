@@ -28,6 +28,9 @@
 					<div class="col-xs-2">
 						{!! Form::submit('Перерасчет',array('class' => 'btn btn-success')) !!}
 					</div>
+					<div class="col-xs-2">
+						<input type="date" readonly name="output" class="form-control" value='{{$nowDate}}'>
+					</div>
 				{!! Form::close() !!}
 			</div>
 		</div>

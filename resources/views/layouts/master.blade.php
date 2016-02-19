@@ -14,6 +14,7 @@
       	
       	@yield('stylesheet')
       	<script type="text/javascript" src="/assets/js/jquery-2.1.4.min.js"></script>
+      	<script type="text/javascript" src="/assets/js/excellentexport.js"></script>
       	<script type="text/javascript" src="/assets/js/main.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap.min.js"></script>
       	<script type="text/javascript" src="/assets/js/bootstrap-select.js"></script>
@@ -65,6 +66,7 @@
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown">Отчеты<b class="caret"></b></a>
 			          <ul class="dropdown-menu">
 			            <li><a href="/chargeCommission">Начисленные комиссии</a></li>
+			            <li><a href="/reportRepayment">Погашения</a></li>
 			            <li><a href="#">Отчет о наличии оригиналов документов</a></li>
 			          </ul>
 			        </li>
@@ -75,7 +77,7 @@
 			          <ul class="dropdown-menu">
 			            <li><a href="/delivery">Поставки</a></li>
 			            <li><a href="/finance">Финансирование</a></li>
-			            <li><a href="/repayment">Погашения</a></li>
+			            <li><a href="/repayment">Поступившие платежи</a></li>
 			            <li><a href="/invoicing">Выставление счетов</a></li>
 			            <li><a href="#">Документы 1С</a></li>
 			          </ul>
@@ -110,11 +112,7 @@
 			    </div><!-- /.navbar-collapse -->
 			  </div><!-- /.container-fluid -->
 			</nav>
-			<div class="row" id="filter-container">
-				@section('filter')
-		            
-		        @show
-			</div>
+		    @yield('filter')
 			@include('global.messages')
             @yield('content')
         </div>

@@ -23,7 +23,7 @@ class LimitController extends Controller
     {   
         $sort = Input::get('sort') == null ? 'relation_id' : Input::get('sort');
         $client_id_select = Input::get('client_id_select') == null ? 'all' : Input::get('client_id_select');
-        $countCongestion = Input::get('count_congestion') == null ? 'remainder_of_the_debt_first_payment' : Input::get('count_congestion');
+        $countCongestion = Input::get('count_congestion') == null ? 'balance_owed' : Input::get('count_congestion');
         $sortDirection = Input::get('sortDirection') == null ? 'DESC' : Input::get('sortDirection');
         $clients = Client::all();
         $debtors = Debtor::all();

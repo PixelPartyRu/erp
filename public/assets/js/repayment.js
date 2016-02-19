@@ -107,6 +107,40 @@ $(document).ready(function(){
 		}
 		$('.debtorPayerCreate').selectpicker('refresh');
 	})
+
+	$('body').on('click','.repaymentDelete',function(){
+		var id = $(this).data('id');
+		_token = $("meta[name='_token']").attr("content");
+		$.ajax({
+			type: "POST",
+			headers: { 'X-CSRF-TOKEN': _token },
+		  	url: "repayment/deleteRepayment",
+		  	data: {_token:_token,id:id}
+		}).done(function(data){	
+			if (data['callback'] == 'success'){
+				$('#deleteModal #delete-modal-id').val(data['id']);
+				$('#deleteModal').modal('show'); 
+			}else{
+				message(data);
+			}
+		});
+	})
+
+	$('body').on('click','#delete-modal-send',function(){
+		var id = $('#delete-modal-id').val();
+		_token = $("meta[name='_token']").attr("content");
+		$.ajax({
+			type: "POST",
+			headers: { 'X-CSRF-TOKEN': _token },
+		  	url: "repayment/deleteConfirm",
+		  	data: {_token:_token,id:id}
+		}).done(function(data){	
+			message(data['data']);
+			$('#deleteModal').modal('hide'); 
+			$('#repayment-table-content').html(data['view']);
+		});
+	});
+	
 });
 
 function selectPickerImportChange(selector,style){
@@ -300,10 +334,11 @@ function repaymentPush(delivery,repaymentId,handler){
 	  	url: "repayment/repayment",
 	  	data: {_token:_token, delivery:delivery,repaymentId:repaymentId, handler:handler},
 	}).done(function(data){	
-		data.forEach(function(item) {
+		data['callback'].forEach(function(item) {
        		message(item);			
 		});
-		$('#repaymentModal').modal('hide'); 
+		$('#repaymentModal').modal('hide');
+		$('#repayment-table-content').html(data['view']);
 	});
 }
 
