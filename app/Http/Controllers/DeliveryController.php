@@ -56,7 +56,7 @@ class DeliveryController extends Controller
 				}
 				$resultArrayVar = [];
 			}
-			//var_dump($resultArray);
+			//var_dump($resultArray[]);
 			if (count($resultArray[0] === 4) && count($resultArray[1] === 4) && count($resultArray[2] === 4) && count($resultArray[3] === 2) && count($resultArray[4] === 4)){
 				$clientInn = $resultArray[1][3];
 				$clientName = $resultArray[1][1];
@@ -68,7 +68,7 @@ class DeliveryController extends Controller
 				$registryDate = $resultArray[0][1];
 				$client = Client::where('inn','=',$clientInn)->first();			  
 				$debtor = Debtor::where('inn','=',$debtorInn)->first();
-								  
+							  
 				$registryDelivery = Delivery::where('registry','=',$registryVar)
 											->where('client_id','=',$client->id)
 											->first();
@@ -87,6 +87,9 @@ class DeliveryController extends Controller
 
 									$contractCreatedAt = $contract->created_at->format('Y-m-d');
 									$contractCodeVar = $contract->code;
+									//var_dump($contractCodeVar.' '.$contractCode);
+
+									//var_dump($contractCreatedAt.' '.$contractDate);
 									if($contractCodeVar === $contractCode and $contractCreatedAt === $contractDate){
 										//Code
 										$row = 0;
@@ -239,11 +242,9 @@ class DeliveryController extends Controller
     			}
     		}else{
     			$relation = $delivery->relation;
-    			$deliveries = $relation->deliveries()->where('state',false)->get();
 	            $usedLimit = 0;
-				foreach($deliveries as $limitDelivery){
-					$usedLimit += $limitDelivery->balance_owed;
-				}
+
+				$usedLimit = $relation->deliveries()->where('state',false)->where('status','Профинансирована')->sum('balance_owed');
 	            $limit = $relation->limit;
 	            if ($limit) {
 	                $limitValue = $limit->value;
@@ -372,12 +373,30 @@ class DeliveryController extends Controller
      public function getPopapDelivery(){
      	$data = Input::get('data');
      	$deliveries = [];
+     	$messageArray = [];
+   		$relationId = Delivery::find($data[0])->relation_id;
+   		$stop = false;
      	foreach ($data as $id) {
      		$delivery = Delivery::find($id);
+     		if ($delivery->relation_id != $relationId){
+     			$stop = true;
+     		}
      		array_push($deliveries,$delivery);
      	}
+     	if ($stop == false){
+     		$callback = 'success';
+     		$messageShot = '';
+			$message = '';
+			$data = view('delivery.verificationModalRow',['deliveries' => $deliveries])->render();
+     	}else{
+     		$callback = 'danger';
+     		$messageShot = 'Ошибка! ';
+			$message = 'Выбраны поставки по разным связям!';
+			$data = '';
+     	}
 
-     	return  view('delivery.verificationModalRow',['deliveries' => $deliveries]);
+     	$messageArray = ['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'data'=>$data];
+     	return $messageArray;		
      }
 }
 

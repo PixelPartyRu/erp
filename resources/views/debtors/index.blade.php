@@ -19,7 +19,7 @@
 			<i class="fa fa-chevron-down"></i> 
 		</div>		
 		<div class="panel-body">
-				{!! Form::open(array('action' => 'DebtorController@store','id'=>'debtor-form')) !!}
+				{!! Form::open(array('action' => 'DebtorController@store','id'=>'debtor-form','class'=>'noDoubleClickNoAjaxForm')) !!}
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="InputEmail1">Полное наименование:</label>

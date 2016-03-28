@@ -25,7 +25,7 @@
 					<input type="button" value="Импортировать" data-toggle="modal" data-target="#importModal" class="form-control btn btn-success">
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-4">
-					<input type="button" value="Создать вручную" data-toggle="modal" data-target="#createModal" class="form-control btn btn-success">
+					<input type="button" value="Создать вручную" id="createOpenModal" class="form-control btn btn-success">
 				</div>
 				<div class="col-xs-12 col-sm-12 col-md-3 col-lg-4">
 					<input type="button" id="repaymentModalBtn" value="Проведение погашения" class="form-control btn btn-success">

@@ -15,7 +15,7 @@
 			<i class="fa fa-chevron-down"></i>
 		</div>
 		<div class="panel-body">
-			{!! Form::open(array('action' => 'AgreementController@store')) !!}
+			{!! Form::open(array('action' => 'AgreementController@store','class'=>'noDoubleClickNoAjaxForm')) !!}
 				{!! Form::hidden('client_id',$client->id) !!}
 			<div class="row">
 				<div class="col-xs-12 col-sm-6 col-md-5 col-lg-4">

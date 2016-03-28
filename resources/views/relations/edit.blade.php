@@ -11,7 +11,7 @@
     <div class="panel panel-success">
 		<div class="panel-heading">Редактирование связи</div>
 		<div class="panel-body">
-				{!! Form::model($relation, array('route' => array('relation.update', $relation->id), 'method' => 'PUT')) !!}
+				{!! Form::model($relation, array('route' => array('relation.update', $relation->id), 'method' => 'PUT','class'=>'noDoubleClickNoAjaxForm')) !!}
 					<div class="row">
 						<div class="form-group col-xs-3 col-sm-3 col-md-3 col-lg-2"> 
 						  	{!! Form::select('client_view',array($client->id => $client->name.'('.$client->inn.')'),$relation->client->id,array('class'=>'selectpicker','disabled')) !!}
@@ -40,7 +40,7 @@
 								<div class="row">	
 						
 									<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-										<label for="rpp">Коэфициент финансирования(%):</label>
+										<label for="rpp">Коэффициент финансирования(%):</label>
 										{!! Form::text('rpp',$relation->rpp,array('class' => 'form-control small_checkbox inline','id' => 'rpp')) !!}
 									</div>
 									<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-4">

@@ -13,7 +13,7 @@
         <div class="form-group">
       		<form>
                 <input name="file" id="importFile" encoding='multipart/form-data'  accept=".txt" type="file" />
-                <input type="button" id="importBtn" value="Загрузка файла клиент-банка" class="btn btn-success" />
+                <input type="button" id="importBtn" disabled='disabled' value="Загрузка файла клиент-банка" class="btn btn-success" />
           </form>
     		</div>
         <div class="table-responsive" id="importModalTableBody">
@@ -21,7 +21,7 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-success" id="sendImportRepayment">Сохранить</button>
+        <button type="button" class="btn btn-success" disabled id="sendImportRepayment">Сохранить</button>
         <button type="button" class="btn btn-danger" id="importClose" data-dismiss="modal">Отменить</button>
       </div>
     </div>

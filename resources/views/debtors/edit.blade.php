@@ -14,7 +14,7 @@
     <div class="panel panel-success">
 		<div class="panel-heading">Редактирование данных дебитора</div>
 		<div class="panel-body">
-		{!! Form::model($debtor, array('route' => array('debtor.update', $debtor->id), 'method' => 'PUT','id'=>'debtor-form')) !!}
+		{!! Form::model($debtor, array('route' => array('debtor.update', $debtor->id), 'method' => 'PUT','id'=>'debtor-form','class'=>'noDoubleClickNoAjaxForm')) !!}
 			<div class="row">
 				<div class="form-group col-xs-12 col-sm-6 col-md-4 col-lg-4">
 					<label>Полное наименование:</label>

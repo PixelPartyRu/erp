@@ -14,28 +14,6 @@
 @section('content')
 	<h1><strong>Начисленные комиссии</strong></h1>
 	@include('chargeCommission.filter')
-	<div class="panel panel-success openClickTable" >
-		<div class="panel-heading">
-			<span>Тестирование</span>
-			<i class="fa fa-chevron-down"></i> 
-		</div>
-		<div class="panel-body">
-			<div class="row">
-				{!! Form::open(array('action' => 'ChargeCommissionController@recalculationTest')) !!}
-					<div class="col-xs-2">
-						<input type="date" name="dateTest" class="form-control">
-					</div>
-					<div class="col-xs-2">
-						{!! Form::submit('Перерасчет',array('class' => 'btn btn-success')) !!}
-					</div>
-					<div class="col-xs-2">
-						<input type="date" readonly name="output" class="form-control" value='{{$nowDate}}'>
-					</div>
-				{!! Form::close() !!}
-			</div>
-		</div>
-	</div>
-
 
 	<div class="panel panel-info" >
 	<div class="panel-heading">
@@ -46,6 +24,7 @@
 			<table class="table table-striped" id="client-table">
 			  <thead>
 			  	<tr>
+			  		<th>№</th>
 			  		<th>Клиент</th>
 			  		<th>Дебитор</th>
 			  		<th>Номер реестра</th>

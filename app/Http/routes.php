@@ -62,7 +62,9 @@ Route::group(['middleware' => ['web']], function () {
 	Route::post('repayment/getIndexRepayment', 'RepaymentController@getIndexRepayment');
 	Route::post('repayment/deleteRepayment', 'RepaymentController@deleteRepayment');
 	Route::post('repayment/deleteConfirm', 'RepaymentController@deleteConfirm');
-
+	Route::post('repayment/ClearTable', 'RepaymentController@ClearTable');
+	Route::post('repayment/getDebtor', 'RepaymentController@getDebtor');
+	
 	Route::resource('reportRepayment', 'ReportRepaymentController');
 	/*
 	|--------------------------------------------------------------------------
@@ -84,5 +86,7 @@ Route::resource('invoicing','InvoicingController');
 Route::get('recalculation', 'NightChargeController@index');
 Route::post('recalculation/recalculate', 'NightChargeController@recalculate');
 Route::post('excelCreate', 'ExcelController@index');
-
+Route::get('new', function ()    {
+    return view('new');
+});
 

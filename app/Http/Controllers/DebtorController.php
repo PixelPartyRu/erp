@@ -33,15 +33,14 @@ class DebtorController extends Controller
             'full_name'  => 'required',
             'name'       => 'required',
             'inn'       => 'required',
-            'kpp'       => array('required', 'size:9'),
-            'ogrn'       => array('required','unique', 'size:13'),
+            'kpp'       => 'required|size:9',
+            'ogrn'       => 'required|unique:debtors|size:13'
         );
         $validator = Validator::make(Input::all(), $rules);
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('debtor')
-                ->withErrors($validator);
+            return redirect()->back()->with('danger','Данные дебитора введены неверно')->withInput();
         } else {
             if(count(Debtor::where('inn','=',Input::get('inn'))->get())>0){
                 return redirect()->back()->with('danger','Данные дебитора введены неверно')->withInput();
@@ -98,8 +97,8 @@ class DebtorController extends Controller
             'full_name'  => 'required',
             'name'       => 'required',
             'inn'       => 'required',
-            'kpp'       => array('required', 'size:9'),
-            'ogrn'       => array('required', 'size:13'),
+            'kpp'       => 'required|size:9',
+            'ogrn'       => 'required|unique:debtors|size:13'
         );
         $validator = Validator::make(Input::all(), $rules);
 

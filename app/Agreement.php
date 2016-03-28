@@ -14,4 +14,8 @@ class Agreement extends Model
     {
         return $this->HasMany('App\Relation');
     }
+    public function bill()
+    {
+        return $this->HasOne('App\Bill');
+    }
 }

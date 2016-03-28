@@ -4,9 +4,18 @@ $(document).ready(function(){
 	repaymentPushCheck();
 	selectPickerImportChange('[name = "clientPayerCreate"]','btn-danger');
 	selectPickerImportChange('[name = "debtorPayerCreate"]','btn-default');
+
+	$('body').on('change','#importFile',function(){
+		buttonLock($('#importBtn'),false);
+		buttonLock($('#sendImportRepayment'),true);
+	})
+	
 	$('body').on('click','#importBtn',function(){
 		var file = document.getElementById("importFile").files[0];
 		if (file != undefined){
+			buttonLock($(this),true);
+			buttonLock($('#sendImportRepayment'),false);
+			
 			var _token = $('[name="_token"]').attr('content');
 	   		var reader = new FileReader();
 	   		reader.readAsText(file,'CP1251');
@@ -34,7 +43,28 @@ $(document).ready(function(){
 			
 	})
 
+	$('body').on('change','[name="clientPayerCreate"]',function(){
+		var clientId = $(this).val();
+		var _token = $('[name="_token"]').attr('content');
+		$.ajax({
+			type: "POST",
+		  	url: "repayment/getDebtor",
+		  	data: {_token:_token, clientId: clientId}
+		}).done(function(data) {
+			var items = '';
+			$('[name = "debtorPayerCreate"]').empty();
+			items += '<option value="0">Выберите дебитора</option>';
+			$.each( data, function(key,value) {
+		  		items+= ('<option value="'+value.id+'">'+value.name+'</option>');
+		  		console.log(value);
+			});
+			$('[name = "debtorPayerCreate"]').append(items);
+			$('[name = "debtorPayerCreate"]').selectpicker('refresh');
+		});
+	})
+
 	$('body').on('click','#modal-btn-success',function(){
+		buttonLock($(this),true);
 		var sendArray = [];
 		var number = $('#paymentNumber').val();
 		var date = $('#paymentDate').val();
@@ -69,10 +99,18 @@ $(document).ready(function(){
 			if (data['error'] == false){
 				updateIndex();
 				$('#createModal').modal('hide');				
+			}else{
+				buttonLock($('#modal-btn-success'),false);
 			}
 			message(data['data']);
+
 		});
 
+	})
+
+	$('body').on('click','#createOpenModal',function(){
+		$('#createModal').modal('show');
+		buttonLock($('#modal-btn-success'),false);
 	})
 
 	//Провести погашение 
@@ -157,6 +195,8 @@ function selectPickerImportChange(selector,style){
 
 function radioChange(){
 	$('body').on('click','#sendImportRepayment',function(){
+		$(this).prop('disabled', true);
+
 		var sendArray = [];
 		$('.importModalTableBodyTr').each(function(index,value){
 			var tdVar = $(this).find('td');
@@ -190,6 +230,8 @@ function radioChange(){
 			if (data['error'] == false){
 				updateIndex();
 				$('#importModal').modal('hide');				
+			}else{
+				$('#sendImportRepayment').prop('disabled', false);
 			}
 			data['data'].forEach(function(item) {
 			  	message(item);
@@ -250,6 +292,7 @@ function tableModalClick(type){
 	tableChecked(tableVar);//layaut.js
 
 	tableTrVar.on('click',function(){//balance
+		$('#preloader').show();
 		var inputVar = $(this).find('td').eq(0).find('input');
 		var inputVarVal = inputVar.val();
 		var _token = $('[name="_token"]').attr('content');
@@ -297,12 +340,14 @@ function tableModalClick(type){
 			$('#repaymentBalanceHidden').val(balance);
 			$('#repaymentModalBalance').val(balance);
 			$('#repaymentModalBalance').number(true,2,',',' ');
+			$('#preloader').hide();
 		});
 	});
 }	
 
 function repaymentPushCheck(){
 	$('body').on('click','#repaymentModalPush',function(){
+		buttonLock($(this),true);
 		var deliveryIdArray = [];
 		var repaymentId = $('#repaymentId').val();
 		var handler = $('#tabsType').val();
@@ -323,6 +368,7 @@ function repaymentPushCheck(){
 			repaymentPush(deliveryIdArray,repaymentId,handler);
 		}else{
 			sendMessage('warning','Внимание! ','Выберите поставку');
+			buttonLock($(this),false);
 		}
 	});
 }
@@ -338,6 +384,7 @@ function repaymentPush(delivery,repaymentId,handler){
        		message(item);			
 		});
 		$('#repaymentModal').modal('hide');
+		buttonLock($('#repaymentModalPush'),false);
 		$('#repayment-table-content').html(data['view']);
 	});
 }

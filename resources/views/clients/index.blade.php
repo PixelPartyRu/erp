@@ -27,7 +27,7 @@
 			<i class="fa fa-chevron-down"></i> 
 		</div>
 		<div class="panel-body">
-				{!! Form::open(array('action' => 'ClientController@store','id'=>'form-client')) !!}
+				{!! Form::open(array('action' => 'ClientController@store','id'=>'form-client','class'=>'noDoubleClickNoAjaxForm')) !!}
 					<div class="row">
 						<div class="form-group col-xs-12 col-sm-6 col-md-6 col-lg-6">
 							<label for="Input1">Полное наименование:</label>

@@ -6,6 +6,7 @@
 			<td><input name='deliveryChoice' type="checkbox" value='{{$delivery->id}}' data-type="commission"></td>
 			<td>{{ $num++ }}</td>
 			<td>{{ $delivery->relation->contract->code }}</td>
+			<td>{{ $delivery->waybill }}</td>
 			<td>Комиссия по поставке</td>
 			<td><nobr>{{ number_format($fixed,2,',',' ') }}</nobr></td>
 			<td nowrap>
@@ -20,6 +21,7 @@
 			<td><input name='deliveryChoice' type="checkbox" value='{{$delivery->id}}' data-type="percent"></td>
 			<td>{{ $num++ }}</td>
 			<td>{{ $delivery->relation->contract->code }}</td>
+			<td>{{ $delivery->waybill }}</td>
 			<td>Проценты по поставке</td>
 			<td><nobr>{{ number_format($debt,2,',',' ') }}</nobr></td>
 			<td nowrap>

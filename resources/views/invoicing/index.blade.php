@@ -13,7 +13,7 @@
 			<select name="client_id" id="client_id" class="form-control filter_select">
 				<option value="all" selected>Все клиенты</option> 
 				@foreach ($clients as $client)
-			 	<option value="{{$client->client->id}}">{{$client->client->name}}</option>
+			 	<option value="{{$client->id}}">{{$client->name}}</option>
 				@endforeach
 			</select>
 			</div>

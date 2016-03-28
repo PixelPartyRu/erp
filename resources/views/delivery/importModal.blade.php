@@ -11,7 +11,7 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
-		{!! Form::open(array('action' => 'DeliveryController@store', 'files' => true)) !!}
+		{!! Form::open(array('action' => 'DeliveryController@store', 'files' => true, 'class'=>'noDoubleClickNoAjaxForm')) !!}
 		    {!! Form::label('getFile', 'Загрузить файл с исходными данными:')!!}
 		    {!! Form::file('report')!!}
 			<label for="Input1">Наличие оригинала документа:</label>

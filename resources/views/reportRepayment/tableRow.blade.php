@@ -61,15 +61,15 @@
 			<td>Итого:</td>
 			<td>{{ number_format($sumWaybill,2,',',' ') }}</td>
 			<td></td>
-			<td>{{ number_format($commission->sum('repayment_sum'),2,',',' ') }}</td>
-			<td>{{ number_format($commission->sum('first_payment_sum'),2,',',' ')  }}</td>
-			<td>{{ number_format($commission->sum('with_nds'),2,',',' ') }}</td>
+			<td>{{ number_format($commissions->sum('repayment_sum'),2,',',' ') }}</td>
+			<td>{{ number_format($commissions->sum('first_payment_sum'),2,',',' ')  }}</td>
+			<td>{{ number_format($commissions->sum('with_nds'),2,',',' ') }}</td>
 			<td></td>
 			<td></td>
-			<td>{{ number_format($commission->sum('first_payment_debt_before'),2,',',' ') }}</td>
-			<td>{{ number_format($commission->sum('balance_owed_after'),2,',',' ') }}</td>
-			<td>{{ number_format($commission->sum('first_payment_debt_after'),2,',',' ') }}</td>
-			<td>{{ number_format($commission->sum('to_client'),2,',',' ') }}</td>
+			<td>{{ number_format($commissions->sum('first_payment_debt_before'),2,',',' ') }}</td>
+			<td>{{ number_format($commissions->sum('balance_owed_after'),2,',',' ') }}</td>
+			<td>{{ number_format($commissions->sum('first_payment_debt_after'),2,',',' ') }}</td>
+			<td>{{ number_format($commissions->sum('to_client'),2,',',' ') }}</td>
 		</tr>
 	@endif
 </tbody>

@@ -10,4 +10,9 @@ class Bill extends Model
     {
         return $this->belongsTo('App\Client');
     }
+
+    public function agreement()
+    {
+        return $this->belongsTo('App\Agreement');
+    }
 }

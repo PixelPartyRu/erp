@@ -43,8 +43,8 @@ class ClientController extends Controller
             'full_name'  => 'required',
             'name'       => 'required',
             'inn'       => 'required',
-            'kpp'       => array('required', 'size:9'),
-            'ogrn'       => array('required','unique', 'size:13')
+            'kpp'       => 'required|size:9',
+            'ogrn'       => 'required|unique:clients|size:13'
         );
         $validator = Validator::make(Input::all(), $rules);
         // process the login
@@ -68,8 +68,7 @@ class ClientController extends Controller
 				    Session::flash('success', 'Клиент добавлен');
                 return Redirect::to('client/'.$client->id.'/agreement');
                 }else{
-                    return Redirect::to('client')
-                    ->withErrors($validator);
+                     return redirect()->back()->with('danger','ИНН введен не верно')->withInput();
                 }
             }
         }
@@ -96,15 +95,14 @@ class ClientController extends Controller
             'full_name'  => 'required',
             'name'       => 'required',
             'inn'       => 'required',
-            'kpp'       => array('required', 'size:9'),
-            'ogrn'       => array('required', 'size:13'),
+            'kpp'       => 'required|size:9',
+            'ogrn'       => 'required|unique:clients|size:13'
         );
         $validator = Validator::make(Input::all(), $rules);
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('client')
-                ->withErrors($validator);
+            return redirect()->back()->with('danger','Данные клиента введены неверно')->withInput();
         } else {
             // store
             $client = Client::find($id);

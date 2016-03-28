@@ -29,27 +29,27 @@ class FinanceController extends Controller
 
     public function store()
     {   
-      	$idDeliveryArray = Input::get('arrayFinance');
-      	$stek = [];
-      	$sum = 0;
-      	$waybillCount = 0;
-      	$i = 0;
-       	foreach ($idDeliveryArray as $id){
-       		$delivery = Delivery::find($id);
-    			$stek[$i][0] = $delivery->client->name;
-    			$stek[$i][1] = $delivery->first_payment_amount;
-    			$stek[$i][2] = $delivery->registry;
-    			$stek[$i][3] = $delivery->date_of_registry;
-    			$stek[$i][4] = $delivery->id;
-    			$i++;
-        }
+    	$idDeliveryArray = Input::get('arrayFinance');
+    	$stek = [];
+    	$sum = 0;
+    	$waybillCount = 0;
+    	$i = 0;
+     	foreach ($idDeliveryArray as $id){
+     		$delivery = Delivery::find($id);
+  			$stek[$i][0] = $delivery->client->name;
+  			$stek[$i][1] = $delivery->first_payment_amount;
+  			$stek[$i][2] = $delivery->registry;
+  			$stek[$i][3] = $delivery->date_of_registry;
+  			$stek[$i][4] = $delivery->id;
+  			$i++;
+      }
 
-       	$size = count($stek);
-       	if ($size > 1){
-	       	usort($stek,function($a, $b){
-	       		return $a[2] - $b[2];
-	       	});
-  	    }
+     	$size = count($stek);
+     	if ($size > 1){
+       	usort($stek,function($a, $b){
+       		return $a[2] - $b[2];
+       	});
+	    }
 
 	    $keyStek = [];
       $client = $stek[0][0];
@@ -57,6 +57,7 @@ class FinanceController extends Controller
    		$number_of_waybill = 1;
    		$registry = $stek[0][2];
    		$date_of_registry = $stek[0][3];
+
    		array_push($keyStek,$stek[0][4]);
    		if ($size > 1){
 	       	for ($i=1; $i<$size; $i++){
@@ -70,23 +71,24 @@ class FinanceController extends Controller
 		       		}
 	       		}else{
 		       		$this->saveFinance($client,$sum,$number_of_waybill,$registry,$date_of_registry,$keyStek);
+              $keyStek = [];
 
 		       		$size = count($stek);
 			       	$client = $stek[$i][0];
-			   		$sum = (float)$stek[$i][1];
-			   		$number_of_waybill = 1;
-			   		$registry = $stek[$i][2];
-			   		$date_of_registry = $stek[$i][3];
-			   		array_push($keyStek,$stek[$i][4]);
+  			   		$sum = (float)$stek[$i][1];
+  			   		$number_of_waybill = 1;
+  			   		$registry = $stek[$i][2];
+  			   		$date_of_registry = $stek[$i][3];
+  			   		array_push($keyStek,$stek[$i][4]);
 
-			   		if ($i === $size - 1){
-		       			$this->saveFinance($client,$sum,$number_of_waybill,$registry,$date_of_registry,$keyStek);
+  			   		if ($i === $size - 1){
+  		       			$this->saveFinance($client,$sum,$number_of_waybill,$registry,$date_of_registry,$keyStek);
 		       		}
 		       	}	    
-		    }
+	        }
 	    }else{
 	    	$this->saveFinance($client,$sum,$number_of_waybill,$registry,$date_of_registry,$keyStek);
-       	}
+      }
 	}
 
     protected function saveFinance($client,$sum,$number_of_waybill,$registry,$date_of_registry,$keyStek){
@@ -99,24 +101,14 @@ class FinanceController extends Controller
    		$finance->registry = $registry;
    		$finance->date_of_registry = $date_of_registry;
    		$finance->status = "К финансированию";
-   		$finance->save();
- 			$this->saveKey($keyStek);
- 			$keyStek = [];
-    }
-
-    protected function saveKey($keyStek){
-    	if (Finance::max('id')){
-   			$financeMaxId = Finance::max('id');
-   		}else{
-   			$financeMaxId = 1;
-   		}
-   		
-   		foreach ($keyStek as $key){
-        $deliveryToFinance = new DeliveryToFinance;
-        $deliveryToFinance->delivery_id = $key;
-        $deliveryToFinance->finance_id = $financeMaxId;
-        $deliveryToFinance->save();
-   		}
+   		if ($finance->save()){
+        foreach ($keyStek as $key){
+          $deliveryToFinance = new DeliveryToFinance;
+          $deliveryToFinance->delivery_id = $key;
+          $deliveryToFinance->finance_id = $finance->id;
+          $deliveryToFinance->save();
+        }
+      }
     }
 
     public function financingSuccess(){
@@ -133,11 +125,9 @@ class FinanceController extends Controller
               $deliveryToFinances = $finance->deliveryToFinance;
               //проверка лимита
               $relation = $deliveryToFinances->first()->delivery->relation;
-              $deliveries = $relation->deliveries()->where('state',false)->get();
               $usedLimit = 0;
-              foreach($deliveries as $delivery){
-                $usedLimit += $delivery->balance_owed;
-              }
+              $usedLimit = $relation->deliveries()->where('state',false)->where('status','Профинансирована')->sum('balance_owed');
+
               $limit = $relation->limit;
               if ($limit) {
                 $limitValue = $limit->value;
@@ -145,18 +135,19 @@ class FinanceController extends Controller
                 if ($finance->sum <= $freeLimit){
                   $finance->date_of_funding = $financingDate;
                   $finance->status = 'Подтверждено';
-                  $finance->save();
+                  if ($finance->save()){
+                    foreach($deliveryToFinances as $deliveryToFinance){
+                      $delivery = $deliveryToFinance->delivery;
+                      $delivery->date_of_funding = $financingDate;
+                      $delivery->status = 'Профинансирована';
+                      // $delivery->stop_commission = true;
+                      $delivery->save();
+                    } 
+                  }
                   $callback = 'success';
                   $messageShot = 'Успешно!';
                   $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
                   array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type'=>true, 'data'=>$key]);
-                  
-                  foreach($deliveryToFinances as $deliveryToFinance){
-                    $delivery = $deliveryToFinance->delivery;
-                    $delivery->date_of_funding = $financingDate;
-                    $delivery->status = 'Профинансирована';
-                    $delivery->save();
-                  }
                 }else{
                   $callback = 'danger';
                   $messageShot = 'Ошибка!';

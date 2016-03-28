@@ -40,8 +40,13 @@
 	          							<h4 class="modal-title">Клиенты с тарифом "{{$tariff->name}}"</h4>
 							        </div>
 							        <div class="modal-body">
-										@forelse($tariff->relations as $relation)
-											{{ $relation->client->name }} <a href="/client/{{ $relation->client->id }}/edit"><i class="table_icons fa fa-pencil" data-toggle="tooltip" title="Редактировать клиента"></i></a><br>
+							        	<?php 	
+							        		$clients = App\Client::whereHas('relations', function ($query) use ($tariff) {
+												    $query->where('tariff_id', '=', $tariff->id);
+												})->get();
+							        	?>
+										@forelse($clients as $client)
+											{{ $client->name }} <a href="/client/{{ $client->id }}/edit"><i class="table_icons fa fa-pencil" data-toggle="tooltip" title="Редактировать клиента"></i></a><br>
 										@empty
 										@endforelse
 									</div>

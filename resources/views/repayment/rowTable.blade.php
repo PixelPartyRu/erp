@@ -46,7 +46,7 @@
             ?>
             <tr class="importModalTableBodyTr">
             	<td class='no-space'>{{ $row['Номер'] }}</td>
-               <td class='date no-space' data-val={{ $row['Дата'] }}>{{ date('d/m/Y', strtotime($row['Дата'])) }}</td>
+               <td class='date no-space' data-val={{ $row['ДатаПоступило'] }}>{{ date('d/m/Y', strtotime($row['Дата'])) }}</td>
                <td class='no-space' data-val={{ $row['Сумма'] }} >
                   <nobr>{{ number_format($row['Сумма'],2,',',' ') }}</nobr>
                </td>

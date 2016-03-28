@@ -7,8 +7,13 @@ update = function(){
 			$('#create').prop('disabled', false);
 			$('#client_id').val('all');
 		}else{
-			$('#create').prop('disabled', true);
-			$('#update').prop('disabled', false);
+			if(data=='<span>Идет расчет комиссий!!!</span>' && $('#month').val()!=''){
+				$('#update').prop('disabled', false);
+				$('#create').prop('disabled', false);
+			}else{
+				$('#create').prop('disabled', true);
+				$('#update').prop('disabled', false);
+			}
 		}
 	})
 }
@@ -44,8 +49,16 @@ $(document).ready(function(){
 				$('#AjaxUpdate').empty().append(data);
 
 			}else{
-				$('#create').prop('disabled', true);
-				$('#update').prop('disabled', false);
+				if(data=='<span>Идет расчет комиссий!!!</span>' && $('#month').val()!=''){
+					$('#update').prop('disabled', false);
+					$('#create').prop('disabled', false);
+					$('#client_id').val('all');
+					$('#AjaxUpdate').empty().append(data);
+				}else{
+					$('#create').prop('disabled', true);
+					$('#update').prop('disabled', false);
+					$('#AjaxUpdate').empty().append('Найдены счета, нажмите кнопку обновить');
+				}
 			}
 		})
 	})
@@ -53,6 +66,7 @@ $(document).ready(function(){
 		$('#DeleteAlert').modal('show');
 	})
 	$('body').on('click','#create_submit',function(){
+		buttonLock($(this),true);
 		if($('#month').val!=null){
 			var CSRF_TOKEN = $('meta[name="csrf-token"]').attr('content');
 			$.ajax({
@@ -62,6 +76,7 @@ $(document).ready(function(){
 				success: function(msg){
 					update();
 					$('#DeleteAlert').modal('hide');
+					buttonLock($(this),false);
 			  	}
 			});
 		}

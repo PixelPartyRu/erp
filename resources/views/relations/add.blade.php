@@ -1,5 +1,5 @@
 		<div class="panel-body">
-			{!! Form::open(array('action' => 'RelationController@store')) !!}
+			{!! Form::open(array('action' => 'RelationController@store','class'=>'noDoubleClickNoAjaxForm')) !!}
 				<div class="row">
 									<div class="form-group col-xs-12 col-sm-12 col-md-4 col-lg-4"> 
 							  			{!! Form::select('client_id',['0' => 'Выбор клиента (ИНН)'] + select_inn($clients, 'full_name', 'id'),0, array('class'=>'selectpicker')) !!}
@@ -28,7 +28,7 @@
 							<div class="panel-body">
 							<div class="row">
 								<div class="form-group col-xs-12 col-sm-3 col-md-3 col-lg-3">
-									<label for="rpp">Коэфициент финансирования(%)</label>
+									<label for="rpp">Коэффициент финансирования(%)</label>
 								  	{!! Form::text('rpp',null,array('class' => 'form-control small_checkbox inline','id' => 'rpp','required'=>'true')) !!}
 								</div>
 

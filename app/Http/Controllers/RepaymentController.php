@@ -17,15 +17,18 @@ use App\Repayment;
 use App\Relation;
 use App\DeliveryToFinance;
 use App\ChargeCommissionView;
+use App\ChargeCommission;
 use Carbon\Carbon;
+use App\CommissionsRage;
 use App\Finance;
 use App\RepaymentInvoice;
 use App\DailyChargeCommission;
+use App\Bill;
 
 class RepaymentController extends Controller
 {
     public function index(){
-        $repayments = Repayment::all();
+        $repayments = Repayment::OrderBy('date')->get();
         $clients = Client::all();
         $debtors = Debtor::all();
     	return view('repayment.index',['repayments' => $repayments, 'clients' => $clients, 'debtors' => $debtors]);
@@ -232,13 +235,13 @@ class RepaymentController extends Controller
         $repayment = Repayment::find(Input::get('repaymentId'));
         $handler = Input::get('dataVar');
         if ($handler === 'delivery'){
-            $deliveries = $this->getDeliveries($repayment,false);
+            $deliveries = $this->getDeliveries($repayment,false,false);
             return view('repayment.repaymentModalTableDelivery',['deliveries' => $deliveries, 'type' => 'delivery']);
         }elseif($handler === 'commission'){
-            $deliveries = $this->getDeliveries($repayment,false);
-            return view('repayment.tableCommission',['deliveries' => $deliveries,'type' => 'commission']);    
+            $deliveries = $this->getDeliveriesCommission($repayment);
+            return view('repayment.tableCommission',['deliveries' => $deliveries,'repayment' => $repayment,'type' => 'commission']);    
         }else{
-            $deliveries = $this->getDeliveries($repayment,true);
+            $deliveries = $this->getDeliveries($repayment,true,true);
             return view('repayment.repaymentModalTableDelivery',['deliveries' => $deliveries,'type' => 'toClient']);
         }
     }
@@ -249,12 +252,12 @@ class RepaymentController extends Controller
         return $repayment->balance;
     }
 
-    public function getDeliveries($repayment,$state){
+    public function getDeliveries($repayment,$state,$return){
         if ($repayment->type === 1){
             $deliveries = $repayment->client->deliveries()
                                     ->where('status','=','Профинансирована')
                                     ->where('state','=',$state)
-                                    ->get();
+                                    ->orderBy('date_of_waybill');
         }else{
             $clientVar = $repayment->client->id;
             $debtorVar = $repayment->debtor->id;
@@ -264,9 +267,29 @@ class RepaymentController extends Controller
             $deliveries = $relation->deliveries()
                                     ->where('status','=','Профинансирована')
                                     ->where('state','=',$state)
-                                    ->get();
+                                    ->orderBy('date_of_waybill');
+                                  
         }
-        return $deliveries;
+        if ($return == true){
+            $deliveries = $deliveries->where('return','!=','Д');
+        }
+        return $deliveries->get();  
+    }
+
+    public function getDeliveriesCommission($repayment){
+    	if ($repayment->type === 1){
+    		$korresp = $repayment->client;
+    	}else{
+    		$clientVar = $repayment->client->id;
+            $debtorVar = $repayment->debtor->id;
+            $korresp = Relation::where('client_id','=',$clientVar)
+                                  ->where('debtor_id','=',$debtorVar)
+                                  ->first();
+    	}
+    	$deliveries = $korresp->deliveries()->whereHas('chargeCommission', function ($query) {
+						    $query->where('waybill_status', false);
+						})->get();
+    	return $deliveries;
     }
 
     public function repayment(){
@@ -281,7 +304,7 @@ class RepaymentController extends Controller
         }else{
             $callback = $this->toClientRepayment($deliveries,$repayment);
         }
-        $repayments = Repayment::all();
+        $repayments = Repayment::OrderBy('date')->get();
         $view = view('repayment.tableRepaymentRow',['repayments' => $repayments])->render();
         return ['callback' => $callback, 'view' => $view];
     }
@@ -299,6 +322,14 @@ class RepaymentController extends Controller
             $id = $delivery['delivery'];
             $sum = floatval($delivery['sum']);
             $delivery = Delivery::find($id);
+
+            $sumEqBalance = true;
+            if ($sum != $delivery->balance_owed){
+				$sumEqBalance = false;
+            }//проверка равенства остатка накладной и поступившего платежа
+
+            $this->deleteOverCommission($delivery,$repayment);
+
             $first = $delivery->remainder_of_the_debt_first_payment;
             $dailyRepaymentSum = $sum;
             $dayliFirstPaymentDebtBefore = $delivery->remainder_of_the_debt_first_payment;
@@ -309,203 +340,176 @@ class RepaymentController extends Controller
             $dailyTypeOfPayment = null;
             $dailyRepayment = $repayment->id;
 
-            if ($sum >= $delivery->balance_owed){//полное погашение
+            //погашение
+            $delivery->balance_owed = $delivery->balance_owed - $sum;
+            $dayliBalanceOwedAfter = $delivery->balance_owed;
+            $balance = $balance - $sum;
+            $dailyFixed = 0;
+            $dailyFixedNds = 0;
+            $dailyPercent = 0;
+            $dailyPercentNds = 0;
+            $dailyUdz = 0;
+            $dailyUdzNds = 0;
+            $dailyDeferment = 0;
+            $dailyDefermentNds = 0;
+
+            if ($sum > $first){//полное погашение поставки
                 $dayliFirstPaymentSum = $first;
+                $sum -= $first;
+                $delivery->remainder_of_the_debt_first_payment = 0;
+                $delivery->end_date_of_funding = $repayment->date;
 
-                if($first > 0){
-                    $delivery->balance_owed = $delivery->balance_owed - $first;
-                    $balance = $balance - $first;
-                    $delivery->remainder_of_the_debt_first_payment = 0;
-                    $delivery->state = true;
-                    $delivery->end_date_of_funding = $repayment->date;
-                    $delivery->date_of_payment = $repayment->date;
-                }
-                $commission = $delivery->chargeCommission()->where('waybill_status',false)->first();
+                //коммиссии
+                $commission = $delivery->chargeCommission;
                 if ($commission){
-                    $debt = $commission->debt;
-                    $balance -= $debt;
-                    $delivery->balance_owed -= $debt;
-                    $dailyFixed = $commission->fixed_charge;
-                    $dailyFixedNds = $commission->fixed_charge_nds;
-                    $dailyPercent = $commission->percent;
-                    $dailyPercentNds = $commission->percent_nds;
-                    $dailyUdz = $commission->udz;
-                    $dailyUdzNds = $commission->udz_nds;
-                    $dailyDeferment = $commission->deferment_penalty;
-                    $dailyDefermentNds = $commission->deferment_penalty_nds;
-                    $this->repaymentFullCommission($commission,$repayment);
-                    //var_dump($commission->debt);
-                    //Second pay
-                }else{
-                    //коммиссии не найдено
-                }
+                  	$debt = $commission->debt;
 
-                if ($delivery->balance_owed > 0){
-                    array_push($secondFinanceArray,[
-                        $delivery->id,
-                        $delivery->registry,
-                        $delivery->balance_owed + $delivery->second_pay,
-                        $delivery->date_of_registry,
-                        $delivery->client->name
-                    ]);
-                    $dayliToClient = $delivery->balance_owed;
-                    $balance = $balance - $delivery->balance_owed;
-                    $delivery->balance_owed = 0;
-                }
-
-                $this->sendInvoice($delivery->id,$sum,'Полное погашение поставки',$repayment->id);
-                $message = 'Накладная '.$delivery->waybill.' полностью погашена';
-                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
-            }else{//частичное
-                 $delivery->balance_owed = $delivery->balance_owed - $sum;
-                 $dayliBalanceOwedAfter = $delivery->balance_owed;
-                 $balance = $balance - $sum;
-                 $this->sendInvoice($delivery->id,$sum,'Частичное погашение поставки',$repayment->id);
-                 if ($sum > $first){//полное погашение поставки
-                    $dayliFirstPaymentSum = $first;
-                    $sum -= $first;
-                    $delivery->remainder_of_the_debt_first_payment = 0;
-                    $delivery->state = true;
-                    $delivery->end_date_of_funding = $repayment->date;
-
-                    //коммиссии
-                    $commission = $delivery->chargeCommission()->where('waybill_status',false)->first();
-                    if ($commission){
-                        $debt = $commission->debt;
-                        if ($sum > $debt){//полное погашение коммисии
-                            $dailyFixed = $commission->fixed_charge;
+                    if ($sum > $commission->fixed_charge){
+                        $sum -= $commission->fixed_charge;
+                        $dailyFixed = $commission->fixed_charge;
+                        $commission->fixed_charge = 0;
+                    }else{
+                        $dailyFixed = $sum;
+                        $commission->fixed_charge = $commission->fixed_charge - $sum;
+                        $sum = 0;
+                    }
+                    if ($sum > 0){
+                        if ($sum > $commission->fixed_charge_nds){
                             $dailyFixedNds = $commission->fixed_charge_nds;
-                            $dailyPercent = $commission->percent;
-                            $dailyPercentNds = $commission->percent_nds;
-                            $dailyUdz = $commission->udz;
-                            $dailyUdzNds = $commission->udz_nds;
-                            $dailyDeferment = $commission->deferment_penalty;
-                            $dailyDefermentNds = $commission->deferment_penalty_nds;
-                            $this->repaymentFullCommission($commission,$repayment);
-                            //second pay add
-                        }else{//частичное пошашение коммиссии
-                            $dailyFixed = 0;
-                            $dailyFixedNds = 0;
-                            $dailyPercent = 0;
-                            $dailyPercentNds = 0;
-                            $dailyUdz = 0;
-                            $dailyUdzNds = 0;
-                            $dailyDeferment = 0;
-                            $dailyDefermentNds = 0;
-                            $commission->debt = $debt - $sum;
-                            if ($sum > $commission->fixed_charge){
-                                $sum -= $commission->fixed_charge;
-                                $dailyFixed = $commission->fixed_charge;
-                                $commission->fixed_charge = 0;
+                            $sum -= $commission->fixed_charge_nds;
+                            $commission->fixed_charge_nds = 0;
+                            $commission->fixed_charge_return = true;
+                        }else{
+                            $commission->fixed_charge_nds = $sum;
+                            $commission->fixed_charge_nds = $commission->fixed_charge_nds - $sum;
+                            $dailyFixedNds = $sum;
+                            $sum = 0;
+                        }
+                        if ($sum > 0){
+                            if ($sum > $commission->percent){
+                                $dailyPercent = $commission->percent;
+                                $sum -= $commission->percent;
+                                $commission->percent = 0;
                             }else{
-                                $dailyFixed = $sum;
-                                $commission->fixed_charge = $commission->fixed_charge - $sum;
+                                $dailyPercent = $sum;
+                                $commission->percent = $commission->percent - $sum;
                                 $sum = 0;
                             }
                             if ($sum > 0){
-                                if ($sum > $commission->fixed_charge_nds){
-                                    $dailyFixedNds = $commission->fixed_charge_nds;
-                                    $sum -= $commission->fixed_charge_nds;
-                                    $commission->fixed_charge_nds = 0;
-                                    $commission->fixed_charge_return = true;
+                                if ($sum > $commission->percent_nds){
+                                    $dailyPercentNds = $commission->percent_nds;
+                                    $sum -= $commission->percent_nds;
+                                    $commission->percent_nds = 0;
+                                    $commission->percent_return = true;
                                 }else{
-                                    $commission->fixed_charge_nds = $sum;
-                                    $commission->fixed_charge_nds = $commission->fixed_charge_nds - $sum;
+                                	$dailyPercentNds = $sum;
+                                    $commission->percent_nds = $sum;
+                                    $commission->percent_nds = $commission->percent_nds - $sum;
                                     $sum = 0;
                                 }
                                 if ($sum > 0){
-                                    if ($sum > $commission->percent){
-                                        $dailyPercent = $commission->percent;
-                                        $sum -= $commission->percent;
-                                        $commission->percent = 0;
+                                    if ($sum > $commission->udz){
+                                        $dailyUdz = $commission->udz;
+                                        $sum -= $commission->udz;
+                                        $commission->udz = 0;
                                     }else{
-                                        $dailyPercent = $sum;
-                                        $commission->percent = $commission->percent - $sum;
+                                        $dailyUdz = $sum;
+                                        $commission->udz = $commission->udz - $sum;
                                         $sum = 0;
                                     }
                                     if ($sum > 0){
-                                        if ($sum > $commission->percent_nds){
-                                            $dailyPercentNds = $commission->percent_nds;
-                                            $sum -= $commission->percent_nds;
-                                            $commission->percent_nds = 0;
-                                            $commission->percent_return = true;
+                                        if ($sum > $commission->udz_nds){
+                                            $dailyUdzNds = $commission->udz_nds;
+                                            $sum -= $commission->udz_nds;
+                                            $commission->udz_nds = 0;
+                                            $commission->udz_return = true;
                                         }else{
-                                            $commission->percent_nds = $sum;
-                                            $commission->percent_nds = $commission->percent_nds - $sum;
+                                            $dailyUdzNds = $sum;
+                                            $commission->udz_nds = $commission->udz_nds - $sum;
                                             $sum = 0;
                                         }
                                         if ($sum > 0){
-                                            if ($sum > $commission->udz){
-                                                $dailyUdz = $commission->udz;
-                                                $sum -= $commission->udz;
-                                                $commission->udz = 0;
+                                            if ($sum > $commission->deferment_penalty){
+                                                $dailyDeferment = $commission->deferment_penalty;
+                                                $sum -= $commission->deferment_penalty;
+                                                $commission->deferment_penalty = 0;
                                             }else{
-                                                $dailyUdz = $sum;
-                                                $commission->udz = $commission->udz - $sum;
+                                                $dailyDeferment = $sum;
+                                                $commission->deferment_penalty = $commission->deferment_penalty - $sum;
                                                 $sum = 0;
                                             }
                                             if ($sum > 0){
-                                                if ($sum > $commission->udz_nds){
-                                                    $dailyUdzNds = $commission->udz_nds;
-                                                    $sum -= $commission->udz_nds;
-                                                    $commission->udz_nds = 0;
-                                                    $commission->udz_return = true;
+                                                if ($sum > $commission->deferment_penalty_nds){
+                                                    $dailyDefermentNds = $commission->deferment_penalty_nds;
+                                                    $sum -= $commission->deferment_penalty_nds;
+                                                    $commission->deferment_penalty_nds = 0;
+                                                    $commission->deferment_penalty_return = true;
                                                 }else{
-                                                    $dailyUdzNds = $sum;
-                                                    $commission->udz_nds = $commission->udz_nds - $sum;
+                                                    $dailyDefermentNds = $sum;
+                                                    $commission->deferment_penalty_nds = $commission->deferment_penalty_nds - $sum;
                                                     $sum = 0;
-                                                }
-                                                if ($sum > 0){
-                                                    if ($sum > $commission->deferment_penalty){
-                                                        $dailyDeferment = $commission->deferment_penalty;
-                                                        $sum -= $commission->deferment_penalty;
-                                                        $commission->deferment_penalty = 0;
-                                                    }else{
-                                                        $dailyDeferment = $sum;
-                                                        $commission->deferment_penalty = $commission->deferment_penalty - $sum;
-                                                        $sum = 0;
-                                                    }
-                                                    if ($sum > 0){
-                                                        if ($sum > $commission->deferment_penalty_nds){
-                                                            $dailyDefermentNds = $commission->deferment_penalty_nds;
-                                                            $sum -= $commission->deferment_penalty_nds;
-                                                            $commission->deferment_penalty_nds = 0;
-                                                            $commission->deferment_penalty_return = true;
-                                                        }else{
-                                                            $dailyDefermentNds = $sum;
-                                                            $commission->deferment_penalty_nds = $commission->deferment_penalty_nds - $sum;
-                                                            $sum = 0;
-                                                        }
-                                                    }
                                                 }
                                             }
                                         }
                                     }
                                 }
                             }
-                            if ($sum > 0){
-                                $delivery->second_pay = $sum;
-                                $sum = 0;
-                            }
-                            $commission->without_nds = $commission->fixed_charge + $commission->percent + $commission->udz + $commission->deferment_penalty;
-                            $commission->nds = $commission->fixed_charge_nds + $commission->percent_nds + $commission->udz_nds + $commission->deferment_penalty_nds;
-                            $commission->with_nds = $commission->without_nds + $commission->nds;
-                            $commission->save();
                         }
-                    }else{
-                        //коммиссии не найдено
                     }
-                }else{//частичное погашение поставки
-                    $delivery->remainder_of_the_debt_first_payment = $first - $sum;
-                    $dayliFirstPaymentSum = $sum;
-                    $dayliFirstPaymentDebtAfter = $delivery->remainder_of_the_debt_first_payment;
-                    $sum = 0;
-                }
+                    $commission->without_nds = $commission->fixed_charge + $commission->percent + $commission->udz + $commission->deferment_penalty;
+                    $commission->nds = $commission->fixed_charge_nds + $commission->percent_nds + $commission->udz_nds + $commission->deferment_penalty_nds;
+                    $commission->with_nds = $commission->without_nds + $commission->nds;
+                    $commission->debt = $commission->with_nds;
+                    $commission->save();
 
-                
-                $message = 'Накладная '.$delivery->waybill.' погашена частично';
-                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+                    if ($commission->debt <= 0){//коммиссии полностью погашены debt == 0
+                    	if ($sumEqBalance == true){ //to client
+                    		$delivery->state = true;
+	               			$delivery->date_of_payment = $repayment->date;
+                    		if ($sum > 0){ 
+                    			$toClientSum = $sum + $delivery->second_pay;                  			
+								array_push($secondFinanceArray,[
+			                        $delivery->id,
+			                        $delivery->registry,
+			                        $toClientSum,
+			                        $delivery->date_of_registry,
+			                        $delivery->client->name
+			                    ]);
+			                    $dayliToClient = $toClientSum;
+			                    $message = 'Накладная и коммиссии '.$delivery->waybill.' погашены. Второй платеж сформирован.';	
+                    		}else{
+                    			$message = 'Накладная и коммиссии '.$delivery->waybill.' погашены. Остаток для второго платежа равен нулю.';	
+                    		}
+
+                    	}else{//second pay
+							$delivery->second_pay += $sum;
+							$message = 'Накладная и коммиссии по накладной '.$delivery->waybill.'погашены. Остаток частично покрывает второй платеж.';
+                    	}
+                    	$this->repaymentFullCommission($commission,$repayment);
+                    }else{//коммиссии пошашены частично
+                    	if ($sumEqBalance == true){ //to client
+                    		$delivery->state = true;
+	               			$delivery->date_of_payment = $repayment->date;
+                    		$message = 'Накладная '.$delivery->waybill.' погашена. Коммиссии погашены частично';
+                    	}else{
+	                    	$message = 'Коммиссии по накладной '.$delivery->waybill.' погашены частично';
+                    	}	
+                    }
+                }else{
+                    //коммиссии не найдено
+                }
+            }else{//частичное погашение поставки sum < first
+                $delivery->remainder_of_the_debt_first_payment = $first - $sum;
+                $dayliFirstPaymentSum = $sum;
+                $dayliFirstPaymentDebtAfter = $delivery->remainder_of_the_debt_first_payment;
+                $message = 'Первый платеж по накладной '.$delivery->waybill.' погашен частично';
             }
+
+            $sum = 0;
+            $delivery->save();
+            $this->recalculateDailyCharge($repayment,$delivery->id);//recalculation
+            array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+            //конец погашения
 
             $return = $delivery->return;
             $returnType = $repayment->type;
@@ -553,53 +557,40 @@ class RepaymentController extends Controller
                 'dayliFirstPaymentSum' => $dayliFirstPaymentSum,
                 'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter,
                 'dailyTypeOfPayment' => $dailyTypeOfPayment,
-                'dailyRepayment' => $dailyRepayment,
                 'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter
 
             ];
-            $this->createDailyCharge($dailyArray,$commission->id,$delivery->id);
+            $this->createDailyCharge($dailyArray,$delivery->id,$repayment->id,true);
         } 
         //second pay
         if (count($secondFinanceArray) > 0){
-            usort($secondFinanceArray,function($a, $b){
-                if ($a[1] == $b[1]) {
-                    return 0;
-                }
-                return ($a[1] < $b[1]) ? -1 : 1;
-            });
+            $this->secondPay($secondFinanceArray);//second pay
+        }
 
-            $waybillNumber = 1;
-            $deliveryArray = [];
-            $typeFinance = 'Второй платеж';
-            $statusFinance = 'К финансированию';
+        return $messageArray;
+    }
 
-            for($i = 0; $i<count($secondFinanceArray); $i++){
-                $registry = $secondFinanceArray[$i][1];
-                array_push($deliveryArray,$secondFinanceArray[$i][0]);
-                if (isset($secondFinanceArray[$i + 1])){
-                    if ($secondFinanceArray[$i + 1][1] == $registry){
-                        $secondFinanceArray[$i + 1][2] += $secondFinanceArray[$i][2];
-                        $waybillNumber++;
-                    }else{
-                        $finance = new Finance;
-                        $finance->client = $secondFinanceArray[$i][4];
-                        $finance->sum = $secondFinanceArray[$i][2];
-                        $finance->number_of_waybill = $waybillNumber;
-                        $finance->type_of_funding = $typeFinance;
-                        $finance->registry = $secondFinanceArray[$i][1];
-                        $finance->date_of_registry = $secondFinanceArray[$i][3];
-                        $finance->status = $statusFinance;
-                        if ($finance->save()){
-                            foreach ($deliveryArray as $id){
-                                $deliveryToFinance = new DeliveryToFinance;
-                                $deliveryToFinance->delivery_id = $id;
-                                $deliveryToFinance->finance_id = $finance->id;
-                                $deliveryToFinance->save();
-                            }   
-                        }
-                        $deliveryArray = [];
-                        $waybillNumber = 1; 
-                    }
+    public function secondPay($secondFinanceArray){
+        
+        usort($secondFinanceArray,function($a, $b){
+            if ($a[1] == $b[1]) {
+                return 0;
+            }
+            return ($a[1] < $b[1]) ? -1 : 1;
+        });
+
+        $waybillNumber = 1;
+        $deliveryArray = [];
+        $typeFinance = 'Второй платеж';
+        $statusFinance = 'К финансированию';
+
+        for($i = 0; $i<count($secondFinanceArray); $i++){
+            $registry = $secondFinanceArray[$i][1];
+            array_push($deliveryArray,$secondFinanceArray[$i][0]);
+            if (isset($secondFinanceArray[$i + 1])){
+                if ($secondFinanceArray[$i + 1][1] == $registry){
+                    $secondFinanceArray[$i + 1][2] += $secondFinanceArray[$i][2];
+                    $waybillNumber++;
                 }else{
                     $finance = new Finance;
                     $finance->client = $secondFinanceArray[$i][4];
@@ -620,9 +611,27 @@ class RepaymentController extends Controller
                     $deliveryArray = [];
                     $waybillNumber = 1; 
                 }
+            }else{
+                $finance = new Finance;
+                $finance->client = $secondFinanceArray[$i][4];
+                $finance->sum = $secondFinanceArray[$i][2];
+                $finance->number_of_waybill = $waybillNumber;
+                $finance->type_of_funding = $typeFinance;
+                $finance->registry = $secondFinanceArray[$i][1];
+                $finance->date_of_registry = $secondFinanceArray[$i][3];
+                $finance->status = $statusFinance;
+                if ($finance->save()){
+                    foreach ($deliveryArray as $id){
+                        $deliveryToFinance = new DeliveryToFinance;
+                        $deliveryToFinance->delivery_id = $id;
+                        $deliveryToFinance->finance_id = $finance->id;
+                        $deliveryToFinance->save();
+                    }   
+                }
+                $deliveryArray = [];
+                $waybillNumber = 1; 
             }
         }
-        return $messageArray;
     }
 
     public function repaymentFullCommission($commission,$repayment){
@@ -642,7 +651,8 @@ class RepaymentController extends Controller
         $commission->percent_return = true;
         $commission->udz_return = true;
         $commission->deferment_penalty_return = true;
-
+        $commission->date_of_repayment = $repayment->date;
+        $commission->waybill_status = true;
         $commission->with_nds = 0;
         $commission->without_nds = 0;
         
@@ -650,12 +660,6 @@ class RepaymentController extends Controller
         $commission->date_of_repayment = $repayment->date;
         $commission->waybill_status = true;
         $commission->save();
-
-        $commissionView = $commission->chargeCommissionView;
-        $commissionView->date_of_repayment = $commission->date_of_repayment;
-        $commissionView->waybill_status = $commission->waybill_status;
-        $commissionView->charge_commission_id = $commission->id;
-        $commissionView->save();
     }
 
     public function commissionRepayment($deliveries,$repayment){
@@ -688,20 +692,19 @@ class RepaymentController extends Controller
             $dailyTypeOfPayment = null;
             $dailyRepayment = $repayment->id;
 
-            $delivery->balance_owed -= $sum;
             $dayliBalanceOwedAfter = $delivery->balance_owed;
+
+            //$this->deleteOverCommission($delivery,$repayment);
 
             $commission = $delivery->chargeCommission()->where('waybill_status',false)->first();
             if ($commission){
                 $balance-=$sum;
-                $this->sendInvoice($delivery->id,$sum,'Погашение коммисии',$repayment->id);
                 if ($type === 'commission'){
                     if ($sum < $commission->fixed_charge){//частичное погашение коммисии
                         $dailyFixed = $sum;
                         $commission->fixed_charge = $commission->fixed_charge - $sum;
                         $sum=0;
                         $message = 'Коммиссии по накладной '.$delivery->waybill.' погашено частичны';
-                        array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
                     }else{
                         $dailyFixed = $commission->fixed_charge;
                         $sum -= $commission->fixed_charge;
@@ -717,7 +720,6 @@ class RepaymentController extends Controller
                             $sum = 0;
                         }
                         $message = 'Коммиссии по накладной '.$delivery->waybill.' полностью погашены';
-                        array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
                     }
                 }else{//--------------------------
                     if ($sum < $commission->debt - ($commission->fixed_charge + $commission->fixed_charge_nds)){//частичное погашение коммисии
@@ -779,7 +781,6 @@ class RepaymentController extends Controller
                             }
                         }
                         $message = 'Проценты по коммиссии по накладной '.$delivery->waybill.' частично погашены';
-                        array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
                     }else{//---------------------------------------
                         $sum=0;
 
@@ -808,7 +809,6 @@ class RepaymentController extends Controller
                         $commission->udz_return = true;
                         $commission->deferment_penalty_return = true;
                         $message = 'Проценты по коммиссии по накладной '.$delivery->waybill.' полностью погашены';
-                        array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
                     }
                 }
                 $commission->without_nds = $commission->fixed_charge + $commission->percent + $commission->udz + $commission->deferment_penalty;
@@ -816,10 +816,12 @@ class RepaymentController extends Controller
                 $commission->with_nds = $commission->without_nds + $commission->nds;
                 $commission->debt = $commission->with_nds;
                 if ($commission->debt <= 0){
-                    $commission->date_of_repayment = $repayment->date();
+                    $commission->date_of_repayment = $repayment->date;
                     $commission->waybill_status = true; 
                 }
                 $commission->save();
+
+                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
 
                 $daily_without_nds = $dailyFixed + $dailyPercent + $dailyUdz + $dailyDeferment;
                 $daily_nds = $dailyFixedNds + $dailyPercentNds + $dailyUdzNds + $dailyDefermentNds;
@@ -865,10 +867,9 @@ class RepaymentController extends Controller
                     'dayliFirstPaymentSum' => $dayliFirstPaymentSum,
                     'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter,
                     'dailyTypeOfPayment' => $dailyTypeOfPayment,
-                    'dailyRepayment' => $dailyRepayment,
                     'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter
                 ];
-                $this->createDailyCharge($dailyArray,$commission->id,$delivery->id);
+                $this->createDailyCharge($dailyArray,$delivery->id,$repayment->id,true);
             }
 
             $repayment->balance = $balance;
@@ -917,7 +918,6 @@ class RepaymentController extends Controller
 
                 $delivery->return = $returnHandler;
                 $delivery->save();
-                $this->sendInvoice($delivery->id,$sum,'Перечислено клиенту',$repayment->id);
 
                 $deliveryToFinance = new DeliveryToFinance;
                 $deliveryToFinance->delivery_id = $delivery->id;
@@ -937,15 +937,6 @@ class RepaymentController extends Controller
 
     return $messageArray;
 
-    }
-
-    public function sendInvoice($client,$sum,$type,$repayment){
-        $invoice = new RepaymentInvoice;
-        $invoice->sum = $sum;
-        $invoice->delivery_id = $client;
-        $invoice->type = $type;
-        $invoice->repayment_id = $repayment;
-        $invoice->save();
     }
 
     public function getDeliveryFirstPayment(){
@@ -975,7 +966,7 @@ class RepaymentController extends Controller
     }
 
     public function getIndexRepayment(){
-        $repayments = Repayment::all();
+        $repayments = Repayment::OrderBy('date')->get();
         $clients = Client::all();
         $debtors = Debtor::all();
         return view('repayment.tableRepaymentRow',['repayments' => $repayments, 'clients' => $clients, 'debtors' => $debtors]);
@@ -1005,18 +996,173 @@ class RepaymentController extends Controller
         $messageShot = 'Успешно!';
         $message = 'П/п под номером '.$repayment->number.' успешно удалено';
 
-        $repayments = Repayment::all();
+        $repayments = Repayment::OrderBy('date')->get();
         $view = view('repayment.tableRepaymentRow',['repayments' => $repayments])->render();
 
         return ['view' => $view,'data' => ['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]];
     }
 
-    public function createDailyCharge($dailyArray,$commissionId,$deliveryId){
+    public function recalculateDailyCharge($repayment,$deliveryId){
+        $allDailyArray =[];
+        $nds = 18;
+        $dateNow = new Carbon(date('Y-m-d'));
+        $dateOfRepayment = new Carbon($repayment->date);
+
+        $delivery = Delivery::find($deliveryId);
+        $relation = $delivery->relation;//связь
+        $tariff = $relation->tariff;//тарифы
+
+        $dateOfRepaymentClone = clone $dateOfRepayment;
+        $dateOfFunding = new Carbon($delivery->date_of_funding);  
+
+        $percent_commission = $tariff->commissions->where('type','finance')->first();
+        $udz_commission = $tariff->commissions->where('type','udz')->first();
+        $penalty_commission = $tariff->commissions->where('type','peni')->first();
+
+        $dateOfRecourse = new Carbon($delivery->date_of_recourse);
+
+        $dateOfRepaymentDiff = $dateOfRepayment->diffInDays($dateNow,false);
+
+        for($i=0;$i<$dateOfRepaymentDiff;$i++){
+            $dailyArray = [];
+            $dateNowVar = $dateOfRepaymentClone->addDays(1);
+
+            $dateOfFundingDiffTest = $dateOfFunding->diffInDays($dateNowVar,false);
+            $daysInYear = date("L", mktime(0,0,0, 7,7, $dateNowVar->year))?366:365; 
+            $actualDeferment = $dateOfRecourse->diffInDays($dateNowVar,false);//Фактическая просрочка
+
+            $dailyFixed = 0;
+            $dailyFixedNds = 0;
+
+            $dailyPercent = 0;
+            $dailyPercentNds = 0;
+  //        //Процент
+            if ($percent_commission){
+                //Годовые/дни
+                $handle = $percent_commission->additional_sum;
+
+                if ($percent_commission->rate_stitching == true){
+                    $percent = ($percent_commission->commission_value) / $daysInYear;
+                }else{
+                    $percent = $percent_commission->commission_value;
+                }
+                
+                //От финансирование либо накладной
+                if ($handle == true){
+                    $dailyPercent = (($delivery->balance_owed / 100.00) * $percent);
+                }else{
+                    $dailyPercent = (($delivery->remainder_of_the_debt_first_payment / 100.00) * $percent);
+                }
+
+                if ($percent_commission->nds == true){
+                    $dailyPercentNds = ($dailyPercent / 100.00) * $nds;
+                } 
+            }
+
+            $dailyUdz = 0;
+            $dailyUdzNds = 0;
+            if ($udz_commission){
+                $dayOrYear = $udz_commission->rate_stitching;
+                //Нахождение разницы
+                $handle = $udz_commission->additional_sum;
+                //проверка накладной и финансирования
+                if ($handle == true){
+                    $waybillOrFirstPayment = $delivery->balance_owed;
+                }else{
+                    $waybillOrFirstPayment = $delivery->remainder_of_the_debt_first_payment;
+                }
+
+                $rage = $udz_commission->commissionsRages()->where('min', '<=', $dateOfFundingDiffTest)
+                                                                ->where(function($query) use ($dateOfFundingDiffTest)
+                                                                {
+                                                                    $query->where('max','>=', $dateOfFundingDiffTest)
+                                                                          ->orWhere('max','=', 0);
+                                                                })
+                                                                ->first();                               
+                if($rage){
+                    if ($dayOrYear == true){
+                        $udz = ($rage->value) / $daysInYear;
+                    }else{
+                        $udz = $rage->value;
+                    }
+                    $dailyUdz = ($waybillOrFirstPayment / 100.00) * $udz;
+                    //Ндс
+                    if ($udz_commission->nds == true){
+                       $dailyUdzNds = ($dailyUdz / 100.00) * $nds;
+                    }
+                }             
+            }else{
+               // var_dump('Коммиссии не найдено');
+            }
+     // //         //Пеня за просрочку
+            
+            $dailyDeferment = 0;
+            $dailyDefermentNds = 0;
+            if ($penalty_commission){
+                $dayOrYear = $penalty_commission->rate_stitching;
+                //Нахождение разницы
+
+                if($actualDeferment > 0){
+                    $rage = $penalty_commission->commissionsRages()->where('min', '<=', $actualDeferment)
+                                            ->where(function($query) use ($actualDeferment)
+                                            {
+                                                $query->where('max','>=', $actualDeferment)
+                                                      ->orWhere('max','=', 0);
+                                            })
+                                            ->first();
+                    if ($rage){
+                        $handle = $penalty_commission->additional_sum;
+                        //проверка накладной и финансирования
+                        if ($handle == true){
+                            $waybillOrFirstPayment = $delivery->balance_owed;
+                        }else{
+                            $waybillOrFirstPayment = $delivery->remainder_of_the_debt_first_payment;
+                        }
+
+                        if ($dayOrYear == true){
+                            $penalty = ($rage->value) / $daysInYear;
+                        }else{
+                            $penalty = $rage->value;
+                        }
+
+                        $dailyDeferment = ($waybillOrFirstPayment / 100.00) * $penalty;
+                        //Ндс
+                        if ($penalty_commission->nds == true){
+                            $dailyDefermentNds = ($dailyDeferment / 100.00) * $nds; 
+                        }          
+                    }//диапазон
+                }//просрочка меньше нуля   
+            } 
+
+            $daily_without_nds = $dailyFixed + $dailyPercent + $dailyUdz + $dailyDeferment;
+            $daily_nds = $dailyFixedNds + $dailyPercentNds + $dailyUdzNds + $dailyDefermentNds;
+            $daily_with_nds = $daily_without_nds + $daily_nds;
+
+            $dailyArray = [
+                'dailyFixed' => $dailyFixed,
+                'dailyFixedNds' => $dailyFixedNds,
+                'dailyPercent' => $dailyPercent,
+                'dailyPercentNds' => $dailyPercentNds,
+                'dailyUdz' => $dailyUdz,
+                'dailyUdzNds' => $dailyUdzNds,
+                'dailyDeferment' => $dailyDeferment,
+                'dailyDefermentNds' => $dailyDefermentNds,
+                'dailyWithoutNds' => $daily_without_nds,
+                'dailyNds' => $daily_nds,
+                'dailyWithNds' => $daily_with_nds,
+                'dateNow' => $dateNowVar->format('Y-m-d')
+            ];
+            $this->createDailyCharge($dailyArray,$delivery->id,$repayment->id,false); 
+        }//цикл
+    }
+
+    public function createDailyCharge($dailyArray,$deliveryId,$repaymentId,$handler){
 
         $daily = new DailyChargeCommission;
-        $repayment = Repayment::find($dailyArray['dailyRepayment']);
-        $daily->delivery_id = $deliveryId;
-        $daily->charge_commission_id = $commissionId;
+        $delivery = Delivery::find($deliveryId);
+        $repayment = Repayment::find($repaymentId);
+        $daily->delivery_id = $delivery->id;
+        $daily->charge_commission_id = $delivery->chargeCommission->id;
 
         $daily->fixed_charge = $dailyArray['dailyFixed'];
         $daily->percent = $dailyArray['dailyPercent'];
@@ -1026,22 +1172,87 @@ class RepaymentController extends Controller
         $daily->nds = $dailyArray['dailyNds'];
         $daily->without_nds = $dailyArray['dailyWithoutNds'];
         $daily->with_nds = $dailyArray['dailyWithNds'];
-        $daily->handler = true;
+        $daily->handler = $handler;
 
         $daily->fixed_charge_nds = $dailyArray['dailyFixedNds'];
         $daily->percent_nds = $dailyArray['dailyPercentNds'];
         $daily->udz_nds = $dailyArray['dailyUdzNds'];
         $daily->deferment_penalty_nds = $dailyArray['dailyDefermentNds'];
-        $daily->created_at = $repayment->date;
-        $daily->repayment_id = $dailyArray['dailyRepayment'];
-        $daily->repayment_sum = $dailyArray['dailyRepaymentSum'];
-        $daily->first_payment_sum = $dailyArray['dayliFirstPaymentSum'];
-        $daily->first_payment_debt_after = $dailyArray['dayliFirstPaymentDebtAfter'];
-        $daily->first_payment_debt_before = $dailyArray['dayliFirstPaymentDebtBefore'];
-        $daily->balance_owed_after = $dailyArray['dayliBalanceOwedAfter'];
-        $daily->to_client = $dailyArray['dayliToClient'];
-        $daily->type_of_payment = $dailyArray['dailyTypeOfPayment'];
+
+        if ($handler == true){
+            $daily->created_at = $repayment->date;
+
+            $daily->repayment_id = $repaymentId;
+            $daily->repayment_sum = $dailyArray['dailyRepaymentSum'];
+            $daily->first_payment_sum = $dailyArray['dayliFirstPaymentSum'];
+            $daily->first_payment_debt_after = $dailyArray['dayliFirstPaymentDebtAfter'];
+            $daily->first_payment_debt_before = $dailyArray['dayliFirstPaymentDebtBefore'];
+            $daily->balance_owed_after = $dailyArray['dayliBalanceOwedAfter'];
+            $daily->to_client = $dailyArray['dayliToClient'];
+            $daily->type_of_payment = $dailyArray['dailyTypeOfPayment'];
+        }else{
+            $daily->created_at = $dailyArray['dateNow'];
+        }
 
         $daily->save();
     }
-}
+
+    public function ClearTable(){
+        DailyChargeCommission::Truncate();
+        //ChargeCommission::Truncate();
+        Bill::Truncate();
+        //Repayment::Truncate();
+        DeliveryToFinance::Truncate();
+        //Finance::Truncate();
+        $repayments = Repayment::OrderBy('date')->get();
+        foreach ($repayments as $repayment) {
+            $repayment->balance = $repayment->sum;
+            $repayment->save();
+        }
+        return ['callback' => 'success','message'=>'Успешно','message_shot'=>'Таблицы очищены'];
+    }
+
+    public function deleteOverCommission($delivery,$repayment){
+	 	DailyChargeCommission::where('handler',false)
+                            ->where('delivery_id','=',$delivery->id)
+                            ->whereDate('created_at','>',$repayment->date)
+                            ->delete();
+
+        $dayliChargeCommission = DailyChargeCommission::where('handler',false)
+                                ->where('delivery_id','=',$delivery->id)
+                                ->get();
+        $dayliPaymentCommission = DailyChargeCommission::where('handler',true)
+                                ->where('delivery_id','=',$delivery->id)
+                                ->get();
+
+        $commission = $delivery->chargeCommission()->where('waybill_status',false)->first();
+        if ($commission){
+            $commission->fixed_charge = $dayliChargeCommission->sum('fixed_charge') - $dayliPaymentCommission->sum('fixed_charge');
+            $commission->fixed_charge_nds = $dayliChargeCommission->sum('fixed_charge_nds') - $dayliPaymentCommission->sum('fixed_charge_nds');
+            $commission->percent = $dayliChargeCommission->sum('percent') - $dayliPaymentCommission->sum('percent');
+            $commission->percent_nds = $dayliChargeCommission->sum('percent_nds') - $dayliPaymentCommission->sum('percent_nds');
+            $commission->udz = $dayliChargeCommission->sum('udz') - $dayliPaymentCommission->sum('udz');
+            $commission->udz_nds = $dayliChargeCommission->sum('udz_nds') - $dayliPaymentCommission->sum('udz_nds');
+            $commission->deferment_penalty = $dayliChargeCommission->sum('deferment_penalty') - $dayliPaymentCommission->sum('deferment_penalty');
+            $commission->deferment_penalty_nds = $dayliChargeCommission->sum('deferment_penalty_nds') - $dayliPaymentCommission->sum('deferment_penalty_nds');
+            $withiut_nds = $commission->fixed_charge + $commission->percent + $commission->udz + $commission->deferment_penalty;
+            $nds = $commission->fixed_charge_nds + $commission->percent_nds + $commission->udz_nds + $commission->deferment_penalty_nds;
+            $with_nds = $withiut_nds + $nds;
+            $commission->without_nds = $withiut_nds;
+            $commission->nds = $nds;
+            $commission->with_nds = $with_nds;
+            $commission->debt = $with_nds;
+            $commission->save();
+        }
+	}
+
+    public function getDebtor(){
+        $clientId = Input::get('clientId');
+        $client = Client::find($clientId);
+        $debtor = [];
+        foreach ($client->relations as $relation){
+            array_push($debtor,$relation->debtor()->select('name','id')->first());
+        }
+        return $debtor;
+    }
+}	

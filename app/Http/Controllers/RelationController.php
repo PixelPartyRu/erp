@@ -87,7 +87,8 @@ class RelationController extends Controller
             $contract->gd_debitor_1c = Input::get('contract_gd_debitor_1c');
             $contract->description = Input::get('contract_description');
             $contract->created_at = Input::get('contract_created_at');
-            $contract->date_end = Input::get('contract_date_end');
+            if(Input::get('contract_date_end')!=NULL)
+                $contract->date_end = Input::get('contract_date_end');
             $contract->save();
             $relation = new Relation;
             $relation->client_id = Input::get('client_id');
@@ -189,7 +190,8 @@ class RelationController extends Controller
             $relation->contract->gd_debitor_1c = Input::get('contract_gd_debitor_1c');
             $relation->contract->description = Input::get('contract_description');
             $relation->contract->created_at = Input::get('contract_created_at');
-            $relation->contract->date_end = Input::get('contract_date_end');
+            if(Input::get('contract_date_end')!=NULL)
+                $relation->contract->date_end = Input::get('contract_date_end');
             $relation->contract->save();
 			
            // $relation->client_id = Input::get('client_id');

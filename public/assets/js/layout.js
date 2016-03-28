@@ -13,6 +13,11 @@ $(document).ajaxComplete(function(){
 $(document).ready(function(){
 	tableChecked();
 
+	$('body').on('submit','.noDoubleClickNoAjaxForm',function(){
+		$(this).find('input[type="submit"]').prop('disabled', true);
+	})
+
+	$('input').attr('autocomplete', 'off');
 	//table scroll
 	var win_height = $(window).height();
 	$('.table-responsive').css('maxHeight',win_height * 0.9);
@@ -140,6 +145,19 @@ $(document).ready(function(){
 			var url = '/storage/exports/'+data;
 		});
 	})
+
+	//-----------------------------
+	_token = $("meta[name='_token']").attr("content");
+	$('body').on('click','#deleteDataTable',function(event){
+		$.ajax({
+			type: "POST",
+		  	url: "repayment/ClearTable",
+		  	data: {_token: _token}
+		}).done(function(data) {
+			message(data);
+		});
+	});
+	//-----------------------------
 });
 
 function deleteClass(tr){
@@ -229,5 +247,9 @@ function tableChecked(table){
 		
 
 	})
+}
+
+function buttonLock(el,handler) {
+	el.prop('disabled', handler);
 }
 

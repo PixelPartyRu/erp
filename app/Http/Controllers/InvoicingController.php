@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Session;
 
 use App\DailyChargeCommission;
-use App\ChargeCommissionView;
 use App\ChargeCommission;
 use App\Delivery;
 use App\Repayment;
@@ -28,8 +27,10 @@ class InvoicingController extends Controller
     public function index(Request $request)
     {   
         Carbon::setLocale('ru');
-        $clients_filter =ChargeCommissionView::select('client_id')->distinct()->get();
-
+        $clients_filter=Client::whereHas('deliveries', function ($query) {
+        $query->where('status', '=', 'Профинансирована');
+    })->get();
+         
         if($request->ajax()){
             $bills = Bill::where('id','>',0);
             if(Input::get('year')!=Null){
@@ -57,19 +58,23 @@ class InvoicingController extends Controller
                         if($agreement->account == FALSE){
                     		foreach ($relation->deliveries as $delivery) {
                                 if($delivery->status=='Профинансирована')
-                                {
+                                {	//echo $client->name.": долг перед месяцем:";
                                     $pred_with_nds = $delivery->dailyChargeCommission()
                                         ->where('handler',false)
                                         ->whereDate('created_at', '<', $bill_date_first_day)
                                         ->sum('with_nds');
+                                    // var_dump($pred_with_nds);
+                                    // echo $client->name.": погашения:";
                                     $repayments = $delivery->dailyChargeCommission()
                                         ->where('handler',true)
                                         ->sum('with_nds');
+                                    // var_dump($repayments);echo $client->name.": начисленные комиссии:";
                                     $with_nds_delivery = $delivery->dailyChargeCommission()
                                         ->where('handler',false)
                                         ->whereYear('created_at', '=', Input::get('year'))
                                         ->whereMonth('created_at', '=', Input::get('month'))
-                                        ->sum('with_nds');  
+                                        ->sum('with_nds'); 
+                                    // var_dump($with_nds_delivery);
                                     if($repayments>$pred_with_nds){
                                         if($repayments>=($with_nds_delivery+$pred_with_nds)){
                                             $debt+=0;
@@ -79,6 +84,9 @@ class InvoicingController extends Controller
                                     }else{
                                         $debt+=$with_nds_delivery;
                                     }
+                                    // echo $client->name.": текущий долг:";
+                                    // var_dump($debt);
+                                    // echo "\n";
                                                
                                 }
                             }
@@ -86,10 +94,13 @@ class InvoicingController extends Controller
                             $debt=0;
                         }
                 	}
-                    $monthRepayment[$agreement->code] = $debt;
+                	// var_dump($debt);
+                    $monthRepayment[$agreement->id] = $debt;
                 }
             }
-            return view('invoicing.indexAjax', ['bills' => $bills,'debts_full'=>$debts_full,'monthRepayment'=>$monthRepayment,'sum'=>$sum]);
+            // var_dump($monthRepayment);
+            $stop=Delivery::where('stop_commission','=',true)->get();
+            return view('invoicing.indexAjax', ['stop'=> $stop,'bills' => $bills,'debts_full'=>$debts_full,'monthRepayment'=>$monthRepayment,'sum'=>$sum]);
         }
         else{
             $dt = Carbon::now()->startOfMonth();
@@ -106,7 +117,7 @@ class InvoicingController extends Controller
         }
     }
     public function store(){
-        echo "ok";
+       	
         $rules = array(
             'year'  => 'required',
             'month'       => 'required',
@@ -199,7 +210,7 @@ class InvoicingController extends Controller
                     if($with_nds!=0){
                         $bill = new Bill;
                         $bill->bill_date = $bill_date;
-                        $bill->agreement = $agreement->code;
+                        $bill->agreement_id = $agreement->id;
                         $bill->nds = $nds;
                         $bill->with_nds = $with_nds;
                         $bill->without_nds = $without_nds;

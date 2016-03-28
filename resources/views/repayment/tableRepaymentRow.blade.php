@@ -13,7 +13,7 @@
 		<th>Назначение платежа</th>
 	</tr>
 </thead>
-<tbody>			
+<tbody>	
 	@forelse($repayments as $repayment)
 		<tr>
 			<td>{{ Form::radio('fieldTable', $repayment->id, null, ['class' => 'fieldTable']) }}</td>

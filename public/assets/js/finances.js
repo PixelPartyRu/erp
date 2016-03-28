@@ -5,12 +5,16 @@ $(document).ready(function(){
 
 	//Окно закрытия
 	$('.popapClose').on('click',function(){
-		$('#popup-table').html('');
 		$('#popapModal').modal('hide');
 	})
 	//Окно подтверждения
 	$('body').on('click','#financeSuccess',function(){
 		var dataVar = [];
+
+		buttonLock($(this),true);
+
+		$('#popup-table').html('');
+		buttonLock($('#financingSuccessBtn'),false);
 		$('.financeChoice:checked').each(function(i){
 			dataVar.push($(this).data('id'));
 		// 
@@ -27,12 +31,14 @@ $(document).ready(function(){
 		  		$('#popapModal').modal('show');
        		}
        		else{
-       			message(data);			
+       			message(data);		
 			}
+			buttonLock($('#financeSuccess'),false);	
 		});
 	});
 	//Подтвердить
-	$('#financingSuccessBtn').on('click',function(){
+	$('body').on('click','#financingSuccessBtn',function(){
+		buttonLock($(this),true);
 		var financeArray = [];
 		
 		$('.financeChoicePopup:checked').each(function(i){
@@ -49,10 +55,9 @@ $(document).ready(function(){
 			  	data: {financeArray: financeArray,financingDate: financingDate,_token:_token}
 			}).done(function(data) {
 				$('.popapClose').click();
-
 				data.forEach(function(item) {
 				  	if(item['callback']=='success'){
-	           			message(item);
+	           			//message(item);
 	           			if (item['type'] == true){
 							createCommission(item['data']);//Начисление коммиссии
 	           			}
@@ -64,6 +69,7 @@ $(document).ready(function(){
 				$('.filterUpdate').change();
 			});
 		}else{
+			buttonLock($('#financingSuccessBtn'),false);
 			sendMessage('warning','Внимание!','Выберите финансирование');
 		}
 	});

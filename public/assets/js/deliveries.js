@@ -1,6 +1,13 @@
 $(document).ready(function(){
 	popapVerificationClick();//получить description связи по поставке
 	$('body').on('click','#popupOpen',function(){
+		buttonLock($(this),true);
+
+		buttonLock($('#notVerificationBtn'),false);
+		buttonLock($('#verificationBtn'),false);
+		buttonLock($('#financeBtn'),false);
+		$('#popup-table').html('');
+
 		var dataVar=[];
 		var checkedVar = $('.verification:checked');
 		if (checkedVar.length > 0){
@@ -13,32 +20,38 @@ $(document).ready(function(){
 			  	url: "delivery/getPopapDelivery",
 			  	data: {_token: _token,data:dataVar}
 			}).done(function(data) {
-				$('#popup-table').append(data);
-				$('#verificationModal').modal('show');
+				if (data['callback'] == 'success'){
+	           		$('#popup-table').append(data['data']);
+					$('#verificationModal').modal('show');	
+				}else{
+					message(data);
+				}
+				buttonLock($('#popupOpen'),false);
 			});
-			
-
 		}else{
 			sendMessage('warning','Внимание!','Выберите поставку');
+			buttonLock($('#popupOpen'),false);
 		}
 	});//open
 
 	$('body').on('click','.verificationModalClose',function(){
-		$('#popup-table').html('');
 		$('#verificationModal').modal('hide'); 
 	});//close
 
 	$('body').on('click','#verificationBtn',function(){
+		buttonLock($(this),true);
 		verification('verification');
 		$('.verificationModalClose').click();
 	});//verification
 
 	$('body').on('click','#notVerificationBtn',function(){
+		buttonLock($(this),true);
 		verification('notVerification');
 		$('.verificationModalClose').click();
 	});//not verefication
 
 	$('body').on('click','#financeBtn',function(){
+		buttonLock($(this),true);
 		var verificationArray = [];
 		verificationArray = getCheckedArray();
 		if (verificationArray.length != 0){
@@ -52,7 +65,9 @@ $(document).ready(function(){
 					if (item['data'] != 0){
 						financeArray.push(item['data']);
 					}
-	           		message(item);			
+					if (item['callback'] != 'success'){
+		           		message(item);	
+					}		
 				});
 				pushToFinance(financeArray);
 				$('#filterUpdate').click();
@@ -60,7 +75,6 @@ $(document).ready(function(){
 		}
 
 		$('.verificationModalClose').click();
-		
 	});//finance
 
 	//Filter
@@ -299,7 +313,9 @@ function verification(handler){
 		  	data: {handler: handler, verificationArray: verificationArray}
 		}).done(function(data) {
 			data.forEach(function(item) {
-           		message(item);			
+           		if (item['callback'] != 'success'){
+	           		message(item);	
+				}			
 			});
 			$('#filterUpdate').click();
 		});

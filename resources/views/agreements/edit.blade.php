@@ -11,7 +11,7 @@
 	<div class="panel panel-success">
 		<div class="panel-heading">Редактирование договора</div>
 		<div class="panel-body">
-		{!! Form::model($agreement, array('route' => array('agreement.update', $agreement->id), 'method' => 'PUT')) !!}
+		{!! Form::model($agreement, array('route' => array('agreement.update', $agreement->id), 'method' => 'PUT','class'=>'noDoubleClickNoAjaxForm')) !!}
 			<div class="row">
 				<div class="col-xs-6 col-sm-6 col-md-3 col-lg-3">
 					<div class="absolute">

@@ -24,17 +24,17 @@ class AgreementController extends Controller
         $rules = array(
             'code'  => 'required',
            // 'penalty'       => 'required',
-            'code_1c'       => 'required,unique:agreements',
+            'code_1c'       => 'required|unique:agreements',
             //'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('client/'.Input::get('client_id').'/agreement')
-                ->withErrors($validator);
+            Session::flash('danger', $validator->errors()->first());
+            return redirect()->back()->withInput();
         } else {
-            // store
+           //store
             $agreement = new Agreement;
             $agreement->code = Input::get('code');
             if (Input::get('type')){
@@ -97,15 +97,15 @@ class AgreementController extends Controller
         $rules = array(
             'code'  => 'required',
             //'penalty'       => 'required',
-            'code_1c'       => 'required,unique:agreements',
+            'code_1c'       => 'required|unique:agreements',
             //'date_end'       => 'required',
         );
         $validator = Validator::make(Input::all(), $rules);
 
         // process the login
         if ($validator->fails()) {
-            return Redirect::to('client/'.$id.'/agreement')
-                ->withErrors($validator);
+            Session::flash('danger', $validator->errors()->first());
+            return redirect()->back()->withInput();
         } else {
             // store
          	$agreement = Agreement::find($id);

@@ -175,3 +175,20 @@ table td, table th {
 .in-total td {
 	font-weight: bold;
 }
+
+#preloader {
+	position: fixed;
+	z-index: 9999;
+	width: 100%;
+	height: 100%;
+	//background: rgba(0,0,0,0.8);
+	background: transparent;
+	display: none;
+}
+
+/*#preloader i {
+	color: white;
+	position: relative;
+	left: 48%;
+	top: 48%;
+}*/
