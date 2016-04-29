@@ -213,19 +213,32 @@ class RepaymentController extends Controller
     public function getRepayment(){
         $outputArray = [];
         $repayment = Repayment::find(Input::get('id'));
-        if ($repayment->balance > 0){
-            $client = $repayment->client;
-            if ($repayment->type === 0){
-                $cor = $repayment->debtor;
+        $repaymentDate = new Carbon($repayment->date);
+        $lastBill = Bill::orderBy('bill_date','desc')->first();
+        $lastBillCarbon = new Carbon($lastBill->bill_date);
+        
+        $diffBillsDate = $lastBillCarbon->diffInDays($repaymentDate,false);
+
+        if ($diffBillsDate > 0){
+            if ($repayment->balance > 0){
+                $client = $repayment->client;
+                if ($repayment->type === 0){
+                    $cor = $repayment->debtor;
+                }else{
+                    $cor = $repayment->client;
+                }
+                $view = view('repayment.repaymentModalContent',['repayment' => $repayment, 'client' => $client,'cor'=>$cor])->render();
+                $outputArray = ['error' => false, 'data' => $view];
             }else{
-                $cor = $repayment->client;
+                $callback = 'danger';
+                $messageShot = 'Ошибка!';
+                $message = 'Выбранное п/п имеет нулевой баланс';
+                $outputArray = ['error' => true, 'data' => ['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]];
             }
-            $view = view('repayment.repaymentModalContent',['repayment' => $repayment, 'client' => $client,'cor'=>$cor])->render();
-            $outputArray = ['error' => false, 'data' => $view];
         }else{
             $callback = 'danger';
-            $messageShot = 'Ошибка!';
-            $message = 'Выбранное п/п имеет нулевой баланс';
+            $messageShot = 'Ошибка п/п!';
+            $message = 'Платежное поручение датировано датой закрытого месяца';
             $outputArray = ['error' => true, 'data' => ['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]];
         }
         return $outputArray;
@@ -314,140 +327,149 @@ class RepaymentController extends Controller
         $balance = $repayment->balance;
         $secondFinanceArray = [];
         $messageArray = [];
-        $callback = 'success';
-        $messageShot = 'Успешно! ';
 
         foreach ($deliveries as $delivery){
             $dailyArray = [];
+            $callback = 'success';
+            $messageShot = 'Успешно! ';
+
             $id = $delivery['delivery'];
             $sum = floatval($delivery['sum']);
             $delivery = Delivery::find($id);
 
-            $sumEqBalance = true;
-            if ($sum != $delivery->balance_owed){
-				$sumEqBalance = false;
-            }//проверка равенства остатка накладной и поступившего платежа
+            //проверка на позднее погашение
+            $overRepaymentDate = DailyChargeCommission::where('handler',true)
+                                    ->where('delivery_id','=',$delivery->id)
+                                    ->whereDate('created_at','>',$repayment->date)
+                                    ->get();
+            if (count($overRepaymentDate) == 0){
+                                    
+                $sumEqBalance = true;
+                if ($sum != $delivery->balance_owed){
+    				$sumEqBalance = false;
+                }//проверка равенства остатка накладной и поступившего платежа
 
-            $this->deleteOverCommission($delivery,$repayment);
+                $this->deleteOverCommission($delivery,$repayment);
 
-            $first = $delivery->remainder_of_the_debt_first_payment;
-            $dailyRepaymentSum = $sum;
-            $dayliFirstPaymentDebtBefore = $delivery->remainder_of_the_debt_first_payment;
-            $dayliBalanceOwedAfter = 0;
-            $dayliToClient = 0;
-            $dayliFirstPaymentSum = 0;
-            $dayliFirstPaymentDebtAfter = 0;
-            $dailyTypeOfPayment = null;
-            $dailyRepayment = $repayment->id;
+                $first = $delivery->remainder_of_the_debt_first_payment;
+                $dailyRepaymentSum = $sum;
+                $dayliFirstPaymentDebtBefore = $delivery->remainder_of_the_debt_first_payment;
+                $dayliBalanceOwedAfter = 0;
+                $dayliToClient = 0;
+                $dayliFirstPaymentSum = 0;
+                $dayliFirstPaymentDebtAfter = 0;
+                $dailyTypeOfPayment = null;
+                $dailyRepayment = $repayment->id;
 
-            //погашение
-            $delivery->balance_owed = $delivery->balance_owed - $sum;
-            $dayliBalanceOwedAfter = $delivery->balance_owed;
-            $balance = $balance - $sum;
-            $dailyFixed = 0;
-            $dailyFixedNds = 0;
-            $dailyPercent = 0;
-            $dailyPercentNds = 0;
-            $dailyUdz = 0;
-            $dailyUdzNds = 0;
-            $dailyDeferment = 0;
-            $dailyDefermentNds = 0;
+                //погашение
+                $delivery->balance_owed = $delivery->balance_owed - $sum;
+                $dayliBalanceOwedAfter = $delivery->balance_owed;
+                $balance = $balance - $sum;
+                $dailyFixed = 0;
+                $dailyFixedNds = 0;
+                $dailyPercent = 0;
+                $dailyPercentNds = 0;
+                $dailyUdz = 0;
+                $dailyUdzNds = 0;
+                $dailyDeferment = 0;
+                $dailyDefermentNds = 0;
 
-            if ($sum > $first){//полное погашение поставки
-                $dayliFirstPaymentSum = $first;
-                $sum -= $first;
-                $delivery->remainder_of_the_debt_first_payment = 0;
-                $delivery->end_date_of_funding = $repayment->date;
+                if ($sum > $first){//полное погашение поставки
+                    $dayliFirstPaymentSum = $first;
+                    $sum -= $first;
+                    $delivery->remainder_of_the_debt_first_payment = 0;
+                    $delivery->end_date_of_funding = $repayment->date;
 
-                //коммиссии
-                $commission = $delivery->chargeCommission;
-                if ($commission){
-                  	$debt = $commission->debt;
+                    //коммиссии
+                    $commission = $delivery->chargeCommission;
+                    if ($commission){
+                      	$debt = $commission->debt;
 
-                    if ($sum > $commission->fixed_charge){
-                        $sum -= $commission->fixed_charge;
-                        $dailyFixed = $commission->fixed_charge;
-                        $commission->fixed_charge = 0;
-                    }else{
-                        $dailyFixed = $sum;
-                        $commission->fixed_charge = $commission->fixed_charge - $sum;
-                        $sum = 0;
-                    }
-                    if ($sum > 0){
-                        if ($sum > $commission->fixed_charge_nds){
-                            $dailyFixedNds = $commission->fixed_charge_nds;
-                            $sum -= $commission->fixed_charge_nds;
-                            $commission->fixed_charge_nds = 0;
-                            $commission->fixed_charge_return = true;
+                        if ($sum > $commission->fixed_charge){
+                            $sum -= $commission->fixed_charge;
+                            $dailyFixed = $commission->fixed_charge;
+                            $commission->fixed_charge = 0;
                         }else{
-                            $commission->fixed_charge_nds = $sum;
-                            $commission->fixed_charge_nds = $commission->fixed_charge_nds - $sum;
-                            $dailyFixedNds = $sum;
+                            $dailyFixed = $sum;
+                            $commission->fixed_charge = $commission->fixed_charge - $sum;
                             $sum = 0;
                         }
                         if ($sum > 0){
-                            if ($sum > $commission->percent){
-                                $dailyPercent = $commission->percent;
-                                $sum -= $commission->percent;
-                                $commission->percent = 0;
+                            if ($sum > $commission->fixed_charge_nds){
+                                $dailyFixedNds = $commission->fixed_charge_nds;
+                                $sum -= $commission->fixed_charge_nds;
+                                $commission->fixed_charge_nds = 0;
+                                $commission->fixed_charge_return = true;
                             }else{
-                                $dailyPercent = $sum;
-                                $commission->percent = $commission->percent - $sum;
+                                $commission->fixed_charge_nds = $sum;
+                                $commission->fixed_charge_nds = $commission->fixed_charge_nds - $sum;
+                                $dailyFixedNds = $sum;
                                 $sum = 0;
                             }
                             if ($sum > 0){
-                                if ($sum > $commission->percent_nds){
-                                    $dailyPercentNds = $commission->percent_nds;
-                                    $sum -= $commission->percent_nds;
-                                    $commission->percent_nds = 0;
-                                    $commission->percent_return = true;
+                                if ($sum > $commission->percent){
+                                    $dailyPercent = $commission->percent;
+                                    $sum -= $commission->percent;
+                                    $commission->percent = 0;
                                 }else{
-                                	$dailyPercentNds = $sum;
-                                    $commission->percent_nds = $sum;
-                                    $commission->percent_nds = $commission->percent_nds - $sum;
+                                    $dailyPercent = $sum;
+                                    $commission->percent = $commission->percent - $sum;
                                     $sum = 0;
                                 }
                                 if ($sum > 0){
-                                    if ($sum > $commission->udz){
-                                        $dailyUdz = $commission->udz;
-                                        $sum -= $commission->udz;
-                                        $commission->udz = 0;
+                                    if ($sum > $commission->percent_nds){
+                                        $dailyPercentNds = $commission->percent_nds;
+                                        $sum -= $commission->percent_nds;
+                                        $commission->percent_nds = 0;
+                                        $commission->percent_return = true;
                                     }else{
-                                        $dailyUdz = $sum;
-                                        $commission->udz = $commission->udz - $sum;
+                                    	$dailyPercentNds = $sum;
+                                        $commission->percent_nds = $sum;
+                                        $commission->percent_nds = $commission->percent_nds - $sum;
                                         $sum = 0;
                                     }
                                     if ($sum > 0){
-                                        if ($sum > $commission->udz_nds){
-                                            $dailyUdzNds = $commission->udz_nds;
-                                            $sum -= $commission->udz_nds;
-                                            $commission->udz_nds = 0;
-                                            $commission->udz_return = true;
+                                        if ($sum > $commission->udz){
+                                            $dailyUdz = $commission->udz;
+                                            $sum -= $commission->udz;
+                                            $commission->udz = 0;
                                         }else{
-                                            $dailyUdzNds = $sum;
-                                            $commission->udz_nds = $commission->udz_nds - $sum;
+                                            $dailyUdz = $sum;
+                                            $commission->udz = $commission->udz - $sum;
                                             $sum = 0;
                                         }
                                         if ($sum > 0){
-                                            if ($sum > $commission->deferment_penalty){
-                                                $dailyDeferment = $commission->deferment_penalty;
-                                                $sum -= $commission->deferment_penalty;
-                                                $commission->deferment_penalty = 0;
+                                            if ($sum > $commission->udz_nds){
+                                                $dailyUdzNds = $commission->udz_nds;
+                                                $sum -= $commission->udz_nds;
+                                                $commission->udz_nds = 0;
+                                                $commission->udz_return = true;
                                             }else{
-                                                $dailyDeferment = $sum;
-                                                $commission->deferment_penalty = $commission->deferment_penalty - $sum;
+                                                $dailyUdzNds = $sum;
+                                                $commission->udz_nds = $commission->udz_nds - $sum;
                                                 $sum = 0;
                                             }
                                             if ($sum > 0){
-                                                if ($sum > $commission->deferment_penalty_nds){
-                                                    $dailyDefermentNds = $commission->deferment_penalty_nds;
-                                                    $sum -= $commission->deferment_penalty_nds;
-                                                    $commission->deferment_penalty_nds = 0;
-                                                    $commission->deferment_penalty_return = true;
+                                                if ($sum > $commission->deferment_penalty){
+                                                    $dailyDeferment = $commission->deferment_penalty;
+                                                    $sum -= $commission->deferment_penalty;
+                                                    $commission->deferment_penalty = 0;
                                                 }else{
-                                                    $dailyDefermentNds = $sum;
-                                                    $commission->deferment_penalty_nds = $commission->deferment_penalty_nds - $sum;
+                                                    $dailyDeferment = $sum;
+                                                    $commission->deferment_penalty = $commission->deferment_penalty - $sum;
                                                     $sum = 0;
+                                                }
+                                                if ($sum > 0){
+                                                    if ($sum > $commission->deferment_penalty_nds){
+                                                        $dailyDefermentNds = $commission->deferment_penalty_nds;
+                                                        $sum -= $commission->deferment_penalty_nds;
+                                                        $commission->deferment_penalty_nds = 0;
+                                                        $commission->deferment_penalty_return = true;
+                                                    }else{
+                                                        $dailyDefermentNds = $sum;
+                                                        $commission->deferment_penalty_nds = $commission->deferment_penalty_nds - $sum;
+                                                        $sum = 0;
+                                                    }
                                                 }
                                             }
                                         }
@@ -455,112 +477,118 @@ class RepaymentController extends Controller
                                 }
                             }
                         }
-                    }
-                    $commission->without_nds = $commission->fixed_charge + $commission->percent + $commission->udz + $commission->deferment_penalty;
-                    $commission->nds = $commission->fixed_charge_nds + $commission->percent_nds + $commission->udz_nds + $commission->deferment_penalty_nds;
-                    $commission->with_nds = $commission->without_nds + $commission->nds;
-                    $commission->debt = $commission->with_nds;
-                    $commission->save();
+                        $commission->without_nds = $commission->fixed_charge + $commission->percent + $commission->udz + $commission->deferment_penalty;
+                        $commission->nds = $commission->fixed_charge_nds + $commission->percent_nds + $commission->udz_nds + $commission->deferment_penalty_nds;
+                        $commission->with_nds = $commission->without_nds + $commission->nds;
+                        $commission->debt = $commission->with_nds;
+                        $commission->save();
 
-                    if ($commission->debt <= 0){//коммиссии полностью погашены debt == 0
-                    	if ($sumEqBalance == true){ //to client
-                    		$delivery->state = true;
-	               			$delivery->date_of_payment = $repayment->date;
-                    		if ($sum > 0){ 
-                    			$toClientSum = $sum + $delivery->second_pay;                  			
-								array_push($secondFinanceArray,[
-			                        $delivery->id,
-			                        $delivery->registry,
-			                        $toClientSum,
-			                        $delivery->date_of_registry,
-			                        $delivery->client->name
-			                    ]);
-			                    $dayliToClient = $toClientSum;
-			                    $message = 'Накладная и коммиссии '.$delivery->waybill.' погашены. Второй платеж сформирован.';	
-                    		}else{
-                    			$message = 'Накладная и коммиссии '.$delivery->waybill.' погашены. Остаток для второго платежа равен нулю.';	
-                    		}
-
-                    	}else{//second pay
-							$delivery->second_pay += $sum;
-							$message = 'Накладная и коммиссии по накладной '.$delivery->waybill.'погашены. Остаток частично покрывает второй платеж.';
-                    	}
-                    	$this->repaymentFullCommission($commission,$repayment);
-                    }else{//коммиссии пошашены частично
-                    	if ($sumEqBalance == true){ //to client
-                    		$delivery->state = true;
-	               			$delivery->date_of_payment = $repayment->date;
-                    		$message = 'Накладная '.$delivery->waybill.' погашена. Коммиссии погашены частично';
-                    	}else{
-	                    	$message = 'Коммиссии по накладной '.$delivery->waybill.' погашены частично';
-                    	}	
+                        if ($commission->debt <= 0){//коммиссии полностью погашены debt == 0
+                            $this->repaymentFullCommission($commission,$repayment);
+                        	if ($sumEqBalance == true){ //to client
+                        		$delivery->state = true;
+    	               			$delivery->date_of_payment = $repayment->date;
+                        		if ($sum > 0){ 
+                        			$toClientSum = $sum + $delivery->second_pay;                  			
+    								array_push($secondFinanceArray,[
+    			                        $delivery->id,
+    			                        $delivery->registry,
+    			                        $toClientSum,
+    			                        $delivery->date_of_registry,
+    			                        $delivery->client->name
+    			                    ]);
+    			                    $dayliToClient = $toClientSum;
+    			                    $message = 'Накладная и коммиссии '.$delivery->waybill.' погашены. Второй платеж сформирован.';	
+                        		}else{
+                        			$message = 'Накладная и коммиссии '.$delivery->waybill.' погашены. Остаток для второго платежа равен нулю.';	
+                        		}
+                                $commission->waybill_status = true;
+                                $commission->save();
+                        	}else{//second pay
+    							$delivery->second_pay += $sum;
+    							$message = 'Накладная и коммиссии по накладной '.$delivery->waybill.'погашены. Остаток частично покрывает второй платеж.';
+                        	}
+                        }else{//коммиссии пошашены частично
+                        	if ($sumEqBalance == true){ //to client
+                        		$delivery->state = true;
+    	               			$delivery->date_of_payment = $repayment->date;
+                        		$message = 'Накладная '.$delivery->waybill.' погашена. Коммиссии погашены частично';
+                        	}else{
+    	                    	$message = 'Коммиссии по накладной '.$delivery->waybill.' погашены частично';
+                        	}	
+                        }
+                    }else{
+                        //коммиссии не найдено
                     }
-                }else{
-                    //коммиссии не найдено
+                }else{//частичное погашение поставки sum < first
+                    $delivery->remainder_of_the_debt_first_payment = $first - $sum;
+                    $dayliFirstPaymentSum = $sum;
+                    $dayliFirstPaymentDebtAfter = $delivery->remainder_of_the_debt_first_payment;
+                    $message = 'Первый платеж по накладной '.$delivery->waybill.' погашен частично';
                 }
-            }else{//частичное погашение поставки sum < first
-                $delivery->remainder_of_the_debt_first_payment = $first - $sum;
-                $dayliFirstPaymentSum = $sum;
-                $dayliFirstPaymentDebtAfter = $delivery->remainder_of_the_debt_first_payment;
-                $message = 'Первый платеж по накладной '.$delivery->waybill.' погашен частично';
+
+                $sum = 0;
+                $delivery->save();
+                $this->recalculateDailyCharge($repayment,$delivery->id);//recalculation
+                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+                //конец погашения
+
+                $return = $delivery->return;
+                $returnType = $repayment->type;
+
+                    if ($returnType === 0){
+                        if (($return === '') || ($return == 'Д')){
+                            $returnHandler = 'Д';
+                        }else{
+                            $returnHandler = 'К/Д';
+                        } 
+                    }else{
+                        if (($return === '') || ($return == 'К')){
+                            $returnHandler = 'К';
+                        }else{
+                            $returnHandler = 'К/Д';
+                        }
+                    }
+
+                $delivery->return = $returnHandler;
+                $dailyTypeOfPayment = $returnHandler;
+                $delivery->save();
+
+                $repayment->balance = $balance;
+                $repayment->save();
+
+                $daily_without_nds = $dailyFixed + $dailyPercent + $dailyUdz + $dailyDeferment;
+                $daily_nds = $dailyFixedNds + $dailyPercentNds + $dailyUdzNds + $dailyDefermentNds;
+                $daily_with_nds = $daily_without_nds + $daily_nds;
+                $dailyArray = [
+                    'dailyFixed' => $dailyFixed,
+                    'dailyFixedNds' => $dailyFixedNds,
+                    'dailyPercent' => $dailyPercent,
+                    'dailyPercentNds' => $dailyPercentNds,
+                    'dailyUdz' => $dailyUdz,
+                    'dailyUdzNds' => $dailyUdzNds,
+                    'dailyDeferment' => $dailyDeferment,
+                    'dailyDefermentNds' => $dailyDefermentNds,
+                    'dailyWithoutNds' => $daily_without_nds,
+                    'dailyNds' => $daily_nds,
+                    'dailyWithNds' => $daily_with_nds,
+                    'dailyRepaymentSum' => $dailyRepaymentSum,
+                    'dayliFirstPaymentDebtBefore' => $dayliFirstPaymentDebtBefore,
+                    'dayliBalanceOwedAfter' => $dayliBalanceOwedAfter,
+                    'dayliToClient' => $dayliToClient,
+                    'dayliFirstPaymentSum' => $dayliFirstPaymentSum,
+                    'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter,
+                    'dailyTypeOfPayment' => $dailyTypeOfPayment,
+                    'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter
+
+                ];
+                $this->createDailyCharge($dailyArray,$delivery->id,$repayment->id,true);
+            }else{
+                $callback = 'danger';
+                $messageShot = 'Ошибка! ';
+                $message = 'Погашение по пп № '.$repayment->number.' не может быть выполнено, так как по данной накладной было проведено погашение более поздней датой.';
+                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
             }
-
-            $sum = 0;
-            $delivery->save();
-            $this->recalculateDailyCharge($repayment,$delivery->id);//recalculation
-            array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
-            //конец погашения
-
-            $return = $delivery->return;
-            $returnType = $repayment->type;
-
-                if ($returnType === 0){
-                    if (($return === '') || ($return == 'Д')){
-                        $returnHandler = 'Д';
-                    }else{
-                        $returnHandler = 'К/Д';
-                    } 
-                }else{
-                    if (($return === '') || ($return == 'К')){
-                        $returnHandler = 'К';
-                    }else{
-                        $returnHandler = 'К/Д';
-                    }
-                }
-
-            $delivery->return = $returnHandler;
-            $dailyTypeOfPayment = $returnHandler;
-            $delivery->save();
-
-            $repayment->balance = $balance;
-            $repayment->save();
-
-            $daily_without_nds = $dailyFixed + $dailyPercent + $dailyUdz + $dailyDeferment;
-            $daily_nds = $dailyFixedNds + $dailyPercentNds + $dailyUdzNds + $dailyDefermentNds;
-            $daily_with_nds = $daily_without_nds + $daily_nds;
-            $dailyArray = [
-                'dailyFixed' => $dailyFixed,
-                'dailyFixedNds' => $dailyFixedNds,
-                'dailyPercent' => $dailyPercent,
-                'dailyPercentNds' => $dailyPercentNds,
-                'dailyUdz' => $dailyUdz,
-                'dailyUdzNds' => $dailyUdzNds,
-                'dailyDeferment' => $dailyDeferment,
-                'dailyDefermentNds' => $dailyDefermentNds,
-                'dailyWithoutNds' => $daily_without_nds,
-                'dailyNds' => $daily_nds,
-                'dailyWithNds' => $daily_with_nds,
-                'dailyRepaymentSum' => $dailyRepaymentSum,
-                'dayliFirstPaymentDebtBefore' => $dayliFirstPaymentDebtBefore,
-                'dayliBalanceOwedAfter' => $dayliBalanceOwedAfter,
-                'dayliToClient' => $dayliToClient,
-                'dayliFirstPaymentSum' => $dayliFirstPaymentSum,
-                'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter,
-                'dailyTypeOfPayment' => $dailyTypeOfPayment,
-                'dayliFirstPaymentDebtAfter' => $dayliFirstPaymentDebtAfter
-
-            ];
-            $this->createDailyCharge($dailyArray,$delivery->id,$repayment->id,true);
         } 
         //second pay
         if (count($secondFinanceArray) > 0){
@@ -647,18 +675,15 @@ class RepaymentController extends Controller
         $commission->udz_nds = 0;
         $commission->deferment_penalty_nds = 0;
 
-        $commission->fixed_charge_return = true;
-        $commission->percent_return = true;
-        $commission->udz_return = true;
-        $commission->deferment_penalty_return = true;
+        // $commission->fixed_charge_return = true;
+        // $commission->percent_return = true;
+        // $commission->udz_return = true;
+        // $commission->deferment_penalty_return = true;
         $commission->date_of_repayment = $repayment->date;
-        $commission->waybill_status = true;
         $commission->with_nds = 0;
         $commission->without_nds = 0;
         
         $commission->nds = 0;
-        $commission->date_of_repayment = $repayment->date;
-        $commission->waybill_status = true;
         $commission->save();
     }
 

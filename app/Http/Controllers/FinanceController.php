@@ -14,6 +14,7 @@ use Carbon\Carbon;
 use App\Delivery;
 use App\DeliveryToFinance;
 use App\Finance;
+use App\Bill;
 use Session;
 
 class FinanceController extends Controller
@@ -114,66 +115,79 @@ class FinanceController extends Controller
     public function financingSuccess(){
         $financeArray = Input::get('financeArray');
         $financingDate = Input::get('financingDate');
+        $fundingDate = new Carbon($financingDate);
+        $lastBill = Bill::orderBy('bill_date','desc')->first();
+        $lastBillCarbon = new Carbon($lastBill->bill_date);
+
         $messageArray = [];
         foreach ($financeArray as $key){
           $finance = Finance::find($key);
           $registryDate = new Carbon($finance->date_of_registry);
-          $fundingDate = new Carbon($financingDate);
+          
           $diffDate = $registryDate->diffInDays($fundingDate,false);
-          if ($diffDate >= 0){
-            if ($finance->type_of_funding === 'Первый платеж'){
-              $deliveryToFinances = $finance->deliveryToFinance;
-              //проверка лимита
-              $relation = $deliveryToFinances->first()->delivery->relation;
-              $usedLimit = 0;
-              $usedLimit = $relation->deliveries()->where('state',false)->where('status','Профинансирована')->sum('balance_owed');
+          $diffBillsDate = $lastBillCarbon->diffInDays($fundingDate,false);
 
-              $limit = $relation->limit;
-              if ($limit) {
-                $limitValue = $limit->value;
-                $freeLimit = $limitValue - $usedLimit;
-                if ($finance->sum <= $freeLimit){
-                  $finance->date_of_funding = $financingDate;
-                  $finance->status = 'Подтверждено';
-                  if ($finance->save()){
-                    foreach($deliveryToFinances as $deliveryToFinance){
-                      $delivery = $deliveryToFinance->delivery;
-                      $delivery->date_of_funding = $financingDate;
-                      $delivery->status = 'Профинансирована';
-                      // $delivery->stop_commission = true;
-                      $delivery->save();
-                    } 
+          if ($diffBillsDate > 0){
+            if ($diffDate >= 0){
+              if ($finance->type_of_funding === 'Первый платеж'){
+                $deliveryToFinances = $finance->deliveryToFinance;
+                //проверка лимита
+                $relation = $deliveryToFinances->first()->delivery->relation;
+                $usedLimit = 0;
+                $usedLimit = $relation->deliveries()->where('state',false)->where('status','Профинансирована')->sum('balance_owed');
+
+                $limit = $relation->limit;
+                if ($limit) {
+                  $limitValue = $limit->value;
+                  $freeLimit = $limitValue - $usedLimit;
+                  if ($finance->sum <= $freeLimit){
+                    $finance->date_of_funding = $financingDate;
+                    $finance->status = 'Подтверждено';
+                    if ($finance->save()){
+                      foreach($deliveryToFinances as $deliveryToFinance){
+                        $delivery = $deliveryToFinance->delivery;
+                        $delivery->date_of_funding = $financingDate;
+                        $delivery->status = 'Профинансирована';
+                        // $delivery->stop_commission = true;
+                        $delivery->save();
+                      } 
+                    }
+                    $callback = 'success';
+                    $messageShot = 'Успешно!';
+                    $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
+                    array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type'=>true, 'data'=>$key]);
+                  }else{
+                    $callback = 'danger';
+                    $messageShot = 'Ошибка!';
+                    $message = 'Превышен лимит для связи. Клиент: '.$relation->client->name.' и Дебитор: '.$relation->debtor->name;
+                    array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
                   }
-                  $callback = 'success';
-                  $messageShot = 'Успешно!';
-                  $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
-                  array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type'=>true, 'data'=>$key]);
                 }else{
                   $callback = 'danger';
                   $messageShot = 'Ошибка!';
-                  $message = 'Превышен лимит для связи. Клиент: '.$relation->client->name.' и Дебитор: '.$relation->debtor->name;
+                  $message = 'Лимит для связи не найден. Клиент: '.$relation->client->name.' и Дебитор: '.$relation->debtor->name;
                   array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
                 }
               }else{
-                $callback = 'danger';
-                $messageShot = 'Ошибка!';
-                $message = 'Лимит для связи не найден. Клиент: '.$relation->client->name.' и Дебитор: '.$relation->debtor->name;
-                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+                  $finance->date_of_funding = $financingDate;
+                  $finance->status = 'Подтверждено';
+                  $finance->save();
+                  $callback = 'success';
+                  $messageShot = 'Успешно!';
+                  $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
+                  array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type' => false]);
               }
             }else{
-                $finance->date_of_funding = $financingDate;
-                $finance->status = 'Подтверждено';
-                $finance->save();
-                $callback = 'success';
-                $messageShot = 'Успешно!';
-                $message = 'Финансирование для клиента '.$finance->client.' подтверждено';
-                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot,'type' => false]);
+                  $callback = 'danger';
+                  $messageShot = 'Ошибка!';
+                  $message = 'Дата реестра превышает дату финансирования';
+                  array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
             }
           }else{
-                $callback = 'danger';
-                $messageShot = 'Ошибка!';
-                $message = 'Дата реестра превышает дату финансирования';
-                array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
+            $callback = 'danger';
+            $messageShot = 'Ошибка!';
+            $message = 'Финансирование поставки в закрытом месяце- запрещено!';
+            array_push($messageArray,['callback' => $callback,'message'=>$message,'message_shot'=>$messageShot]);
           }
         }
         

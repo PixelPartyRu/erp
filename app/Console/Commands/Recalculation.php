@@ -20,7 +20,7 @@ class Recalculation extends Command
      *
      * @var string
      */
-    protected $signature = 'Recalculation';
+    protected $signature = 'Recalculation {date?}';
 
     /**
      * The console command description.
@@ -46,7 +46,11 @@ class Recalculation extends Command
      */
     public function handle()
     {   
-
+        // if ($this->argument('date')){
+        //   $dateNow = $this->argument('date');
+        // }else{
+        //   $dateNow = new Carbon(date('Y-m-d'));
+        // }
         $dateNow = new Carbon(date('Y-m-d'));
         $this->setDeliveries($dateNow); 
         $nds = 18;
@@ -71,7 +75,7 @@ class Recalculation extends Command
           	$dailyFixedNds = 0;
           	//фиксированный сбор
           	if ($dateOfFundingDiff == 1){
-	      		if ($fixed_charge_var){
+	      		 if ($fixed_charge_var){
 	                $fixed_charge_w_nds = $fixed_charge_var->commission_value;
 	                $dailyFixed = $fixed_charge_w_nds;
 	                $commission->fixed_charge = $dailyFixed;
