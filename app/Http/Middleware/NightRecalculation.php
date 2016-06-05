@@ -19,10 +19,9 @@ class NightRecalculation
     public function handle($request, Closure $next)
     {   
         $nowDate = new Carbon(date('Y-m-d'));
-        $chargeCommission = ChargeCommission::where('waybill_status',false)->first();
-        $chargeDate = new Carbon($chargeCommission->charge_date);
-        $dateOfFundingDiff = $chargeDate->diffInDays($nowDate,false);
-        if ($dateOfFundingDiff > 0){
+        $chargeCommission = ChargeCommission::where('waybill_status',false)->whereDate('charge_date','<',$nowDate)->get();
+        //$dateOfFundingDiff = $chargeDate->diffInDays($nowDate,false);
+        if (count($chargeCommission) > 0){
             return Redirect::to('recalculation');
             //return $next($request); 
         }else{

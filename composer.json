@@ -8,10 +8,12 @@
         "php": ">=5.5.9",
         "laravel/framework": "5.2.*",
         "laravelcollective/html": "~5.0",
-        "maatwebsite/excel": "~2.0",
+        "maatwebsite/excel": "~2.1.0",
+        "squizlabs/php_codesniffer": "^2.6",
         "doctrine/dbal": "^2.5",
         "nesbot/carbon": "~1.14",
-        "barryvdh/laravel-debugbar": "^2.1"
+        "barryvdh/laravel-debugbar": "^2.1",
+        "nekulin/phpexcel": "dev-master"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

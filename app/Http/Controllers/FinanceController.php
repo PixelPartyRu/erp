@@ -116,16 +116,21 @@ class FinanceController extends Controller
         $financeArray = Input::get('financeArray');
         $financingDate = Input::get('financingDate');
         $fundingDate = new Carbon($financingDate);
-        $lastBill = Bill::orderBy('bill_date','desc')->first();
-        $lastBillCarbon = new Carbon($lastBill->bill_date);
 
+        $lastBill = Bill::orderBy('bill_date','desc')->first();
+        if (count($lastBill) > 0){
+        	$lastBillCarbon = new Carbon($lastBill->bill_date);
+            $diffBillsDate = $lastBillCarbon->diffInDays($fundingDate,false);
+        }else{
+        	$diffBillsDate = 1;
+        }
+        
         $messageArray = [];
         foreach ($financeArray as $key){
           $finance = Finance::find($key);
           $registryDate = new Carbon($finance->date_of_registry);
           
           $diffDate = $registryDate->diffInDays($fundingDate,false);
-          $diffBillsDate = $lastBillCarbon->diffInDays($fundingDate,false);
 
           if ($diffBillsDate > 0){
             if ($diffDate >= 0){

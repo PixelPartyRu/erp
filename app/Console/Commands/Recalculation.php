@@ -46,12 +46,12 @@ class Recalculation extends Command
      */
     public function handle()
     {   
-        // if ($this->argument('date')){
-        //   $dateNow = $this->argument('date');
-        // }else{
-        //   $dateNow = new Carbon(date('Y-m-d'));
-        // }
-        $dateNow = new Carbon(date('Y-m-d'));
+        if ($this->argument('date')){
+          $dateNow = $this->argument('date');
+        }else{
+          $dateNow = new Carbon(date('Y-m-d'));
+        }
+
         $this->setDeliveries($dateNow); 
         $nds = 18;
         $deliveries = Delivery::where('state',false)->where('status','=','Профинансирована')->get();
@@ -61,8 +61,9 @@ class Recalculation extends Command
         	$relation = $delivery->relation;//связь
             $tariff = $relation->tariff;//тарифы
             $commission = $delivery->chargeCommission;
+            $commission->charge_date = $dateNow;
 
-        	$fixed_charge_var = $tariff->commissions->where('type','document')->first();
+        	  $fixed_charge_var = $tariff->commissions->where('type','document')->first();
             $percent_commission = $tariff->commissions->where('type','finance')->first();
             $udz_commission = $tariff->commissions->where('type','udz')->first();
             $penalty_commission = $tariff->commissions->where('type','peni')->first();

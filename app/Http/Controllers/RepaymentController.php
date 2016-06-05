@@ -215,9 +215,13 @@ class RepaymentController extends Controller
         $repayment = Repayment::find(Input::get('id'));
         $repaymentDate = new Carbon($repayment->date);
         $lastBill = Bill::orderBy('bill_date','desc')->first();
-        $lastBillCarbon = new Carbon($lastBill->bill_date);
-        
-        $diffBillsDate = $lastBillCarbon->diffInDays($repaymentDate,false);
+
+        if (count($lastBill) > 0){
+        	$lastBillCarbon = new Carbon($lastBill->bill_date);
+        	$diffBillsDate = $lastBillCarbon->diffInDays($repaymentDate,false);
+        }else{
+        	$diffBillsDate = 1;
+        }
 
         if ($diffBillsDate > 0){
             if ($repayment->balance > 0){
@@ -1032,6 +1036,7 @@ class RepaymentController extends Controller
         $nds = 18;
         $dateNow = new Carbon(date('Y-m-d'));
         $dateOfRepayment = new Carbon($repayment->date);
+        $fixedCharge = false;
 
         $delivery = Delivery::find($deliveryId);
         $relation = $delivery->relation;//связь
@@ -1043,10 +1048,16 @@ class RepaymentController extends Controller
         $percent_commission = $tariff->commissions->where('type','finance')->first();
         $udz_commission = $tariff->commissions->where('type','udz')->first();
         $penalty_commission = $tariff->commissions->where('type','peni')->first();
+        $fixed_commission = $tariff->commissions()->where('type','document')->first();
 
         $dateOfRecourse = new Carbon($delivery->date_of_recourse);
 
         $dateOfRepaymentDiff = $dateOfRepayment->diffInDays($dateNow,false);
+        $dateOfRepaymentFundingDiff = $dateOfFunding->diffInDays($dateOfRepayment,false);
+
+        if($dateOfRepaymentFundingDiff <= 0){
+            $fixedCharge = true;
+        }
 
         for($i=0;$i<$dateOfRepaymentDiff;$i++){
             $dailyArray = [];
@@ -1058,6 +1069,18 @@ class RepaymentController extends Controller
 
             $dailyFixed = 0;
             $dailyFixedNds = 0;
+
+            if (($fixedCharge == true) && ($i == 0)){
+                if ($fixed_commission){
+                    $fixed_charge_w_nds = $fixed_commission->commission_value;
+                    $dailyFixed = $fixed_charge_w_nds;
+
+                    if ($fixed_commission->nds == true){
+                        $fixed_charge_nds = ($fixed_charge_w_nds / 100.00) * $nds;
+                        $dailyFixedNds = $fixed_charge_nds;
+                    }
+                }
+            }
 
             $dailyPercent = 0;
             $dailyPercentNds = 0;
