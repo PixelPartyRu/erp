@@ -23,7 +23,7 @@ class CreateAgreementsTable extends Migration
             $table->string('description',100);
             $table->boolean('active')->default(true);
 
-            $table->integer('client_id')->unsigned();
+            $table->bigInteger('client_id')->unsigned();
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
 
             $table->timestamps();

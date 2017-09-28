@@ -14,7 +14,7 @@ class AddAgreementsToRelationTable extends Migration
     {
         Schema::table('relations', function($table)
         {
-            $table->integer('agreement_id')->unsigned();
+            $table->bigInteger('agreement_id')->unsigned();
             $table->foreign('agreement_id')->references('id')->on('agreements')->onDelete('cascade');
         });
     }

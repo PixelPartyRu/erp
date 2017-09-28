@@ -19,7 +19,7 @@ class CreateRepaymentInvoicesTable extends Migration
 
             $table->float('sum');
             $table->string('type',50)->nullable();
-            $table->integer('repayment_id')->unsigned();
+            $table->bigInteger('repayment_id')->unsigned();
             $table->foreign('repayment_id')->references('id')->on('repayments')->onDelete('cascade');
             $table->timestamps();
         });

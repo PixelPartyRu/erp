@@ -16,7 +16,7 @@ class AddInBillAgreement extends Migration
         Schema::table('bills', function(Blueprint $table)
         {   
             $table->dropColumn('agreement'); 
-            $table->integer('agreement_id')->unsigned();
+            $table->bigInteger('agreement_id')->unsigned();
             $table->foreign('agreement_id')->references('id')->on('agreements');
         });
     }

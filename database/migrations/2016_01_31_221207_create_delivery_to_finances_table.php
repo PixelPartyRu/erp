@@ -16,7 +16,7 @@ class CreateDeliveryToFinancesTable extends Migration
             $table->increments('id');
             $table->integer('delivery_id')->unsigned();
             $table->foreign('delivery_id')->references('id')->on('deliveries');
-            $table->integer('finance_id')->unsigned();
+            $table->bigInteger('finance_id')->unsigned();
             $table->foreign('finance_id')->references('id')->on('finances')->onDelete('cascade');
             $table->timestamps();
         });

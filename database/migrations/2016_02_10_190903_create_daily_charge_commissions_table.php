@@ -33,7 +33,7 @@ class CreateDailyChargeCommissionsTable extends Migration
             $table->integer('delivery_id')->unsigned();
             $table->foreign('delivery_id')->references('id')->on('deliveries');
 
-            $table->integer('charge_commission_id')->unsigned();
+            $table->bigInteger('charge_commission_id')->unsigned();
             $table->foreign('charge_commission_id')->references('id')->on('charge_commissions');
 
             $table->timestamps();

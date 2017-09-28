@@ -19,7 +19,7 @@ class CreateBillsTable extends Migration
             $table->float('nds');
             $table->float('with_nds');
             $table->float('without_nds');
-            $table->integer('client_id')->unsigned();
+            $table->bigInteger('client_id')->unsigned();
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
             $table->timestamps();
         });

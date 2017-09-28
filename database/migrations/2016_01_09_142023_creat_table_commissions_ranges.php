@@ -17,7 +17,7 @@ class CreatTableCommissionsRanges extends Migration
             $table->integer('min')->nullable();
             $table->integer('max')->nullable();
             $table->float('value')->nullable();
-            $table->integer('commission_id')->unsigned();
+            $table->bigInteger('commission_id')->unsigned();
             $table->foreign('commission_id')->references('id')->on('commissions');
             $table->timestamps();
         });

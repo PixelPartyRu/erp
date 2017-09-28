@@ -31,7 +31,7 @@ class CreateChargeCommissionViewsTable extends Migration
             $table->date('date_of_funding')->nullable();
             $table->string('waybill_status')->nullable();
 
-            $table->integer('charge_commission_id')->unsigned();
+            $table->bigInteger('charge_commission_id')->unsigned();
             $table->foreign('charge_commission_id')->references('id')->on('charge_commissions');
 
             $table->timestamps();

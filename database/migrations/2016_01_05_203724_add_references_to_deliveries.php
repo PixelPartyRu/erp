@@ -14,7 +14,7 @@ class AddReferencesToDeliveries extends Migration
     {
         Schema::table('deliveries', function(Blueprint $table)
         {
-            $table->integer('relation_id')->unsigned();
+            $table->bigInteger('relation_id')->unsigned();
             $table->foreign('relation_id')->references('id')->on('relations')->onDelete('cascade'); 
         });
     }

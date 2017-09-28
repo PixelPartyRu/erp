@@ -23,7 +23,7 @@ class CreateCommissionTable extends Migration
             $table->boolean('rate_stitching')->default(false);
             $table->boolean('time_of_settlement')->default(false);
             $table->float('commission_value')->nullable(); 
-            $table->integer('tariff_id')->unsigned();
+            $table->bigInteger('tariff_id')->unsigned();
             $table->foreign('tariff_id')->references('id')->on('tariffs');
             $table->timestamps();
             

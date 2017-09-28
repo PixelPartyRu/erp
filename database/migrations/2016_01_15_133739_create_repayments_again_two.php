@@ -14,7 +14,6 @@ class CreateRepaymentsAgainTwo extends Migration
     {
         Schema::create('repayments', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('number');
             $table->date('date')->nullable();
             $table->string('info',100)->nullable();
             $table->bigInteger('inn');
@@ -24,10 +23,10 @@ class CreateRepaymentsAgainTwo extends Migration
             $table->bigInteger('recepientInn')->nullable();
             $table->integer('type');
 
-            $table->integer('client_id')->nullable()->unsigned();
+            $table->bigInteger('client_id')->nullable()->unsigned();
             $table->foreign('client_id')->references('id')->on('clients');
 
-            $table->integer('debtor_id')->nullable()->unsigned();
+            $table->bigInteger('debtor_id')->nullable()->unsigned();
             $table->foreign('debtor_id')->references('id')->on('debtors');
             $table->timestamps();
         });

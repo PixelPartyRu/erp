@@ -13,7 +13,7 @@ class AddToDayli extends Migration
     public function up()
     {
         Schema::table('daily_charge_commissions', function (Blueprint $table) {
-            $table->integer('repayment_id')->nullable()->unsigned();
+            $table->bigInteger('repayment_id')->nullable()->unsigned();
             $table->foreign('repayment_id')->references('id')->on('repayments');
 
             $table->float('repayment_sum')->nullable();//

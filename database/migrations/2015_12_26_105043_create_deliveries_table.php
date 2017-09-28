@@ -14,9 +14,9 @@ class CreateDeliveriesTable extends Migration
     {
         Schema::create('deliveries', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('client_id')->unsigned();
+            $table->bigInteger('client_id')->unsigned();
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
-            $table->integer('debtor_id')->unsigned();
+            $table->bigInteger('debtor_id')->unsigned();
             $table->foreign('debtor_id')->references('id')->on('debtors')->onDelete('cascade');
 
             $table->string('waybill',50);

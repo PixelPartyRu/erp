@@ -14,7 +14,7 @@ class TariffIdToRelation extends Migration
     {
         Schema::table('relations', function($table){
 
-            $table->integer('tariff_id')->nullable()->unsigned();
+            $table->bigInteger('tariff_id')->nullable()->unsigned();
             $table->foreign('tariff_id')->references('id')->on('tariffs');
 
         });

@@ -23,10 +23,10 @@ class CreateRepaymentsTable extends Migration
             $table->float('balance');
             $table->string('purpose_of_payment',300)->nullable();
 
-            $table->integer('client_id')->nullable()->unsigned();
+            $table->bigInteger('client_id')->nullable()->unsigned();
             $table->foreign('client_id')->references('id')->on('clients');
 
-            $table->integer('debtor_id')->nullable()->unsigned();
+            $table->bigInteger('debtor_id')->nullable()->unsigned();
             $table->foreign('debtor_id')->references('id')->on('debtors');
             
             $table->timestamps();

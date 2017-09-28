@@ -15,10 +15,10 @@ class AddLinkToVire extends Migration
         Schema::table('charge_commission_views', function(Blueprint $table)
         {   
             $table->dropColumn(['client', 'debtor']);
-            $table->integer('client_id')->unsigned()->nullable();
+            $table->bigInteger('client_id')->unsigned()->nullable();
             $table->foreign('client_id')->references('id')->on('clients');
 
-            $table->integer('debtor_id')->unsigned()->nullable();
+            $table->bigInteger('debtor_id')->unsigned()->nullable();
             $table->foreign('debtor_id')->references('id')->on('debtors');
         });
     }

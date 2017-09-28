@@ -29,16 +29,16 @@ class CreateRelationsTable extends Migration
             $table->integer('regress_period');
             $table->string('regress_period_type',10);
 
-            $table->integer('client_id')->unsigned();
+            $table->bigInteger('client_id')->unsigned();
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('cascade');
 
-            $table->integer('original_document_id')->unsigned();
+            $table->bigInteger('original_document_id')->unsigned();
             $table->foreign('original_document_id')->references('id')->on('original_documents')->onDelete('cascade');
 
-            $table->integer('contract_id')->unsigned();
+            $table->bigInteger('contract_id')->unsigned();
             $table->foreign('contract_id')->references('id')->on('contracts')->onDelete('cascade');
 
-            $table->integer('debtor_id')->unsigned();
+            $table->bigInteger('debtor_id')->unsigned();
             $table->foreign('debtor_id')->references('id')->on('debtors')->onDelete('cascade');
 
             $table->timestamps();
